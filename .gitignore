@@ -43,3 +43,7 @@ appsettings.Development.json
 # Build outputs
 *.dll
 *.exe
+
+# Local recovery notes (do not publish)
+repair-management-app/CHAT_HISTORY_RECOVERY.md
+repair-management-app/PROJECT_RECOVERY_STATUS.md
