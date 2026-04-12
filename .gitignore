@@ -1,0 +1,45 @@
+# .NET / C#
+bin/
+obj/
+.vs/
+.vscode/
+*.user
+*.suo
+*.sln.docstates
+*.userprefs
+.DS_Store
+*.log
+*.swp
+*.swo
+
+# Entity Framework
+Migrations/*
+!Migrations/.gitkeep
+*.db
+*.db-shm
+*.db-wal
+
+# Node / React / Vite
+node_modules/
+dist/
+build/
+.env.local
+.env.*.local
+*.pem
+
+# IDE
+.idea/
+*.iml
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Environment variables (never commit secrets)
+appsettings.Development.json
+.env
+.env.local
+
+# Build outputs
+*.dll
+*.exe
