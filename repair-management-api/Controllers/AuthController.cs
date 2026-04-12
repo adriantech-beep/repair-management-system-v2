@@ -21,15 +21,6 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<ActionResult<LoginResponseDto>> Login([FromBody] LoginRequestDto request)
     {
-        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
-        {
-            return BadRequest(new
-            {
-                code = "VALIDATION_ERROR",
-                message = "Email and password are required."
-            });
-        }
-
         var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
         var deviceInfo = Request.Headers.UserAgent.ToString();
 
@@ -50,15 +41,6 @@ public class AuthController : ControllerBase
     [HttpPost("refresh")]
     public async Task<ActionResult<LoginResponseDto>> Refresh([FromBody] RefreshTokenRequestDto request)
     {
-        if (string.IsNullOrWhiteSpace(request.RefreshToken))
-        {
-            return BadRequest(new
-            {
-                code = "VALIDATION_ERROR",
-                message = "Refresh token is required."
-            });
-        }
-
         var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
         var deviceInfo = Request.Headers.UserAgent.ToString();
 
@@ -80,15 +62,6 @@ public class AuthController : ControllerBase
     [Authorize]
     public async Task<IActionResult> Logout([FromBody] RefreshTokenRequestDto request)
     {
-        if (string.IsNullOrWhiteSpace(request.RefreshToken))
-        {
-            return BadRequest(new
-            {
-                code = "VALIDATION_ERROR",
-                message = "Refresh token is required."
-            });
-        }
-
         await _authService.LogoutAsync(request);
 
         return NoContent();
@@ -98,19 +71,6 @@ public class AuthController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<AuthUserDto>> CreateUser([FromBody] CreateUserRequestDto request)
     {
-        // Validate required fields
-        if (string.IsNullOrWhiteSpace(request.FullName) 
-            || string.IsNullOrWhiteSpace(request.Email) 
-            || string.IsNullOrWhiteSpace(request.Password)
-            || string.IsNullOrWhiteSpace(request.Role))
-        {
-            return BadRequest(new
-            {
-                code = "VALIDATION_ERROR",
-                message = "FullName, Email, Password, and Role are required."
-            });
-        }
-
         var result = await _authService.CreateUserAsync(request);
 
         if (result is null)

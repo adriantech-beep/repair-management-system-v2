@@ -34,6 +34,20 @@ For protected endpoints:
 
 `Authorization: Bearer <accessToken>`
 
+## Validation Error Format
+
+For request payload validation failures, API returns `400 Bad Request` with:
+
+```json
+{
+  "code": "VALIDATION_ERROR",
+  "message": "One or more validation errors occurred.",
+  "errors": {
+    "FieldName": ["Validation message 1", "Validation message 2"]
+  }
+}
+```
+
 ## Endpoint Contract
 
 ## 1) POST /api/auth/login
