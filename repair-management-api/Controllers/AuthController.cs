@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using RepairManagementApi.DTOs;
 using RepairManagementApi.Services;
 using System.IdentityModel.Tokens.Jwt;
@@ -19,6 +20,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
+    [EnableRateLimiting("login")]
     public async Task<ActionResult<LoginResponseDto>> Login([FromBody] LoginRequestDto request)
     {
         var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();

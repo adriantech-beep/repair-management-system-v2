@@ -82,6 +82,15 @@ Failure:
 }
 ```
 
+- `429 Too Many Requests` when login rate limit is exceeded:
+
+```json
+{
+  "code": "AUTH_RATE_LIMITED",
+  "message": "Too many login attempts. Please try again later."
+}
+```
+
 ## 2) POST /api/auth/refresh
 
 Purpose: Exchange valid refresh token for a new token pair (rotation).
