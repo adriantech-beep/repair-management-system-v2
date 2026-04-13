@@ -1,0 +1,295 @@
+{
+  "info": {
+    "name": "Repair Management - Auth v1",
+    "description": "Auth regression suite. Run requests top to bottom in order. Import RepairManagement-Dev.postman_environment.json first.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Login as Admin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Verify login succeeded and extract tokens into environment variables.",
+              "// Every request below relies on accessToken and refreshToken being set here.",
+              "pm.test('Status is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response contains access token and refresh token', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.accessToken).to.be.a('string').and.not.be.empty;",
+              "    pm.expect(body.refreshToken).to.be.a('string').and.not.be.empty;",
+              "    pm.environment.set('accessToken', body.accessToken);",
+              "    pm.environment.set('refreshToken', body.refreshToken);",
+              "});",
+              "",
+              "pm.test('User profile in response has correct role', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.user.role).to.equal('Admin');",
+              "    pm.expect(body.user.email).to.equal('admin@repairmanagement.local');",
+              "});",
+              "",
+              "pm.test('Response time is acceptable', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(3000);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@repairmanagement.local\",\n  \"password\": \"AdminPassword123!\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "2. Get Current User (me)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Proves the access token from step 1 works on a protected endpoint.",
+              "// Also confirms only safe fields are returned (no passwordHash etc).",
+              "pm.test('Status is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Profile contains only safe fields', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body).to.have.property('id');",
+              "    pm.expect(body).to.have.property('fullName');",
+              "    pm.expect(body).to.have.property('email');",
+              "    pm.expect(body).to.have.property('role');",
+              "    pm.expect(body).to.not.have.property('passwordHash');",
+              "    pm.expect(body).to.not.have.property('failedLoginAttempts');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/me",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "me"]
+        }
+      }
+    },
+    {
+      "name": "3. Create Technician (Admin only)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Proves Admin can create a Technician account.",
+              "// A 403 here means the bearer token does not carry Admin role.",
+              "// A 409 here means the email already exists in the database.",
+              "pm.test('Status is 201 Created', function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test('Created user has correct role and no sensitive data', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.role).to.equal('Technician');",
+              "    pm.expect(body.email).to.equal('john@repairmanagement.local');",
+              "    pm.expect(body).to.not.have.property('passwordHash');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"John Technician\",\n  \"email\": \"john@repairmanagement.local\",\n  \"password\": \"TechPassword123!\",\n  \"role\": \"Technician\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/users",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "users"]
+        }
+      }
+    },
+    {
+      "name": "4. Refresh Token (rotation)",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Save the current refreshToken as oldRefreshToken BEFORE the request.",
+              "// After rotation, the old token must be rejected (tested in step 5).",
+              "pm.environment.set('oldRefreshToken', pm.environment.get('refreshToken'));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Proves token rotation works: new pair is issued, new tokens are saved.",
+              "pm.test('Status is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('New tokens are returned and different from old ones', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.accessToken).to.be.a('string').and.not.be.empty;",
+              "    pm.expect(body.refreshToken).to.be.a('string').and.not.be.empty;",
+              "    pm.expect(body.refreshToken).to.not.equal(pm.environment.get('oldRefreshToken'));",
+              "    pm.environment.set('accessToken', body.accessToken);",
+              "    pm.environment.set('refreshToken', body.refreshToken);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/refresh",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "refresh"]
+        }
+      }
+    },
+    {
+      "name": "5. Reuse Old Refresh Token (should fail)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Proves rotation is enforced: the pre-rotation token cannot be reused.",
+              "// oldRefreshToken was saved in step 4's pre-request script.",
+              "pm.test('Status is 401 Unauthorized', function () {",
+              "    pm.response.to.have.status(401);",
+              "});",
+              "",
+              "pm.test('Error code is AUTH_INVALID_REFRESH_TOKEN', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.code).to.equal('AUTH_INVALID_REFRESH_TOKEN');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"refreshToken\": \"{{oldRefreshToken}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/refresh",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "refresh"]
+        }
+      }
+    },
+    {
+      "name": "6. Logout",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Revokes the current refreshToken.",
+              "// After this, refreshToken in the environment is dead.",
+              "// Step 7 proves it cannot be reused.",
+              "pm.test('Status is 204 No Content', function () {",
+              "    pm.response.to.have.status(204);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/logout",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "logout"]
+        }
+      }
+    },
+    {
+      "name": "7. Refresh After Logout (should fail)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Proves logout revocation works: the revoked token cannot generate new sessions.",
+              "pm.test('Status is 401 Unauthorized', function () {",
+              "    pm.response.to.have.status(401);",
+              "});",
+              "",
+              "pm.test('Error code is AUTH_INVALID_REFRESH_TOKEN', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.code).to.equal('AUTH_INVALID_REFRESH_TOKEN');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/refresh",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "refresh"]
+        }
+      }
+    }
+  ]
+}
