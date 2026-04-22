@@ -1,0 +1,407 @@
+{
+  "info": {
+    "name": "Repair Management - Inventory + Waitlist v1",
+    "description": "Inventory and waitlist regression suite. Run requests top to bottom in order after importing the Dev environment.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Login as Admin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Admin tokens are saved', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.accessToken).to.be.a('string').and.not.be.empty;",
+              "    pm.expect(body.refreshToken).to.be.a('string').and.not.be.empty;",
+              "    pm.environment.set('accessToken', body.accessToken);",
+              "    pm.environment.set('refreshToken', body.refreshToken);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@repairmanagement.local\",\n  \"password\": \"AdminPassword123!\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "2. Create Technician User (Admin)",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const suffix = Date.now();",
+              "pm.environment.set('technicianEmail', `tech.${suffix}@repairmanagement.local`);",
+              "pm.environment.set('technicianPassword', 'TechPassword123!');"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 201 Created', function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test('Technician user is created', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.role).to.equal('Technician');",
+              "    pm.expect(body.email).to.equal(pm.environment.get('technicianEmail'));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Waitlist Technician\",\n  \"email\": \"{{technicianEmail}}\",\n  \"password\": \"{{technicianPassword}}\",\n  \"role\": \"Technician\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/users",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "users"]
+        }
+      }
+    },
+    {
+      "name": "3. Login as Technician",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Technician access token is saved', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.accessToken).to.be.a('string').and.not.be.empty;",
+              "    pm.environment.set('technicianAccessToken', body.accessToken);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{technicianEmail}}\",\n  \"password\": \"{{technicianPassword}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "4. Create Out-of-Stock Part (Admin)",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const suffix = Date.now();",
+              "pm.environment.set('partNumber', `PRT-WAIT-${suffix}`);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 201 Created', function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test('Part id is saved and stock starts at 0', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.id).to.be.a('string').and.not.be.empty;",
+              "    pm.expect(body.stockQuantity).to.equal(0);",
+              "    pm.environment.set('partId', body.id);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"partNumber\": \"{{partNumber}}\",\n  \"name\": \"Charging Port Flex\",\n  \"category\": \"Charging Port\",\n  \"stockQuantity\": 0,\n  \"supplierPrice\": 120.00,\n  \"sellingPrice\": 250.00\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/parts",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "parts"]
+        }
+      }
+    },
+    {
+      "name": "5. Add Waitlist Request (Technician)",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const suffix = Date.now();",
+              "pm.environment.set('customerEmail', `customer.${suffix}@example.com`);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 201 Created', function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test('Waitlist request is pending', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.partId).to.equal(pm.environment.get('partId'));",
+              "    pm.expect(body.status).to.equal('Pending');",
+              "    pm.environment.set('waitlistRequestId', body.id);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{technicianAccessToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customerName\": \"Juan Dela Cruz\",\n  \"customerEmail\": \"{{customerEmail}}\",\n  \"customerPhone\": \"09171234567\",\n  \"preferredContactMethod\": \"Email\",\n  \"notes\": \"Please notify once stock arrives\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/parts/{{partId}}/waitlist",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "parts", "{{partId}}", "waitlist"]
+        }
+      }
+    },
+    {
+      "name": "6. Duplicate Waitlist Request (should fail)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 409 Conflict', function () {",
+              "    pm.response.to.have.status(409);",
+              "});",
+              "",
+              "pm.test('Error code is DUPLICATE_WAITLIST_REQUEST', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.code).to.equal('DUPLICATE_WAITLIST_REQUEST');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{technicianAccessToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customerName\": \"Juan Dela Cruz\",\n  \"customerEmail\": \"{{customerEmail}}\",\n  \"customerPhone\": \"09171234567\",\n  \"preferredContactMethod\": \"Email\",\n  \"notes\": \"Duplicate should be rejected\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/parts/{{partId}}/waitlist",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "parts", "{{partId}}", "waitlist"]
+        }
+      }
+    },
+    {
+      "name": "7. Restock Part (Admin)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Stock quantity updates to 5', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.stockQuantity).to.equal(5);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"newQuantity\": 5,\n  \"reason\": \"New supplier delivery\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/parts/{{partId}}/stock",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "parts", "{{partId}}", "stock"]
+        }
+      }
+    },
+    {
+      "name": "8. Get Notified Waitlist by Part",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('At least one waitlist entry is Notified', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body).to.be.an('array');",
+              "    pm.expect(body.length).to.be.greaterThan(0);",
+              "    pm.expect(body[0].status).to.equal('Notified');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/parts/{{partId}}/waitlist?status=Notified",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "parts", "{{partId}}", "waitlist"],
+          "query": [{ "key": "status", "value": "Notified" }]
+        }
+      }
+    },
+    {
+      "name": "9. Technician Create Part (should fail 403)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 403 Forbidden', function () {",
+              "    pm.response.to.have.status(403);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{technicianAccessToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"partNumber\": \"PRT-TECH-FORBIDDEN\",\n  \"name\": \"Battery Pack\",\n  \"category\": \"Battery\",\n  \"stockQuantity\": 1,\n  \"supplierPrice\": 200.00,\n  \"sellingPrice\": 350.00\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/parts",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "parts"]
+        }
+      }
+    },
+    {
+      "name": "10. Create Part Without Token (should fail 401)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 401 Unauthorized', function () {",
+              "    pm.response.to.have.status(401);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"partNumber\": \"PRT-NO-TOKEN\",\n  \"name\": \"LCD Assembly\",\n  \"category\": \"LCD\",\n  \"stockQuantity\": 1,\n  \"supplierPrice\": 300.00,\n  \"sellingPrice\": 500.00\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/parts",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "parts"]
+        }
+      }
+    }
+  ]
+}

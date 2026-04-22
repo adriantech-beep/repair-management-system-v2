@@ -5,6 +5,7 @@ using System.Threading.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Text.Json.Serialization;
 using RepairManagementApi.Data;
 using RepairManagementApi.Services;
 var builder = WebApplication.CreateBuilder(args);
@@ -21,8 +22,17 @@ builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+builder.Services.AddScoped<IWaitlistService, WaitlistService>();
 
-builder.Services.AddControllers();
+builder.Services.AddScoped<IInventoryService, InventoryService>();
+
+builder.Services.AddScoped<INotificationService, LoggingNotificationService>();
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
