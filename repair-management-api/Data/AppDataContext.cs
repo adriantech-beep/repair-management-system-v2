@@ -15,6 +15,7 @@ public class AppDbContext : DbContext
     public DbSet<Part> Parts => Set<Part>();
     public DbSet<PartCompatibility> PartCompatibilities => Set<PartCompatibility>();
     public DbSet<PartWaitlistRequest> PartWaitlistRequests => Set<PartWaitlistRequest>();
+    public DbSet<Branch> Branches => Set<Branch>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -59,6 +60,34 @@ public class AppDbContext : DbContext
                 .WithMany(u => u.RefreshTokens)
                 .HasForeignKey(r => r.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Branch>(entity =>
+        {
+            entity.HasKey(b => b.Id);
+
+            entity.Property(b => b.Code)
+                .IsRequired()
+                .HasMaxLength(20);
+
+            entity.HasIndex(b => b.Code)
+                .IsUnique();
+
+            entity.Property(b => b.Name)
+                .IsRequired()
+                .HasMaxLength(120);
+
+            entity.HasIndex(b => b.Name)
+                .IsUnique();
+
+            entity.Property(b => b.Address)
+                .HasMaxLength(300);
+
+            entity.Property(b => b.CreatedAtUtc)
+                .IsRequired();
+
+            entity.Property(b => b.UpdatedAtUtc)
+                .IsRequired();
         });
 
 
