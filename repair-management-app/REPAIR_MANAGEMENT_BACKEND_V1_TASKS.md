@@ -123,7 +123,7 @@ Acceptance criteria:
 - Admin override policy is explicit and tested
 - Unauthorized cross-branch access returns 403/404 as appropriate
 
-Status: TODO
+Status: BLOCKED
 Branch name: ticket-b3-branch-access-policy
 Commit template: feat(authz): enforce branch scoped access
 
@@ -152,7 +152,7 @@ Acceptance criteria:
 - Branch relationship configured
 - Migration applies successfully
 
-Status: TODO
+Status: IN_PROGRESS
 Branch name: ticket-c1-customer-model
 Commit template: feat(customer): add customer model and mapping
 

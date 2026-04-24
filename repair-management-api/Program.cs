@@ -28,6 +28,9 @@ builder.Services.AddScoped<IInventoryService, InventoryService>();
 
 builder.Services.AddScoped<INotificationService, LoggingNotificationService>();
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IBranchContext, BranchContext>();
+
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
