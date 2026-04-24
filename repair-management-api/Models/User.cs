@@ -27,4 +27,7 @@ public class User
     public DateTime UpdatedAtUtc { get; set; } = DateTime.UtcNow;
 
     public List<RefreshToken> RefreshTokens { get; set; } = [];
+
+    public Guid? BranchId { get; set; }
+    public Branch? Branch { get; set; }
 }

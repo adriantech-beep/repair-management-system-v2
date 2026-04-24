@@ -86,7 +86,8 @@ public class AuthService : IAuthService
                 Id = user.Id,
                 FullName = user.FullName,
                 Email = user.Email,
-                Role = user.Role.ToString()
+                Role = user.Role.ToString(),
+                BranchId = user.BranchId
             }
         };
     }
@@ -105,7 +106,8 @@ public class AuthService : IAuthService
             Id = user.Id,
             FullName = user.FullName,
             Email = user.Email,
-            Role = user.Role.ToString()
+            Role = user.Role.ToString(),
+            BranchId = user.BranchId
         };
     }
 
@@ -149,7 +151,8 @@ public class AuthService : IAuthService
                 Id = storedToken.User.Id,
                 FullName = storedToken.User.FullName,
                 Email = storedToken.User.Email,
-                Role = storedToken.User.Role.ToString()
+                Role = storedToken.User.Role.ToString(),
+                BranchId = storedToken.User.BranchId
             }
         };
     }
@@ -185,6 +188,9 @@ public class AuthService : IAuthService
         // Hash password
         var passwordHash = _passwordHasher.Hash(request.Password);
 
+        var branchExists = await _db.Branches.AnyAsync(b => b.Id == request.BranchId);
+        if (!branchExists) return null;
+
         // Create new user with secure defaults
         var newUser = new User
         {
@@ -198,7 +204,8 @@ public class AuthService : IAuthService
             LockoutEndUtc = null,
             MustChangePassword = true,
             CreatedAtUtc = DateTime.UtcNow,
-            UpdatedAtUtc = DateTime.UtcNow
+            UpdatedAtUtc = DateTime.UtcNow,
+            BranchId = request.BranchId,
         };
 
         _db.Users.Add(newUser);
@@ -209,7 +216,8 @@ public class AuthService : IAuthService
             Id = newUser.Id,
             FullName = newUser.FullName,
             Email = newUser.Email,
-            Role = newUser.Role.ToString()
+            Role = newUser.Role.ToString(),
+            BranchId = newUser.BranchId
         };
     }
 }

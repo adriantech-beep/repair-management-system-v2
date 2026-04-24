@@ -13,4 +13,6 @@ public class Branch
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
 
     public DateTime UpdatedAtUtc { get; set; } = DateTime.UtcNow;
+
+    public List<User> Users { get; set; } = [];
 }

@@ -43,6 +43,13 @@ public class AppDbContext : DbContext
             entity.Property(u => u.Role)
                 .IsRequired()
                 .HasConversion<string>();
+
+            entity.HasIndex(u => u.BranchId);
+            
+            entity.HasOne(u => u.Branch)
+            .WithMany(b => b.Users)
+            .HasForeignKey(u => u.BranchId)
+            .OnDelete(DeleteBehavior.    Restrict);   
         });
 
         // RefreshToken configuration
