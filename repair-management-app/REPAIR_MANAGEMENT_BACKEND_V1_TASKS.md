@@ -91,7 +91,7 @@ Acceptance criteria:
 - CreatedAtUtc and UpdatedAtUtc are tracked
 - Migration applies successfully
 
-Status: IN_PROGRESS
+Status: Done
 Branch name: ticket-b1-branch-entity
 Commit template: feat(branch): add branch entity and mapping
 
@@ -107,7 +107,7 @@ Acceptance criteria:
 - Existing auth user queries include branch context
 - Migration applies cleanly
 
-Status: TODO
+Status: DONE
 Branch name: ticket-b2-user-branch-mapping
 Commit template: feat(auth): add user branch mapping
 

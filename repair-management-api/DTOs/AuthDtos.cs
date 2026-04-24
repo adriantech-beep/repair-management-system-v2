@@ -19,6 +19,7 @@ public class AuthUserDto
     public string FullName { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string Role { get; set; } = string.Empty;
+    public Guid? BranchId { get; set; }
 }
 
 public class LoginResponseDto
@@ -53,4 +54,7 @@ public class CreateUserRequestDto
     [Required]
     [RegularExpression("^(Admin|Technician|admin|technician)$")]
     public string Role { get; set; } = string.Empty;
+
+    [Required]
+    public Guid BranchId { get; set; }
 }

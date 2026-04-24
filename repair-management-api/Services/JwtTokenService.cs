@@ -34,6 +34,8 @@ public class JwtTokenService : IJwtTokenService
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
+       
+
         var claims = new List<Claim>
         {
             new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
@@ -41,6 +43,11 @@ public class JwtTokenService : IJwtTokenService
             new(ClaimTypes.Role, user.Role.ToString()),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
+
+        if (user.BranchId.HasValue)
+        {
+        claims.Add(new Claim("branch_id", user.BranchId.Value.ToString()));
+        }
 
         var token = new JwtSecurityToken(
             issuer: issuer,
