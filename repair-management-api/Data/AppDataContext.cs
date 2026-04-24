@@ -1,3 +1,6 @@
+using System.Reflection.Metadata;
+using System.Runtime.InteropServices.Marshalling;
+using System.Security.AccessControl;
 using Microsoft.EntityFrameworkCore;
 using RepairManagementApi.Models;
 
@@ -16,6 +19,7 @@ public class AppDbContext : DbContext
     public DbSet<PartCompatibility> PartCompatibilities => Set<PartCompatibility>();
     public DbSet<PartWaitlistRequest> PartWaitlistRequests => Set<PartWaitlistRequest>();
     public DbSet<Branch> Branches => Set<Branch>();
+    public DbSet<Customer> Customers => Set<Customer>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -182,5 +186,29 @@ public class AppDbContext : DbContext
                 .HasForeignKey(w => w.PartId)
                 .OnDelete(DeleteBehavior.Cascade);
 });
+    modelBuilder.Entity<Customer>(entity =>
+    {
+        entity.HasKey(c => c.Id);
+        entity.Property(c => c.FullName)
+            .IsRequired()
+            .HasMaxLength(100);
+        entity.Property(c => c.Phone)
+            .IsRequired()  
+            .HasMaxLength(20);
+        entity.Property(c => c.Email)
+            .HasMaxLength(256);
+        entity.Property(c => c.Address)
+            .HasMaxLength(300);
+        entity.HasIndex(c => c.BranchId);
+        entity.HasOne(c => c.Branch)
+            .WithMany(b => b.Customers)
+            .HasForeignKey(c => c.BranchId)
+            .OnDelete(DeleteBehavior.Restrict);
+    
+    
+});
+    
+    
+    
     }
 }
