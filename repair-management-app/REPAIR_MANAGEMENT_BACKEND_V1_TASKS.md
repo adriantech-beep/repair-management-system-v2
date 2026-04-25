@@ -168,7 +168,7 @@ Acceptance criteria:
 - Standard validation error response format is preserved
 - DTOs cover list and detail scenarios
 
-Status: TODO
+Status: DONE
 Branch name: ticket-c2-customer-dtos
 Commit template: feat(customer): add customer dtos and validation
 
@@ -186,7 +186,7 @@ Acceptance criteria:
 - List customers with search
 - Duplicate phone policy is defined and enforced
 
-Status: TODO
+Status: DONE
 Branch name: ticket-c3-customer-service
 Commit template: feat(customer): implement customer service
 

@@ -31,6 +31,8 @@ builder.Services.AddScoped<INotificationService, LoggingNotificationService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IBranchContext, BranchContext>();
 
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
