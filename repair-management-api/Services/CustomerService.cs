@@ -14,6 +14,8 @@ public interface ICustomerService
     Task<List<CustomerResponseDto>> GetCustomersAsync(Guid branchId, string? search);
     Task<CustomerResponseDto?> UpdateCustomerAsync(Guid customerId, UpdateCustomerRequestDto request);
 
+    Task<CustomerResponseDto?> GetCustomerByIdAsync(Guid customerId);
+
 }
 
 public class CustomerService : ICustomerService
@@ -108,7 +110,7 @@ public class CustomerService : ICustomerService
 
         if (customer.Phone != request.Phone)
         {
-            var duplicatePhone = await _db.Customers.AnyAsync(c => c.Phone == request.Phone);
+            var duplicatePhone = await _db.Customers.AnyAsync(c => c.Id != customerId && c.BranchId == customer.BranchId && c.Phone == request.Phone);
             if (duplicatePhone)
             {
                 throw new InvalidOperationException("Duplicate_Phone_Number.");

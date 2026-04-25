@@ -202,7 +202,7 @@ Acceptance criteria:
 - Role permissions enforced
 - Status codes consistent
 
-Status: TODO
+Status: IN_PROGRESS
 Branch name: ticket-c4-customer-controller
 Commit template: feat(customer): add customer controller endpoints
 
