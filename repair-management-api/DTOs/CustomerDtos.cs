@@ -13,7 +13,7 @@ public class CreateCustomerRequestDto
     public string Phone { get; set; } = string.Empty;
 
     [EmailAddress]
-    [StringLength(265)]
+    [StringLength(256)]
     public string? Email { get; set; }
 
     [StringLength(300)]
@@ -35,7 +35,7 @@ public class UpdateCustomerRequestDto
     public string Phone { get; set; } = string.Empty;
 
     [EmailAddress]
-    [StringLength(265)]
+    [StringLength(256)]
     public string? Email { get; set; }
 
     [StringLength(300)]
