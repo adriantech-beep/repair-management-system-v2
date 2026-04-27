@@ -33,6 +33,8 @@ builder.Services.AddScoped<IBranchContext, BranchContext>();
 
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 
+builder.Services.AddScoped<IDeviceService, DeviceService>();
+
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
