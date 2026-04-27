@@ -1,0 +1,296 @@
+{
+  "info": {
+    "name": "Repair Management - Customers v1",
+    "description": "Customer CRUD regression suite. Run requests top to bottom in order after importing the Dev environment. Requires a valid Admin JWT in {{accessToken}} and a valid {{branchId}}.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Login as Admin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Admin tokens are saved', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.accessToken).to.be.a('string').and.not.be.empty;",
+              "    pm.expect(body.refreshToken).to.be.a('string').and.not.be.empty;",
+              "    pm.environment.set('accessToken', body.accessToken);",
+              "    pm.environment.set('refreshToken', body.refreshToken);",
+              "    const branchFromUser = body.user && body.user.branchId ? body.user.branchId : null;",
+              "    if (branchFromUser) {",
+              "        pm.environment.set('branchId', branchFromUser);",
+              "    }",
+              "});",
+              "",
+              "pm.test('Branch ID is available for customer requests', function () {",
+              "    const branchId = pm.environment.get('branchId');",
+              "    pm.expect(branchId, 'Set branchId in environment OR assign a BranchId to this admin user').to.be.a('string').and.not.be.empty;",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@repairmanagement.local\",\n  \"password\": \"AdminPassword123!\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "2. Create Customer (Happy Path)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 201 Created', function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test('Customer ID is saved', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.id).to.be.a('string').and.not.be.empty;",
+              "    pm.expect(body.fullName).to.eql('John Doe');",
+              "    pm.expect(body.phone).to.eql('555-1234');",
+              "    pm.environment.set('customerId', body.id);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"John Doe\",\n  \"phone\": \"555-1234\",\n  \"email\": \"john@example.com\",\n  \"address\": \"123 Main St\",\n  \"branchId\": \"{{branchId}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/customers",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "customers"]
+        }
+      }
+    },
+    {
+      "name": "3. Create Customer - Duplicate Phone (409)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 409 Conflict', function () {",
+              "    pm.response.to.have.status(409);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Jane Smith\",\n  \"phone\": \"555-1234\",\n  \"email\": \"jane@example.com\",\n  \"address\": \"456 Elm St\",\n  \"branchId\": \"{{branchId}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/customers",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "customers"]
+        }
+      }
+    },
+    {
+      "name": "4. Get All Customers",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200 OK', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response is an array', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body).to.be.an('array');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/customers",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "customers"]
+        }
+      }
+    },
+    {
+      "name": "5. Get All Customers - With Search",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200 OK', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('All results contain search term', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body).to.be.an('array');",
+              "    body.forEach(function (customer) {",
+              "        const matchesName = customer.fullName.toLowerCase().includes('john');",
+              "        const matchesPhone = customer.phone.toLowerCase().includes('john');",
+              "        pm.expect(matchesName || matchesPhone).to.be.true;",
+              "    });",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/customers?search=John",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "customers"],
+          "query": [{ "key": "search", "value": "John" }]
+        }
+      }
+    },
+    {
+      "name": "6. Get Customer by ID",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200 OK', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Customer ID matches', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.id).to.eql(pm.environment.get('customerId'));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/customers/{{customerId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "customers", "{{customerId}}"]
+        }
+      }
+    },
+    {
+      "name": "7. Update Customer (Happy Path)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200 OK', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Customer is updated', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.fullName).to.eql('John Updated');",
+              "    pm.expect(body.phone).to.eql('555-9999');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"John Updated\",\n  \"phone\": \"555-9999\",\n  \"email\": \"updated@example.com\",\n  \"address\": \"456 New St\",\n  \"branchId\": \"{{branchId}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/customers/{{customerId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "customers", "{{customerId}}"]
+        }
+      }
+    },
+    {
+      "name": "8. Create Customer - No Auth (401)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 401 Unauthorized', function () {",
+              "    pm.response.to.have.status(401);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"No Auth User\",\n  \"phone\": \"555-0000\",\n  \"branchId\": \"{{branchId}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/customers",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "customers"]
+        }
+      }
+    }
+  ]
+}
