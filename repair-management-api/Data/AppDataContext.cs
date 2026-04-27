@@ -21,6 +21,8 @@ public class AppDbContext : DbContext
     public DbSet<Branch> Branches => Set<Branch>();
     public DbSet<Customer> Customers => Set<Customer>();
 
+    public DbSet<Device> Devices => Set<Device>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -206,6 +208,32 @@ public class AppDbContext : DbContext
             .OnDelete(DeleteBehavior.Restrict);
     
     
+});
+
+
+    modelBuilder.Entity<Device>(entity =>
+    {
+        entity.HasKey(d => d.Id);
+        entity.Property(d => d.Brand).IsRequired().HasMaxLength(50);
+        entity.Property(d => d.Model).IsRequired().HasMaxLength(100);
+        entity.Property(d => d.SerialNumber).HasMaxLength(100);
+        entity.Property(d => d.DeviceType).IsRequired()
+        .HasConversion<string>();
+        entity.Property(d => d.CreatedAtUtc).IsRequired();
+        entity.Property(d => d.UpdatedAtUtc).IsRequired();
+
+        entity.HasIndex(d => d.CustomerId);
+        entity.HasIndex(d => d.BranchId);
+
+        entity.HasOne(d => d.Customer)
+        .WithMany()
+        .HasForeignKey(d => d.CustomerId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+        entity.HasOne(d => d.Branch)
+        .WithMany()
+        .HasForeignKey(d => d.BranchId)
+        .OnDelete(DeleteBehavior.Restrict);
 });
     
     
