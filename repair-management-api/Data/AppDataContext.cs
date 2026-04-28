@@ -23,6 +23,8 @@ public class AppDbContext : DbContext
 
     public DbSet<Device> Devices => Set<Device>();
 
+    public DbSet<RepairJob> RepairJobs => Set<RepairJob>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -233,6 +235,42 @@ public class AppDbContext : DbContext
         entity.HasOne(d => d.Branch)
         .WithMany()
         .HasForeignKey(d => d.BranchId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
+
+    modelBuilder.Entity<RepairJob>(entity =>
+    {
+        entity.HasKey(r => r.Id);
+        entity.Property(r => r.JobNumber).IsRequired().HasMaxLength(30);
+        entity.HasIndex(r => r.JobNumber).IsUnique();
+        entity.Property(r => r.ProblemDescription).IsRequired().HasMaxLength(1000);
+        entity.Property(r => r.DiagnosisNotes).HasMaxLength(1000);
+        entity.Property(r => r.ResolutionNotes).HasMaxLength(1000);
+        entity.Property(r => r.EstimatedCost).HasColumnType("decimal(10,2)");
+        entity.Property(r => r.FinalCost).HasColumnType("decimal(10,2)");
+        entity.Property(r => r.Status).IsRequired().HasConversion<string>();
+        entity.Property(r => r.ReceivedAtUtc).IsRequired();
+        entity.Property(r => r.CreatedAtUtc).IsRequired();
+        entity.Property(r => r.UpdatedAtUtc).IsRequired();
+
+        entity.HasIndex(r => r.CustomerId);
+        entity.HasIndex(r => r.DeviceId);
+        entity.HasIndex(r => r.BranchId);
+        entity.HasIndex(r => r.Status);
+
+        entity.HasOne(r => r.Customer)
+        .WithMany()
+        .HasForeignKey(r => r.CustomerId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+        entity.HasOne(r => r.Device)
+        .WithMany()
+        .HasForeignKey(r => r.DeviceId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+        entity.HasOne(r => r.Branch)
+        .WithMany()
+        .HasForeignKey(r => r.BranchId)
         .OnDelete(DeleteBehavior.Restrict);
 });
     
