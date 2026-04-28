@@ -35,6 +35,8 @@ builder.Services.AddScoped<ICustomerService, CustomerService>();
 
 builder.Services.AddScoped<IDeviceService, DeviceService>();
 
+builder.Services.AddScoped<IRepairJobService, RepairJobService>();
+
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
