@@ -1,0 +1,440 @@
+{
+  "info": {
+    "name": "Repair Management - RepairJobs v1",
+    "description": "RepairJob CRUD regression suite. Run requests top to bottom after importing the Dev environment. Requires Admin JWT in {{accessToken}}, valid {{branchId}}, {{customerId}}, and {{deviceId}}.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Login as Admin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Admin tokens are saved', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.accessToken).to.be.a('string').and.not.be.empty;",
+              "    pm.environment.set('accessToken', body.accessToken);",
+              "    pm.environment.set('refreshToken', body.refreshToken);",
+              "    const branchFromUser = body.user && body.user.branchId ? body.user.branchId : null;",
+              "    if (branchFromUser) {",
+              "        pm.environment.set('branchId', branchFromUser);",
+              "    }",
+              "});",
+              "",
+              "pm.test('Branch ID is available', function () {",
+              "    const branchId = pm.environment.get('branchId');",
+              "    pm.expect(branchId, 'Set branchId in environment OR assign a BranchId to your admin user in DB').to.be.a('string').and.not.be.empty;",
+              "});",
+              "",
+              "pm.test('Customer ID is available', function () {",
+              "    const customerId = pm.environment.get('customerId');",
+              "    pm.expect(customerId, 'Run the Customers collection first to populate customerId').to.be.a('string').and.not.be.empty;",
+              "});",
+              "",
+              "pm.test('Device ID is available', function () {",
+              "    const deviceId = pm.environment.get('deviceId');",
+              "    pm.expect(deviceId, 'Run the Devices collection first to populate deviceId').to.be.a('string').and.not.be.empty;",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@repairmanagement.local\",\n  \"password\": \"AdminPassword123!\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "2. Create Repair Job (Happy Path)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 201 Created', function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test('RepairJob ID is saved', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.id).to.be.a('string').and.not.be.empty;",
+              "    pm.expect(body.problemDescription).to.eql('Screen cracked');",
+              "    pm.expect(body.status).to.eql('Received');",
+              "    pm.environment.set('repairJobId', body.id);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customerId\": \"{{customerId}}\",\n  \"deviceId\": \"{{deviceId}}\",\n  \"branchId\": \"{{branchId}}\",\n  \"problemDescription\": \"Screen cracked\",\n  \"estimatedCost\": 150.00\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/repair-jobs",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "repair-jobs"]
+        }
+      }
+    },
+    {
+      "name": "3. Create Repair Job - Customer Not Found (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 404 Not Found', function () {",
+              "    pm.response.to.have.status(404);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customerId\": \"00000000-0000-0000-0000-000000000000\",\n  \"deviceId\": \"{{deviceId}}\",\n  \"branchId\": \"{{branchId}}\",\n  \"problemDescription\": \"Screen cracked\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/repair-jobs",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "repair-jobs"]
+        }
+      }
+    },
+    {
+      "name": "4. Create Repair Job - Device Not Found (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 404 Not Found', function () {",
+              "    pm.response.to.have.status(404);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customerId\": \"{{customerId}}\",\n  \"deviceId\": \"00000000-0000-0000-0000-000000000000\",\n  \"branchId\": \"{{branchId}}\",\n  \"problemDescription\": \"Screen cracked\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/repair-jobs",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "repair-jobs"]
+        }
+      }
+    },
+    {
+      "name": "5. Get Repair Job by ID",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200 OK', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Repair Job ID matches', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.id).to.eql(pm.environment.get('repairJobId'));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/repair-jobs/{{repairJobId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "repair-jobs", "{{repairJobId}}"]
+        }
+      }
+    },
+    {
+      "name": "6. Get Repair Job by ID - Not Found (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 404 Not Found', function () {",
+              "    pm.response.to.have.status(404);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/repair-jobs/00000000-0000-0000-0000-000000000000",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "repair-jobs", "00000000-0000-0000-0000-000000000000"]
+        }
+      }
+    },
+    {
+      "name": "7. Get Repair Jobs by Branch",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200 OK', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response is an array with at least 1 repair job', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body).to.be.an('array');",
+              "    pm.expect(body.length).to.be.at.least(1);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/repair-jobs",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "repair-jobs"]
+        }
+      }
+    },
+    {
+      "name": "8. Get Repair Jobs by Branch - Status Filter (Received)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200 OK', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('All returned jobs have status Received', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body).to.be.an('array');",
+              "    body.forEach(function(job) {",
+              "        pm.expect(job.status).to.eql('Received');",
+              "    });",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/repair-jobs?status=Received",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "repair-jobs"],
+          "query": [{ "key": "status", "value": "Received" }]
+        }
+      }
+    },
+    {
+      "name": "9. Update Repair Job",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200 OK', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Diagnosis notes are updated', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.diagnosisNotes).to.eql('Panel is shattered, backlight intact');",
+              "    pm.expect(body.estimatedCost).to.eql(180);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"problemDescription\": \"Screen cracked\",\n  \"diagnosisNotes\": \"Panel is shattered, backlight intact\",\n  \"estimatedCost\": 180.00\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/repair-jobs/{{repairJobId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "repair-jobs", "{{repairJobId}}"]
+        }
+      }
+    },
+    {
+      "name": "10. Update Repair Job - Not Found (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 404 Not Found', function () {",
+              "    pm.response.to.have.status(404);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"problemDescription\": \"Screen cracked\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/repair-jobs/00000000-0000-0000-0000-000000000000",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "repair-jobs", "00000000-0000-0000-0000-000000000000"]
+        }
+      }
+    },
+    {
+      "name": "11. Update Repair Job Status (Diagnosing)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200 OK', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Status is updated to Diagnosing', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.status).to.eql('Diagnosing');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"Diagnosing\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/repair-jobs/{{repairJobId}}/status",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "repair-jobs", "{{repairJobId}}", "status"]
+        }
+      }
+    },
+    {
+      "name": "12. Update Repair Job Status - Not Found (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 404 Not Found', function () {",
+              "    pm.response.to.have.status(404);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"Diagnosing\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/repair-jobs/00000000-0000-0000-0000-000000000000/status",
+          "host": ["{{baseUrl}}"],
+          "path": [
+            "api",
+            "repair-jobs",
+            "00000000-0000-0000-0000-000000000000",
+            "status"
+          ]
+        }
+      }
+    }
+  ]
+}
