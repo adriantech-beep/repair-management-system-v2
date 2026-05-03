@@ -135,7 +135,7 @@ Acceptance criteria:
 - Refresh flow retries one failed request after token renewal
 - Invalid refresh token forces full logout and redirect
 
-Status: TODO
+Status: IN_PROGRESS
 Branch name: ticket-f2-auth-session-flow
 Commit template: feat(frontend): implement auth session and refresh flow
 
