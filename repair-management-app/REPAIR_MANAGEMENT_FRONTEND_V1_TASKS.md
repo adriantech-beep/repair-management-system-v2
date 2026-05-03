@@ -135,7 +135,7 @@ Acceptance criteria:
 - Refresh flow retries one failed request after token renewal
 - Invalid refresh token forces full logout and redirect
 
-Status: IN_PROGRESS
+Status: DONE
 Branch name: ticket-f2-auth-session-flow
 Commit template: feat(frontend): implement auth session and refresh flow
 
@@ -152,7 +152,7 @@ Acceptance criteria:
 - Validation error payloads are rendered field-by-field
 - 401 and 403 handling behavior is consistent across pages
 
-Status: TODO
+Status: DONE
 Branch name: ticket-f3-api-client-layer
 Commit template: feat(frontend): add api client and error handling layer
 
