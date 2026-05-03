@@ -21,7 +21,7 @@ The frontend supports:
 - Server state: TanStack Query
 - Forms: React Hook Form + Zod
 - HTTP client: Axios with auth interceptor
-- Styling: CSS variables + component-level styles (no heavy UI framework for v1)
+- Styling: shadcn/ui (Tailwind v4 + Radix primitives) with CSS variables for design tokens
 - Auth strategy: access token + refresh token flow aligned to backend contract
 - Branch strategy: one ticket per branch
 - PR strategy: one PR per completed ticket
@@ -34,6 +34,25 @@ The frontend supports:
 - Route structure
 - Protected route handling
 - Navigation and role-aware menu
+
+### Sidebar Navigation (agreed in F1)
+
+Primary action:
+
+- Create SO (Service Order) — wizard entry point
+
+Management links:
+
+- Dashboard
+- Repair Jobs
+- Customers
+- Devices
+- Inventory
+- Settings
+
+Footer:
+
+- Logout
 
 ### Module B: Customer Management UI
 
@@ -99,7 +118,7 @@ Acceptance criteria:
 - Navigation reflects user role and current route
 - Unknown routes resolve to a clear not-found page
 
-Status: IN_PROGRESS
+Status: DONE
 Branch name: ticket-f1-app-shell-routing
 Commit template: feat(frontend): add app shell and routing foundation
 
@@ -116,7 +135,7 @@ Acceptance criteria:
 - Refresh flow retries one failed request after token renewal
 - Invalid refresh token forces full logout and redirect
 
-Status: TODO
+Status: IN_PROGRESS
 Branch name: ticket-f2-auth-session-flow
 Commit template: feat(frontend): implement auth session and refresh flow
 
@@ -209,15 +228,19 @@ Status: TODO
 Branch name: ticket-f7-repair-list-detail
 Commit template: feat(frontend): add repair job list and detail views
 
-### Ticket F8: Repair Actions (Create, Update, Status Changes)
+### Ticket F8: Service Order Wizard and Repair Actions
 
 Goal:
 
-- Build key repair job mutation flows used by Admin and Technician
+- Build the Create SO wizard and repair job mutation flows
 
 Acceptance criteria:
 
-- Create repair job form uses customer/device context correctly
+- Create SO wizard enforces step order: Customer → Device → Repair Job → Confirmation
+- Step 1 allows searching existing customer or creating new inline
+- Step 2 shows devices for selected customer and allows registering new device
+- Step 3 collects issue description, priority, and technician assignment
+- Step 4 shows a summary and redirects to the new repair job detail page
 - Status change actions enforce allowed role visibility
 - Update form supports diagnosis/resolution/cost fields
 - Mutation success updates relevant views predictably

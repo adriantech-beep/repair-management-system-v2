@@ -1,4 +1,3 @@
-import { NavLink } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -13,6 +12,10 @@ import {
 } from "@/components/ui/sidebar";
 import { LayoutDashboard, Users, Wrench, Settings } from "lucide-react";
 
+import { NavLink, useNavigate } from "react-router-dom";
+import { logout } from "@/api/authApi";
+import useAuthStore from "@/store/authStore";
+
 const navItems = [
   { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
   { label: "Repair Jobs", to: "/repairs", icon: Wrench },
@@ -22,6 +25,22 @@ const navItems = [
 
 const AppSidebar = () => {
   const { state } = useSidebar();
+
+  const navigate = useNavigate();
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const refreshToken = useAuthStore((state) => state.refreshToken);
+  const clearAuth = useAuthStore((state) => state.clearAuth);
+
+  const handleLogout = async () => {
+    try {
+      if (accessToken && refreshToken) {
+        await logout(accessToken, refreshToken);
+      }
+    } finally {
+      clearAuth();
+      navigate("/login", { replace: true });
+    }
+  };
 
   return (
     <Sidebar>
@@ -52,13 +71,13 @@ const AppSidebar = () => {
       </SidebarContent>
 
       <SidebarFooter>
-        <NavLink to="/logout">
-          {({ isActive }) => (
-            <SidebarMenuButton isActive={isActive}>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton onClick={handleLogout}>
               <span>Logout</span>
             </SidebarMenuButton>
-          )}
-        </NavLink>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
   );
