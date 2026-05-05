@@ -10,6 +10,7 @@ The system supports:
 - Customer management
 - Device intake and tracking
 - Repair job workflow management
+- Service Order-first intake with device lookup first
 - Inventory and waitlist management
 - Multi-shop readiness
 - Printable job order support
@@ -69,6 +70,14 @@ For each ticket:
 5. Commit with conventional message
 6. Push branch and open PR
 7. Merge PR only after review and green checks
+
+## Operational Flow Decision (May 2026)
+
+- Primary operational journey is Service Order intake.
+- Customer and device modules remain first-class backend modules but are orchestrated by the SO flow.
+- Device lookup by IMEI/serial is required for intake acceleration.
+- Customer module remains available for maintenance/admin use (not removed).
+- Branch scope remains enforced; frontend should not be able to create cross-branch data.
 
 ## Status Legend
 
@@ -201,6 +210,8 @@ Acceptance criteria:
 - CRUD endpoints available
 - Role permissions enforced
 - Status codes consistent
+- Duplicate phone returns 409 with explicit code/message contract
+- Create and update enforce branch scope rules consistently
 
 Status: IN_PROGRESS
 Branch name: ticket-c4-customer-controller
@@ -279,6 +290,7 @@ Acceptance criteria:
 - Update device details
 - Get device by id
 - List/search devices by customer, brand, model, serial
+- Lookup by IMEI/serial returns device plus linked customer summary for SO intake
 
 Status: TODO
 Branch name: ticket-d3-device-service
@@ -294,6 +306,7 @@ Acceptance criteria:
 
 - Endpoints follow role access rules
 - Proper status codes for not found/validation/auth
+- Add intake lookup endpoint contract (IMEI/serial) with clear found/not-found behavior
 
 Status: TODO
 Branch name: ticket-d4-device-controller
@@ -404,6 +417,7 @@ Acceptance criteria:
 - Assign technician
 - Update costs (repair cost, service charge, final amount)
 - Get job details with timeline
+- Intake flow supports create job from lookup result (existing customer/device) or newly created customer/device chain
 
 Status: TODO
 Branch name: ticket-r4-repairjob-service
