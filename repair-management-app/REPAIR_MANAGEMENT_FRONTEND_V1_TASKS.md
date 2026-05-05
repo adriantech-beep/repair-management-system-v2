@@ -10,6 +10,7 @@ The frontend supports:
 - Staff authentication and session handling
 - Branch-scoped customer and device operations
 - Repair job workflow tracking
+- Service Order-first intake flow (device lookup first, then customer confirmation)
 - Inventory and waitlist visibility
 - Clean dashboard and task-oriented navigation
 - Mobile-friendly layouts for service desk use
@@ -96,6 +97,14 @@ For each ticket:
 6. Push branch and open PR
 7. Merge PR only after review and green checks
 
+## Operational Flow Decision (May 2026)
+
+- Primary operational journey is Create SO (Service Order) wizard.
+- Customer routes are retained as back-office maintenance tools (search, cleanup, corrections).
+- SO wizard starts with device lookup (IMEI/serial); customer data is then confirmed/edited for the new service order.
+- Existing customer records remain reusable across many service orders.
+- Historical service order records should preserve intake context even if customer profile is edited later.
+
 ## Status Legend
 
 - TODO: not started
@@ -162,7 +171,7 @@ Commit template: feat(frontend): add api client and error handling layer
 
 Goal:
 
-- Build customer list/search and create form experience
+- Build customer list/search and minimal create flow for back-office maintenance
 
 Acceptance criteria:
 
@@ -170,8 +179,10 @@ Acceptance criteria:
 - Create form validates before submission
 - Success path updates list without full page reload
 - API validation messages appear on relevant fields
+- Duplicate phone conflict is surfaced clearly (field + root message)
+- Scope stays focused on customer module support, not SO intake orchestration
 
-Status: TODO
+Status: IN_PROGRESS
 Branch name: ticket-f4-customer-list-create
 Commit template: feat(frontend): add customer list and create flow
 
@@ -232,15 +243,15 @@ Commit template: feat(frontend): add repair job list and detail views
 
 Goal:
 
-- Build the Create SO wizard and repair job mutation flows
+- Build the Create SO wizard as the primary intake flow and repair job mutation flows
 
 Acceptance criteria:
 
-- Create SO wizard enforces step order: Customer → Device → Repair Job → Confirmation
-- Step 1 allows searching existing customer or creating new inline
-- Step 2 shows devices for selected customer and allows registering new device
+- Create SO wizard enforces step order: Device Lookup (IMEI/Serial) → Customer Confirm/Edit → Repair Job Details → Confirmation
+- Step 1 allows lookup by IMEI/serial and loads linked device/customer when found
+- Step 2 allows customer confirmation/edit for this intake and supports inline create when no customer match exists
 - Step 3 collects issue description, priority, and technician assignment
-- Step 4 shows a summary and redirects to the new repair job detail page
+- Step 4 shows summary and redirects to the new repair job detail page
 - Status change actions enforce allowed role visibility
 - Update form supports diagnosis/resolution/cost fields
 - Mutation success updates relevant views predictably
