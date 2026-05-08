@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import CustomerList from "./CustomerList";
+import CustomersTable from "./CustomersTable";
 
 const mockUseGetCustomers = vi.fn();
 
@@ -34,7 +34,7 @@ describe("CustomerList", () => {
       isError: false,
     });
 
-    render(<CustomerList />);
+    render(<CustomersTable />);
 
     expect(screen.getByText("John Doe")).toBeInTheDocument();
     expect(screen.getByText("Jane Smith")).toBeInTheDocument();

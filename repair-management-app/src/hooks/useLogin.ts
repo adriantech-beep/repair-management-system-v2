@@ -3,8 +3,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import { login } from "@/api/authApi";
 import useAuthStore from "@/store/authStore";
-import { loginSchema } from "@/routes/loginSchema";
-import type { LoginFormData } from "@/routes/loginSchema";
+import { loginSchema } from "@/routes/loginRoutes/loginSchema";
+import type { LoginFormData } from "@/routes/loginRoutes/loginSchema";
 import parseApiError from "@/api/parseApiError";
 
 export function useLogin() {

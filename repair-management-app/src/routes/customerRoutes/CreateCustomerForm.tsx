@@ -2,14 +2,14 @@ import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { customerSchema, type CustomerFormData } from "./customerSchema";
 import { useCreateCustomer } from "@/hooks/useCustomers";
 import parseApiError from "@/api/parseApiError";
 import useAuthStore from "@/store/authStore";
+import { customerSchema, type CustomerFormData } from "./customerSchema";
+import CustomersTable from "./CustomersTable";
 import CreateCustomerFields from "./CreateCustomerFields";
-import CustomerList from "./CustomerList";
 
-const CreateCustomer = () => {
+const CreateCustomerForm = () => {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
   const { mutateAsync: createCustomer } = useCreateCustomer();
@@ -80,36 +80,57 @@ const CreateCustomer = () => {
   };
 
   return (
-    <div className="mx-auto w-full max-w-xl space-y-6">
-      <CustomerList />
-      <h1 className="text-2xl font-semibold">Create Customer</h1>
+    <div className="mx-auto w-full max-w-6xl space-y-6 p-3 sm:p-6">
+      <header className="space-y-1">
+        <h1 className="text-2xl font-semibold tracking-tight text-emerald-950 sm:text-3xl">
+          Customer Management
+        </h1>
+        <p className="text-sm text-emerald-900/60">
+          Search customers and register new entries for your branch.
+        </p>
+      </header>
 
-      <FormProvider {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <CreateCustomerFields />
+      <div className="grid gap-6 xl:grid-cols-[1.4fr_1fr]">
+        <CustomersTable />
 
-          {form.formState.errors.root?.message ? (
-            <p className="text-sm text-red-600">
-              {form.formState.errors.root.message}
-            </p>
-          ) : null}
+        <section className="rounded-2xl border border-emerald-100/70 bg-white p-5 shadow-sm sm:p-6">
+          <h2 className="mb-1 text-lg font-semibold text-emerald-950">
+            Create Customer
+          </h2>
+          <p className="mb-5 text-sm text-emerald-900/60">
+            Fill out the basic customer profile details below.
+          </p>
 
-          <div className="flex gap-2">
-            <Button type="submit" disabled={form.formState.isSubmitting}>
-              {form.formState.isSubmitting ? "Creating..." : "Create Customer"}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => navigate("/customers")}
-            >
-              Cancel
-            </Button>
-          </div>
-        </form>
-      </FormProvider>
+          <FormProvider {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <CreateCustomerFields />
+
+              {form.formState.errors.root?.message ? (
+                <p className="rounded-md border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-700">
+                  {form.formState.errors.root.message}
+                </p>
+              ) : null}
+
+              <div className="flex flex-wrap gap-2 pt-2">
+                <Button type="submit" disabled={form.formState.isSubmitting}>
+                  {form.formState.isSubmitting
+                    ? "Creating..."
+                    : "Create Customer"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => navigate("/customers")}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </FormProvider>
+        </section>
+      </div>
     </div>
   );
 };
 
-export default CreateCustomer;
+export default CreateCustomerForm;
