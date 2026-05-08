@@ -49,15 +49,15 @@ const CreateCustomerFields = () => {
           control={control}
           name={name}
           render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-base font-medium text-emerald-950/80">
+            <FormItem className="space-y-1.5">
+              <FormLabel className="text-sm font-medium text-emerald-950/80">
                 {placeholder}
               </FormLabel>
               <FormControl>
                 <Input
                   type={type}
                   placeholder={placeholder}
-                  className="h-11 rounded-xl border-emerald-900/15 bg-white/70 text-[15px] placeholder:text-emerald-900/40 focus-visible:border-emerald-600 focus-visible:ring-emerald-200"
+                  className="h-10 rounded-lg border-emerald-900/20 bg-white text-sm text-emerald-950 placeholder:text-emerald-900/40 focus-visible:border-emerald-600 focus-visible:ring-emerald-200"
                   {...field}
                   value={(field.value as string | undefined) ?? ""}
                   onChange={(e) => field.onChange(e.target.value)}

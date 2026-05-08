@@ -16,3 +16,11 @@ export type CreateCustomerRequest = {
   address: string | null;
   branchId: string;
 };
+
+export type UpdateCustomerRequest = {
+  fullName: string;
+  phone: string;
+  email: string | null;
+  address: string | null;
+  branchId: string;
+};

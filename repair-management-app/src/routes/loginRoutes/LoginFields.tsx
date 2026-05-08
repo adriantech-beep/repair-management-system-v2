@@ -1,5 +1,5 @@
 import { Input } from "@/components/ui/input";
-import type { LoginFormData } from "./loginSchema";
+import type { LoginFormData } from "../loginSchema";
 import { Mail, Lock } from "lucide-react";
 
 import { useFormContext } from "react-hook-form";

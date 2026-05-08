@@ -1,4 +1,4 @@
-import Login from "@/routes/Login";
+import Login from "@/routes/loginRoutes/Login";
 import BackgroundIMage from "@/image-assets/PINES_MULTI_TELECOM_BG.png";
 
 const LoginPage = () => {

@@ -1,11 +1,7 @@
-import CreateCustomer from "@/routes/CreateCustomer";
+import CustomersTable from "@/routes/customerRoutes/CustomersTable";
 
 const CustomerPage = () => {
-  return (
-    <div>
-      <CreateCustomer />
-    </div>
-  );
+  return <CustomersTable />;
 };
 
 export default CustomerPage;

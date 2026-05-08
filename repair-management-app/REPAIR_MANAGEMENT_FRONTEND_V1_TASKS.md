@@ -182,7 +182,7 @@ Acceptance criteria:
 - Duplicate phone conflict is surfaced clearly (field + root message)
 - Scope stays focused on customer module support, not SO intake orchestration
 
-Status: IN_PROGRESS
+Status: DONE
 Branch name: ticket-f4-customer-list-create
 Commit template: feat(frontend): add customer list and create flow
 
@@ -199,7 +199,7 @@ Acceptance criteria:
 - Not-found and forbidden states are handled gracefully
 - Route-level loading and error states are present
 
-Status: TODO
+Status: IN_PROGRESS
 Branch name: ticket-f5-customer-edit-detail
 Commit template: feat(frontend): add customer detail and update flow
 
