@@ -10,7 +10,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, Users, Settings } from "lucide-react";
+import { LayoutDashboard, Users, Phone } from "lucide-react";
 
 import { NavLink, useNavigate } from "react-router-dom";
 import { logout } from "@/api/authApi";
@@ -19,7 +19,7 @@ import useAuthStore from "@/store/authStore";
 const navItems = [
   { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
   { label: "Customers", to: "/customers", icon: Users },
-  { label: "Settings", to: "/settings", icon: Settings },
+  { label: "Devices", to: "/devices", icon: Phone },
 ];
 
 const AppSidebar = () => {

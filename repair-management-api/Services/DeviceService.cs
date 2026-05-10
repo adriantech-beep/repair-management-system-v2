@@ -67,6 +67,7 @@ public class DeviceService : IDeviceService
             CustomerId = d.CustomerId,
             Brand = d.Brand,
             Model = d.Model,
+            SerialNumber = d.SerialNumber,
             DeviceType = d.DeviceType,
             CreatedAtUtc = d.CreatedAtUtc
         }).ToList();
