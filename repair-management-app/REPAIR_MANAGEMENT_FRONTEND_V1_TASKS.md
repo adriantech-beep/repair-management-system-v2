@@ -235,7 +235,7 @@ Acceptance criteria:
 - Empty and no-match states are clearly differentiated
 - Detail page is prepared for timeline data once backend exposes it
 
-Status: TODO
+Status: IN_PROGRESS
 Branch name: ticket-f7-repair-list-detail
 Commit template: feat(frontend): add repair job list and detail views
 

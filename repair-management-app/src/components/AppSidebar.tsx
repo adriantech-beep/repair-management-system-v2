@@ -10,7 +10,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, Users, Phone } from "lucide-react";
+import { LayoutDashboard, Users, Wrench } from "lucide-react";
 
 import { NavLink, useNavigate } from "react-router-dom";
 import { logout } from "@/api/authApi";
@@ -18,8 +18,8 @@ import useAuthStore from "@/store/authStore";
 
 const navItems = [
   { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
+  { label: "Repair Jobs", to: "/repair-jobs", icon: Wrench },
   { label: "Customers", to: "/customers", icon: Users },
-  { label: "Devices", to: "/devices", icon: Phone },
 ];
 
 const AppSidebar = () => {
