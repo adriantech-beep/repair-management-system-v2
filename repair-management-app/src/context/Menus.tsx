@@ -108,7 +108,6 @@ function Toggle({ id }: ToggleProps) {
     // currentTarget is always the button with the handler,
     // even if the user clicks on the SVG icon inside it.
     const rect = event.currentTarget.getBoundingClientRect();
-    console.log("[Menus.Toggle]", { id, openId, rect });
 
     setPosition({
       x: rect.left,
@@ -141,6 +140,7 @@ function List({ id, children }: ListProps) {
   return createPortal(
     <ul
       ref={ref}
+      data-slot="menu-list"
       style={{ left: `calc(${position?.x}px - 70px)`, top: `${position?.y}px` }}
       className="fixed z-9999 min-w-40 rounded-lg border border-gray-200 bg-white p-1 shadow-xl"
     >

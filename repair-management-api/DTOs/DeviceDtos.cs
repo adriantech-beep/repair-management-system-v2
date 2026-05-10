@@ -62,6 +62,7 @@ public class DeviceListItemDto
     public Guid CustomerId { get; set; }
     public string Brand { get; set; } = string.Empty;
     public string Model { get; set; } = string.Empty;
+    public string? SerialNumber { get; set; }
     public DeviceType DeviceType { get; set; }
     public DateTime CreatedAtUtc { get; set; }
 }

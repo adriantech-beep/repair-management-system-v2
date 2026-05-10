@@ -56,6 +56,13 @@ function useOutsideClick(onOutsideClick: () => void) {
     function handlePointerDown(event: MouseEvent | globalThis.MouseEvent) {
       if (!(event instanceof globalThis.MouseEvent)) return;
       if (!ref.current) return;
+      const target = event.target as HTMLElement | null;
+
+      // Radix Select renders its menu in a portal outside the modal tree.
+      // Treat interactions inside that content as internal so the modal stays open.
+      if (target?.closest('[data-slot="select-content"]')) return;
+      // Menus list also renders in a portal; keep modal open while using it.
+      if (target?.closest('[data-slot="menu-list"]')) return;
       if (ref.current.contains(event.target as Node)) return;
 
       onOutsideClick();
@@ -104,7 +111,7 @@ function Window({ children, name }: WindowProps) {
   if (name !== openName) return null;
 
   return createPortal(
-    <div className="fixed inset-0 `z-[120]` flex items-center justify-center bg-black/30 p-4">
+    <div className="fixed inset-0 z-120 flex items-center justify-center bg-black/30 p-4">
       <div ref={ref} className="relative w-full max-w-2xl">
         <button
           type="button"
