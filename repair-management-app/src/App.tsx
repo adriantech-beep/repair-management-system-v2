@@ -6,6 +6,8 @@ import DashboardPage from "./pages/DashboardPage";
 import LoginPage from "./pages/LoginPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import CustomerPage from "./pages/CustomerPage";
+import RepairJobsPage from "./pages/RepairJobsPage";
+import RepairJobDetailPage from "./pages/RepairJobDetailPage";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +27,11 @@ const App = () => {
           >
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<DashboardPage />} />
+            <Route path="repair-jobs" element={<RepairJobsPage />} />
+            <Route
+              path="repair-jobs/:repairJobId"
+              element={<RepairJobDetailPage />}
+            />
             <Route path="customers" element={<CustomerPage />} />
           </Route>
 

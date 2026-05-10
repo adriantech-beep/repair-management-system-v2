@@ -28,6 +28,12 @@ vi.mock("@/hooks/useCustomers", () => ({
   useUpdateCustomer: () => ({ mutateAsync: mockMutateAsync }),
 }));
 
+vi.mock("@/routes/deviceRoutes/DevicesByCustomerTable", () => ({
+  default: ({ customerId }: { customerId: string }) => (
+    <div>Devices for {customerId}</div>
+  ),
+}));
+
 vi.mock("@/store/authStore", () => ({
   default: (
     selector: (state: {
@@ -80,6 +86,8 @@ describe("EditCustomerForm", () => {
     expect(screen.getByLabelText("Phone Number")).toHaveValue("09171234567");
     expect(screen.getByLabelText("Email")).toHaveValue("john@example.com");
     expect(screen.getByLabelText("Address")).toHaveValue("123 Main St");
+    expect(screen.getByText("Customer Devices")).toBeInTheDocument();
+    expect(screen.getByText("Devices for abc-123")).toBeInTheDocument();
   });
 
   it("calls updateCustomer with correct payload on submit", async () => {
