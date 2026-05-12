@@ -9,4 +9,5 @@ public interface IDeviceService
     Task<List<DeviceListItemDto>> GetDevicesByCustomerIdAsync(Guid customerId);
     Task<DeviceResponseDto> UpdateDeviceAsync(Guid deviceId, UpdateDeviceRequestDto request);
     Task DeleteDeviceAsync(Guid deviceId);
+    Task<DeviceLookupResponseDto?> LookupDeviceByIdentifierAsync(string identifier);
 }
