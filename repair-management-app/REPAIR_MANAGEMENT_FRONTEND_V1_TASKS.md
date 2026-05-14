@@ -3,6 +3,12 @@
 This file is the approved frontend implementation plan for the repair management system.
 Use it as the source of truth before coding.
 
+## Planning Update (May 2026)
+
+- F8 and F9 were already merged to main.
+- Active planning source moved to REPAIR_MANAGEMENT_FRONTEND_CONTRACT_TASKS.md.
+- This v1 file is retained as historical context.
+
 ## Product Scope (v1)
 
 The frontend supports:
@@ -341,7 +347,7 @@ Acceptance criteria:
 - Basic integration points for parts usage are prepared for I11/I12 backend delivery
 - Error handling matches global frontend standards
 
-Status: IN_PROGRESS
+Status: DONE
 Branch name: ticket-f9-inventory-waitlist-ui
 Commit template: feat(frontend): integrate inventory and waitlist screens
 
@@ -358,9 +364,13 @@ Acceptance criteria:
 - Accessibility basics pass (labels, focus, contrast, keyboard)
 - Build, lint, and tests pass on CI and local
 
-Status: TODO
+Status: BLOCKED
 Branch name: ticket-f10-ux-qa-hardening
 Commit template: chore(frontend): polish ui responsiveness and quality gates
+
+Blocked reason:
+
+- Deferred until contract-backed core business flows are completed per REPAIR_MANAGEMENT_FRONTEND_CONTRACT_TASKS.md.
 
 ## Recommended Build Order
 
