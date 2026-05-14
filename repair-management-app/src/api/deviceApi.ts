@@ -38,9 +38,20 @@ type DeviceLookupResponseApi = {
   Model?: string;
   serialNumber?: string | null;
   SerialNumber?: string | null;
+  imeiOrSerialNumber?: string | null;
+  ImeiOrSerialNumber?: string | null;
   deviceType?: string;
   DeviceType?: string;
 };
+
+function normalizeIdentifierValue(
+  value: string | null | undefined,
+): string | null {
+  if (value == null) return null;
+
+  const normalized = value.trim();
+  return normalized === "" ? null : normalized;
+}
 
 function normalizeIdentifierKey(key: string): string {
   return key.toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -85,11 +96,16 @@ function readImeiOrSerialNumber(
 }
 
 function withCompatImeiOrSerialNumber<
-  T extends { imeiOrSerialNumber: string | null },
+  T extends { imeiOrSerialNumber: string | null | undefined },
 >(payload: T) {
+  const normalizedIdentifier = normalizeIdentifierValue(
+    payload.imeiOrSerialNumber,
+  );
+
   return {
     ...payload,
-    serialNumber: payload.imeiOrSerialNumber,
+    imeiOrSerialNumber: normalizedIdentifier,
+    serialNumber: normalizedIdentifier,
   };
 }
 
@@ -169,7 +185,12 @@ function normalizeDeviceLookupResponse(
     customerPhone: raw.customerPhone ?? raw.CustomerPhone ?? "",
     brand: raw.brand ?? raw.Brand ?? "",
     model: raw.model ?? raw.Model ?? "",
-    serialNumber: raw.serialNumber ?? raw.SerialNumber ?? null,
+    serialNumber:
+      raw.serialNumber ??
+      raw.SerialNumber ??
+      raw.imeiOrSerialNumber ??
+      raw.ImeiOrSerialNumber ??
+      null,
     deviceType: (raw.deviceType ??
       raw.DeviceType ??
       "Other") as DeviceLookupResponse["deviceType"],
@@ -240,8 +261,10 @@ export async function deleteDevice(deviceId: string): Promise<void> {
 export async function lookupDeviceByIdentifier(
   identifier: string,
 ): Promise<DeviceLookupResponse> {
+  const normalizedIdentifier = identifier.trim();
+
   const response = await apiClient.get<unknown>("/api/devices/lookup", {
-    params: { identifier },
+    params: { identifier: normalizedIdentifier },
   });
 
   const normalized = extractDeviceLookupPayload(response.data);
