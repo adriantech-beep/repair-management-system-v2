@@ -245,7 +245,7 @@ Goal:
 
 - Build the Create SO wizard as the primary intake flow and repair job mutation flows
 
-Acceptance criteria:
+Acceptance criteria (summary):
 
 - Create SO wizard enforces step order: Device Lookup (IMEI/Serial) → Customer Confirm/Edit → Repair Job Details → Confirmation
 - Step 1 allows lookup by IMEI/serial and loads linked device/customer when found
@@ -256,9 +256,75 @@ Acceptance criteria:
 - Update form supports diagnosis/resolution/cost fields
 - Mutation success updates relevant views predictably
 
-Status: TODO
-Branch name: ticket-f8-repair-actions
+Status: DONE
+Branch name: ticket-f8-device-lookup
 Commit template: feat(frontend): add repair job create update and status actions
+
+---
+
+#### Detailed Acceptance Criteria for ticket-f8-device-lookup (Create SO Wizard MVP)
+
+**Step 1: Device Lookup**
+
+- User can enter IMEI/Serial and trigger lookup.
+- If found, matched customer/device is shown and stored in wizard state.
+- If not found, user can continue to new intake flow.
+- All validation and API errors are clearly shown.
+
+**Step 2: Customer/Device Confirmation**
+
+- If matched, show summary of customer/device (read-only for MVP).
+- If not matched, show “new intake” mode and explain next steps.
+- User can go back to Step 1 at any time.
+
+**Step 3: Repair Details**
+
+- User can enter problem description (required).
+- User can enter estimated cost (optional).
+- Validation is enforced before submit.
+
+**Step 4: Submit**
+
+- If matched, submit repair job using matched customerId/deviceId.
+- If new intake, create customer, then device, then repair job in order.
+- On success, route to repair job detail/list with confirmation.
+- On failure, show actionable error and allow retry.
+
+**Guardrails**
+
+- Branch scope and role constraints are enforced by backend.
+- No inventory/parts reservation in MVP.
+- Wizard state can be reset after completion.
+
+---
+
+#### Implementation Order (MVP, Small Slices)
+
+1. Step 2: Existing Match Mode
+
+- Show summary card (already done).
+- Add “Confirm and Continue” button to proceed to Step 3.
+
+2. Step 2: New Intake Mode
+
+- Show new intake notice (already done).
+- (Next slice) Add form for new customer/device details.
+
+3. Step 3: Repair Details
+
+- Scaffold form for problem description and estimated cost.
+- Add validation.
+
+4. Step 4: Submit
+
+- Add createRepairJob API/hook.
+- Wire up submit for both matched and new intake paths.
+- Handle success/failure UI.
+
+5. Final polish
+
+- Reset wizard state on completion.
+- Add navigation/UX polish as needed.
 
 ## Epic 4: Inventory Integration and UX Quality
 

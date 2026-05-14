@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-type ServiceOrderWizardStep = 1 | 2;
+type ServiceOrderWizardStep = 1 | 2 | 3 | 4;
 
 type LookUpStatusState = "idle" | "loading" | "found" | "not-found" | "error";
 
@@ -11,6 +11,7 @@ type ServiceOrderWizardState = {
   lookUpMessage?: string | null;
   matchedCustomerId?: string | null;
   matchedCustomerName?: string | null;
+  matchedCustomerPhone?: string | null;
   matchedDeviceId?: string | null;
   matchedDeviceLabel?: string | null;
   setIdentifier: (value: string) => void;
@@ -21,6 +22,7 @@ type ServiceOrderWizardState = {
   setLookupMatch: (
     customerId: string,
     customerName: string,
+    customerPhone: string,
     deviceId: string,
     deviceLabel: string,
   ) => void;
@@ -34,6 +36,7 @@ const initialState = {
   lookUpMessage: null,
   matchedCustomerId: null,
   matchedCustomerName: null,
+  matchedCustomerPhone: null,
   matchedDeviceId: null,
   matchedDeviceLabel: null,
 };
@@ -46,10 +49,17 @@ const useServiceOrderWizardStore = create<ServiceOrderWizardState>((set) => ({
   startLookup: () => set({ lookUpStatus: "loading", lookUpMessage: null }),
   completeLookup: (lookUpStatus, lookUpMessage) =>
     set({ lookUpStatus, lookUpMessage }),
-  setLookupMatch: (customerId, customerName, deviceId, deviceLabel) =>
+  setLookupMatch: (
+    customerId,
+    customerName,
+    customerPhone,
+    deviceId,
+    deviceLabel,
+  ) =>
     set({
       matchedCustomerId: customerId,
       matchedCustomerName: customerName,
+      matchedCustomerPhone: customerPhone,
       matchedDeviceId: deviceId,
       matchedDeviceLabel: deviceLabel,
     }),
@@ -57,9 +67,9 @@ const useServiceOrderWizardStore = create<ServiceOrderWizardState>((set) => ({
     set({
       matchedCustomerId: null,
       matchedCustomerName: null,
+      matchedCustomerPhone: null,
       matchedDeviceId: null,
       matchedDeviceLabel: null,
-      resetWizard: () => set(initialState),
     }),
 }));
 

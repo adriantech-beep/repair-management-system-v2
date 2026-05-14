@@ -3,6 +3,7 @@ import {
   deleteDevice,
   getDeviceById,
   getDevicesByCustomerId,
+  lookupDeviceByIdentifier,
   updateDevice,
 } from "@/api/deviceApi";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -75,5 +76,11 @@ export function useDeleteDevice() {
         exact: true,
       });
     },
+  });
+}
+
+export function useLookupDeviceByIdentifier() {
+  return useMutation({
+    mutationFn: lookupDeviceByIdentifier,
   });
 }

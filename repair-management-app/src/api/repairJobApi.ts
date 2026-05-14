@@ -3,6 +3,7 @@ import type {
   RepairJobResponse,
   RepairJobStatus,
 } from "@/types/repairJob";
+import type { CreateRepairJobRequest } from "@/types/serviceOrder";
 import apiClient from "./httpClient";
 
 type RepairJobListPayload =
@@ -49,5 +50,10 @@ export async function getRepairJobById(repairJobId: string) {
   const response = await apiClient.get<unknown>(
     `/api/repair-jobs/${repairJobId}`,
   );
+  return extractRepairJob(response.data);
+}
+
+export async function createRepairJob(payload: CreateRepairJobRequest) {
+  const response = await apiClient.post<unknown>("/api/repair-jobs", payload);
   return extractRepairJob(response.data);
 }
