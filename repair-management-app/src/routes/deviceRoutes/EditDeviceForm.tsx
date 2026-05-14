@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useGetDeviceById, useUpdateDevice } from "@/hooks/useDevices";
 import { useEffect } from "react";
+import parseApiError from "@/api/parseApiError";
 
 type EditDeviceFormProps = {
   deviceId: string;
@@ -12,7 +13,12 @@ type EditDeviceFormProps = {
 };
 
 const EditDeviceForm = ({ deviceId, onCloseModal }: EditDeviceFormProps) => {
-  const { data: device, isLoading, isError } = useGetDeviceById(deviceId);
+  const {
+    data: device,
+    isLoading,
+    isError,
+    error,
+  } = useGetDeviceById(deviceId);
   const { mutateAsync: updateDevice } = useUpdateDevice();
 
   const form = useForm<DeviceFormData>({
@@ -26,21 +32,63 @@ const EditDeviceForm = ({ deviceId, onCloseModal }: EditDeviceFormProps) => {
   });
 
   const onSubmit = async (data: DeviceFormData) => {
-    if (!device) return;
+    try {
+      form.clearErrors("root");
 
-    await updateDevice({
-      deviceId,
-      customerId: device.customerId,
-      payload: {
-        brand: data.brand,
-        model: data.model,
-        imeiOrSerialNumber:
-          data.imeiOrSerialNumber === "" ? null : data.imeiOrSerialNumber,
-        deviceType: data.deviceType,
-      },
-    });
+      if (!device) return;
 
-    onCloseModal?.();
+      await updateDevice({
+        deviceId,
+        customerId: device.customerId,
+        payload: {
+          brand: data.brand.trim(),
+          model: data.model.trim(),
+          imeiOrSerialNumber: data.imeiOrSerialNumber?.trim() || null,
+          deviceType: data.deviceType,
+        },
+      });
+
+      onCloseModal?.();
+    } catch (error) {
+      const parsed = parseApiError(error);
+
+      if (parsed.fieldErrors) {
+        for (const [fieldName, messages] of Object.entries(
+          parsed.fieldErrors,
+        )) {
+          const normalized = fieldName.toLowerCase();
+          const firstMessage = messages[0];
+          if (!firstMessage) continue;
+
+          if (normalized === "brand") {
+            form.setError("brand", { message: firstMessage });
+          } else if (normalized === "model") {
+            form.setError("model", { message: firstMessage });
+          } else if (
+            normalized === "serialnumber" ||
+            normalized === "imeiorserialnumber"
+          ) {
+            form.setError("imeiOrSerialNumber", { message: firstMessage });
+          } else if (normalized === "devicetype") {
+            form.setError("deviceType", { message: firstMessage });
+          }
+        }
+      }
+
+      if (parsed.status === 409) {
+        form.setError("imeiOrSerialNumber", {
+          message: "IMEI / Serial number already exists in this branch.",
+        });
+      }
+
+      const isNetworkFailure = !parsed.status && !parsed.message;
+
+      form.setError("root", {
+        message: isNetworkFailure
+          ? "Cannot reach the server..."
+          : (parsed.message ?? "Unable to update device."),
+      });
+    }
   };
 
   useEffect(() => {
@@ -61,10 +109,19 @@ const EditDeviceForm = ({ deviceId, onCloseModal }: EditDeviceFormProps) => {
     );
   }
 
-  if (isError) {
+  const parsedLoadError = isError ? parseApiError(error) : null;
+
+  const loadErrorMessage =
+    parsedLoadError?.status === 404
+      ? "Device not found."
+      : parsedLoadError?.status === 403
+        ? "You do not have permission to view this device."
+        : "Unable to load device details.";
+
+  if (isError || !device) {
     return (
       <div className="rounded-xl border border-red-100 bg-red-50 p-4 text-sm text-red-700 shadow-sm">
-        Unable to load device details.
+        {loadErrorMessage}
       </div>
     );
   }

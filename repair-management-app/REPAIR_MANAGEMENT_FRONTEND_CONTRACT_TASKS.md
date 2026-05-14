@@ -87,7 +87,7 @@ Acceptance criteria:
 - Create and update forms map backend conflict and validation errors consistently.
 - Branch-scope forbidden and not-found states are user-readable and actionable.
 
-Status: IN_PROGRESS
+Status: DONE
 Branch name: ticket-c1-customer-contract-completion
 Commit template: feat(frontend): finalize customer module with contract-aligned states
 
@@ -103,7 +103,7 @@ Acceptance criteria:
 - Device lookup by identifier has clear found/not-found/forbidden states.
 - Identifier normalization across serial and IMEI fields is consistent in UI and API payloads.
 
-Status: TODO
+Status: IN_PROGRESS
 Branch name: ticket-c2-device-contract-completion
 Commit template: feat(frontend): complete device workflows with lookup and contract consistency
 

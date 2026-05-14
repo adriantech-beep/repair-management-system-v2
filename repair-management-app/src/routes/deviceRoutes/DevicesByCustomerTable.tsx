@@ -10,8 +10,6 @@ const DevicesByCustomerTable = ({ customerId }: { customerId: string }) => {
     isError,
   } = useGetDevicesByCustomerId(customerId);
 
-  console.log(devices);
-
   if (isLoading) {
     return (
       <div className="rounded-2xl border border-emerald-100 bg-white p-6 text-sm text-emerald-900/70 shadow-sm">

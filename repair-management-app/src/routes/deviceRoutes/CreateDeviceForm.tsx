@@ -43,9 +43,11 @@ const CreateDeviceForm = ({
 
       await createDevice({
         ...data,
+        brand: data.brand.trim(),
+        model: data.model.trim(),
         customerId,
         branchId: user.branchId,
-        imeiOrSerialNumber: data.imeiOrSerialNumber,
+        imeiOrSerialNumber: data.imeiOrSerialNumber?.trim() || null,
         deviceType: data.deviceType,
       });
       onCloseModal?.();

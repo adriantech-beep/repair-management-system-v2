@@ -170,6 +170,14 @@ const CreateServiceOrder = () => {
     } catch (error) {
       const parsed = parseApiError(error);
 
+      if (parsed.status === 403) {
+        completeLookup(
+          "error",
+          "You do not have permission to access this device identifier.",
+        );
+        return;
+      }
+
       if (parsed.status === 404) {
         completeLookup(
           "not-found",

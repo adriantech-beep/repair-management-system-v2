@@ -1,12 +1,13 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import EditDeviceForm from "./EditDeviceForm";
 import { useFormContext } from "react-hook-form";
 import type { DeviceFormData } from "./deviceSchema";
+import EditDeviceForm from "./EditDeviceForm";
 
 const mockMutateAsync = vi.fn();
 const mockOnCloseModal = vi.fn();
+const mockUseGetDeviceById = vi.fn();
 
 const deviceFixture = {
   id: "device-1",
@@ -21,16 +22,16 @@ const deviceFixture = {
 };
 
 vi.mock("@/hooks/useDevices", () => ({
-  useGetDeviceById: () => ({
-    data: deviceFixture,
-    isLoading: false,
-    isError: false,
-  }),
+  useGetDeviceById: (...args: unknown[]) => mockUseGetDeviceById(...args),
   useUpdateDevice: () => ({ mutateAsync: mockMutateAsync }),
 }));
 
+vi.mock("@/api/parseApiError", () => ({
+  default: (error: unknown) => error,
+}));
+
 vi.mock("./CreateDeviceFields", () => ({
-  default: () => {
+  default: function MockCreateDeviceFields() {
     const { register } = useFormContext<DeviceFormData>();
 
     return (
@@ -61,9 +62,15 @@ vi.mock("./CreateDeviceFields", () => ({
 
 describe("EditDeviceForm", () => {
   beforeEach(() => {
-    mockMutateAsync.mockReset();
-    mockOnCloseModal.mockReset();
+    vi.clearAllMocks();
     mockMutateAsync.mockResolvedValue({ ...deviceFixture });
+
+    mockUseGetDeviceById.mockReturnValue({
+      data: deviceFixture,
+      isLoading: false,
+      isError: false,
+      error: null,
+    });
   });
 
   it("prefills the form with the loaded device and submits the update payload", async () => {
@@ -100,5 +107,53 @@ describe("EditDeviceForm", () => {
       });
       expect(mockOnCloseModal).toHaveBeenCalled();
     });
+  });
+
+  it("shows root error on 409 conflict", async () => {
+    const user = userEvent.setup();
+    mockMutateAsync.mockRejectedValue({
+      status: 409,
+      message: "Conflict.",
+    });
+
+    render(
+      <EditDeviceForm
+        deviceId={deviceFixture.id}
+        onCloseModal={mockOnCloseModal}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: /Save Changes/i }));
+
+    expect(await screen.findByText("Conflict.")).toBeInTheDocument();
+    expect(mockOnCloseModal).not.toHaveBeenCalled();
+  });
+
+  it("shows not found state when load returns 404", () => {
+    mockUseGetDeviceById.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      error: { status: 404, message: "Not found" },
+    });
+
+    render(<EditDeviceForm deviceId={deviceFixture.id} />);
+
+    expect(screen.getByText("Device not found.")).toBeInTheDocument();
+  });
+
+  it("shows forbidden state when load returns 403", () => {
+    mockUseGetDeviceById.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      error: { status: 403, message: "Forbidden" },
+    });
+
+    render(<EditDeviceForm deviceId={deviceFixture.id} />);
+
+    expect(
+      screen.getByText("You do not have permission to view this device."),
+    ).toBeInTheDocument();
   });
 });
