@@ -341,7 +341,7 @@ Acceptance criteria:
 - Basic integration points for parts usage are prepared for I11/I12 backend delivery
 - Error handling matches global frontend standards
 
-Status: TODO
+Status: IN_PROGRESS
 Branch name: ticket-f9-inventory-waitlist-ui
 Commit template: feat(frontend): integrate inventory and waitlist screens
 
