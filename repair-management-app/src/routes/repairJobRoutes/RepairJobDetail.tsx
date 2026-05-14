@@ -2,13 +2,19 @@ import parseApiError from "@/api/parseApiError";
 import { useGetCustomerById } from "@/hooks/useCustomers";
 import { useGetDeviceById } from "@/hooks/useDevices";
 import { useCreateWaitlistRequest, useGetParts } from "@/hooks/useInventory";
-import { useGetRepairJobById } from "@/hooks/useRepairJobs";
+import {
+  useGetRepairJobById,
+  useUpdateRepairJob,
+  useUpdateRepairJobStatus,
+} from "@/hooks/useRepairJobs";
+import useAuthStore from "@/store/authStore";
 import type {
   PartResponse,
   PreferredContactMethod,
   WaitlistStatus,
 } from "@/types/inventory";
-import { useState } from "react";
+import { repairJobStatuses, type RepairJobStatus } from "@/types/repairJob";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
   formatCurrency,
@@ -26,12 +32,28 @@ type WaitlistDraft = {
   notes: string;
 };
 
+type RepairJobUpdateDraft = {
+  problemDescription: string;
+  diagnosisNotes: string;
+  resolutionNotes: string;
+  estimatedCost: string;
+  finalCost: string;
+};
+
 const emptyWaitlistDraft: WaitlistDraft = {
   customerName: "",
   customerEmail: "",
   customerPhone: "",
   preferredContactMethod: "Phone",
   notes: "",
+};
+
+const emptyRepairJobUpdateDraft: RepairJobUpdateDraft = {
+  problemDescription: "",
+  diagnosisNotes: "",
+  resolutionNotes: "",
+  estimatedCost: "",
+  finalCost: "",
 };
 
 function normalizeText(value: string | null | undefined) {
@@ -70,12 +92,19 @@ function waitlistStatusClass(status: WaitlistStatus) {
 
 const RepairJobDetail = () => {
   const { repairJobId = "" } = useParams();
+  const user = useAuthStore((state) => state.user);
   const {
     data: repairJob,
     isLoading,
     isError,
     error,
   } = useGetRepairJobById(repairJobId);
+  const { mutateAsync: updateRepairJob, isPending: isUpdatingRepairJob } =
+    useUpdateRepairJob();
+  const {
+    mutateAsync: updateRepairJobStatus,
+    isPending: isUpdatingRepairJobStatus,
+  } = useUpdateRepairJobStatus();
   const { data: parts = [], isLoading: isLoadingParts } = useGetParts();
   const { mutateAsync: createWaitlistRequest, isPending: isCreatingWaitlist } =
     useCreateWaitlistRequest();
@@ -89,6 +118,31 @@ const RepairJobDetail = () => {
     useState<WaitlistDraft>(emptyWaitlistDraft);
   const [waitlistMessage, setWaitlistMessage] = useState<string | null>(null);
   const [waitlistError, setWaitlistError] = useState<string | null>(null);
+  const [repairJobUpdateDraft, setRepairJobUpdateDraft] =
+    useState<RepairJobUpdateDraft>(emptyRepairJobUpdateDraft);
+  const [updateError, setUpdateError] = useState<string | null>(null);
+  const [updateMessage, setUpdateMessage] = useState<string | null>(null);
+  const [statusDraft, setStatusDraft] = useState<RepairJobStatus>("Received");
+  const [statusError, setStatusError] = useState<string | null>(null);
+
+  const normalizedRole = user?.role?.toLowerCase() ?? "";
+  const canEditRepairJobDetails = normalizedRole === "admin";
+  const canUpdateRepairJobStatus =
+    normalizedRole === "admin" || normalizedRole === "technician";
+
+  useEffect(() => {
+    if (!repairJob) return;
+
+    setRepairJobUpdateDraft({
+      problemDescription: repairJob.problemDescription,
+      diagnosisNotes: repairJob.diagnosisNotes ?? "",
+      resolutionNotes: repairJob.resolutionNotes ?? "",
+      estimatedCost:
+        repairJob.estimatedCost == null ? "" : String(repairJob.estimatedCost),
+      finalCost: repairJob.finalCost == null ? "" : String(repairJob.finalCost),
+    });
+    setStatusDraft(repairJob.status);
+  }, [repairJob]);
 
   if (isLoading) {
     return (
@@ -116,6 +170,73 @@ const RepairJobDetail = () => {
   }
 
   if (!repairJob) return null;
+
+  const parseOptionalCost = (value: string, label: string) => {
+    const normalized = value.trim();
+    if (normalized === "") return null;
+
+    const parsed = Number(normalized);
+    if (Number.isNaN(parsed) || parsed < 0) {
+      throw new Error(`${label} must be a valid non-negative number.`);
+    }
+
+    return parsed;
+  };
+
+  const submitRepairJobUpdate = async () => {
+    if (!canEditRepairJobDetails || isUpdatingRepairJob) return;
+
+    try {
+      setUpdateError(null);
+      setUpdateMessage(null);
+
+      if (repairJobUpdateDraft.problemDescription.trim().length < 5) {
+        setUpdateError("Problem description must be at least 5 characters.");
+        return;
+      }
+
+      const estimatedCost = parseOptionalCost(
+        repairJobUpdateDraft.estimatedCost,
+        "Estimated cost",
+      );
+      const finalCost = parseOptionalCost(
+        repairJobUpdateDraft.finalCost,
+        "Final cost",
+      );
+
+      await updateRepairJob({
+        repairJobId,
+        payload: {
+          problemDescription: repairJobUpdateDraft.problemDescription.trim(),
+          diagnosisNotes: repairJobUpdateDraft.diagnosisNotes.trim() || null,
+          resolutionNotes: repairJobUpdateDraft.resolutionNotes.trim() || null,
+          estimatedCost,
+          finalCost,
+        },
+      });
+
+      setUpdateMessage("Repair job details updated.");
+    } catch (submitError) {
+      const parsed = parseApiError(submitError);
+      setUpdateError(parsed.message || "Unable to update repair job.");
+    }
+  };
+
+  const submitStatusUpdate = async () => {
+    if (!canUpdateRepairJobStatus || isUpdatingRepairJobStatus) return;
+
+    try {
+      setStatusError(null);
+
+      await updateRepairJobStatus({
+        repairJobId,
+        payload: { status: statusDraft },
+      });
+    } catch (submitError) {
+      const parsed = parseApiError(submitError);
+      setStatusError(parsed.message || "Unable to update repair job status.");
+    }
+  };
 
   const filteredParts =
     device?.brand && device?.model
@@ -206,11 +327,53 @@ const RepairJobDetail = () => {
           </div>
         </div>
 
-        <span
-          className={`inline-flex self-start rounded-full px-3 py-1 text-sm font-medium ${repairJobStatusClasses[repairJob.status]}`}
-        >
-          {formatRepairJobStatus(repairJob.status)}
-        </span>
+        <div className="space-y-2">
+          <span
+            className={`inline-flex self-start rounded-full px-3 py-1 text-sm font-medium ${repairJobStatusClasses[repairJob.status]}`}
+          >
+            {formatRepairJobStatus(repairJob.status)}
+          </span>
+
+          {canUpdateRepairJobStatus ? (
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <select
+                aria-label="Update repair job status"
+                className="h-9 rounded-md border border-emerald-200 bg-white px-3 text-sm"
+                value={statusDraft}
+                onChange={(event) =>
+                  setStatusDraft(event.target.value as RepairJobStatus)
+                }
+                disabled={isUpdatingRepairJobStatus}
+              >
+                {repairJobStatuses.map((status) => (
+                  <option key={status} value={status}>
+                    {formatRepairJobStatus(status)}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={submitStatusUpdate}
+                disabled={
+                  isUpdatingRepairJobStatus || statusDraft === repairJob.status
+                }
+                className="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-60"
+              >
+                {isUpdatingRepairJobStatus ? "Updating..." : "Update Status"}
+              </button>
+            </div>
+          ) : (
+            <p className="text-xs text-emerald-900/70">
+              You can view status, but status updates are restricted by role.
+            </p>
+          )}
+
+          {statusError ? (
+            <p className="rounded-md border border-red-100 bg-red-50 px-2 py-1.5 text-xs text-red-700">
+              {statusError}
+            </p>
+          ) : null}
+        </div>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[1.7fr_1fr]">
@@ -224,6 +387,128 @@ const RepairJobDetail = () => {
               panel for the future backend timeline endpoint.
             </p>
           </div>
+
+          <section className="space-y-3 rounded-xl border border-emerald-100 bg-emerald-50/40 p-4">
+            <div>
+              <h3 className="text-sm font-semibold text-emerald-950">
+                Update Repair Job
+              </h3>
+              <p className="text-xs text-emerald-900/70">
+                Contract-backed update fields for problem details and costs.
+              </p>
+            </div>
+
+            <label className="block text-xs font-medium text-emerald-900/80">
+              Problem Description
+              <textarea
+                value={repairJobUpdateDraft.problemDescription}
+                onChange={(event) =>
+                  setRepairJobUpdateDraft((current) => ({
+                    ...current,
+                    problemDescription: event.target.value,
+                  }))
+                }
+                rows={3}
+                disabled={!canEditRepairJobDetails || isUpdatingRepairJob}
+                className="mt-1 w-full rounded-md border border-emerald-200 bg-white px-2 py-1.5 text-sm disabled:opacity-70"
+              />
+            </label>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="text-xs font-medium text-emerald-900/80">
+                Diagnosis Notes
+                <textarea
+                  value={repairJobUpdateDraft.diagnosisNotes}
+                  onChange={(event) =>
+                    setRepairJobUpdateDraft((current) => ({
+                      ...current,
+                      diagnosisNotes: event.target.value,
+                    }))
+                  }
+                  rows={2}
+                  disabled={!canEditRepairJobDetails || isUpdatingRepairJob}
+                  className="mt-1 w-full rounded-md border border-emerald-200 bg-white px-2 py-1.5 text-sm disabled:opacity-70"
+                />
+              </label>
+
+              <label className="text-xs font-medium text-emerald-900/80">
+                Resolution Notes
+                <textarea
+                  value={repairJobUpdateDraft.resolutionNotes}
+                  onChange={(event) =>
+                    setRepairJobUpdateDraft((current) => ({
+                      ...current,
+                      resolutionNotes: event.target.value,
+                    }))
+                  }
+                  rows={2}
+                  disabled={!canEditRepairJobDetails || isUpdatingRepairJob}
+                  className="mt-1 w-full rounded-md border border-emerald-200 bg-white px-2 py-1.5 text-sm disabled:opacity-70"
+                />
+              </label>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="text-xs font-medium text-emerald-900/80">
+                Estimated Cost
+                <input
+                  value={repairJobUpdateDraft.estimatedCost}
+                  onChange={(event) =>
+                    setRepairJobUpdateDraft((current) => ({
+                      ...current,
+                      estimatedCost: event.target.value,
+                    }))
+                  }
+                  disabled={!canEditRepairJobDetails || isUpdatingRepairJob}
+                  className="mt-1 w-full rounded-md border border-emerald-200 bg-white px-2 py-1.5 text-sm disabled:opacity-70"
+                />
+              </label>
+
+              <label className="text-xs font-medium text-emerald-900/80">
+                Final Cost
+                <input
+                  value={repairJobUpdateDraft.finalCost}
+                  onChange={(event) =>
+                    setRepairJobUpdateDraft((current) => ({
+                      ...current,
+                      finalCost: event.target.value,
+                    }))
+                  }
+                  disabled={!canEditRepairJobDetails || isUpdatingRepairJob}
+                  className="mt-1 w-full rounded-md border border-emerald-200 bg-white px-2 py-1.5 text-sm disabled:opacity-70"
+                />
+              </label>
+            </div>
+
+            {updateError ? (
+              <p className="rounded-md border border-red-100 bg-red-50 px-2 py-1.5 text-xs text-red-700">
+                {updateError}
+              </p>
+            ) : null}
+
+            {updateMessage ? (
+              <p className="rounded-md border border-emerald-100 bg-emerald-50 px-2 py-1.5 text-xs text-emerald-800">
+                {updateMessage}
+              </p>
+            ) : null}
+
+            <div className="flex items-center justify-between gap-2">
+              {canEditRepairJobDetails ? (
+                <button
+                  type="button"
+                  onClick={submitRepairJobUpdate}
+                  disabled={isUpdatingRepairJob}
+                  className="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-60"
+                >
+                  {isUpdatingRepairJob ? "Saving..." : "Save Job Details"}
+                </button>
+              ) : (
+                <p className="text-xs text-emerald-900/70">
+                  Detail edits require Admin role.
+                </p>
+              )}
+            </div>
+          </section>
 
           <dl className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1">

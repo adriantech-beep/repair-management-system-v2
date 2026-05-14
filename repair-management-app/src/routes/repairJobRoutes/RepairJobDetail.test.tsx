@@ -4,14 +4,19 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import RepairJobDetail from "./RepairJobDetail";
 
 const mockUseGetRepairJobById = vi.fn();
+const mockUseUpdateRepairJob = vi.fn();
+const mockUseUpdateRepairJobStatus = vi.fn();
 const mockUseGetParts = vi.fn();
 const mockUseCreateWaitlistRequest = vi.fn();
 const mockUseGetCustomerById = vi.fn();
 const mockUseGetDeviceById = vi.fn();
+const mockUseAuthStore = vi.fn();
 
 vi.mock("@/hooks/useRepairJobs", () => ({
   useGetRepairJobById: (repairJobId: string) =>
     mockUseGetRepairJobById(repairJobId),
+  useUpdateRepairJob: () => mockUseUpdateRepairJob(),
+  useUpdateRepairJobStatus: () => mockUseUpdateRepairJobStatus(),
 }));
 
 vi.mock("@/hooks/useInventory", () => ({
@@ -28,7 +33,26 @@ vi.mock("@/hooks/useDevices", () => ({
   useGetDeviceById: (deviceId: string) => mockUseGetDeviceById(deviceId),
 }));
 
+vi.mock("@/store/authStore", () => ({
+  default: (selector: (state: { user: { role: string } | null }) => unknown) =>
+    selector(mockUseAuthStore()),
+}));
+
 function mockDefaultDependencies() {
+  mockUseAuthStore.mockReturnValue({
+    user: { role: "Admin" },
+  });
+
+  mockUseUpdateRepairJob.mockReturnValue({
+    mutateAsync: vi.fn(),
+    isPending: false,
+  });
+
+  mockUseUpdateRepairJobStatus.mockReturnValue({
+    mutateAsync: vi.fn(),
+    isPending: false,
+  });
+
   mockUseGetParts.mockReturnValue({
     data: [],
     isLoading: false,
@@ -212,5 +236,54 @@ describe("RepairJobDetail", () => {
 
     expect(screen.getByText("Parts Availability")).toBeInTheDocument();
     expect(screen.getByText("Create Waitlist Request")).toBeInTheDocument();
+  });
+
+  it("shows status controls but hides detail edit action for technician role", () => {
+    mockDefaultDependencies();
+    mockUseAuthStore.mockReturnValue({
+      user: { role: "Technician" },
+    });
+
+    mockUseGetRepairJobById.mockReturnValue({
+      data: {
+        id: "job-1",
+        customerId: "customer-1",
+        deviceId: "device-1",
+        branchId: "branch-1",
+        jobNumber: "RJ-1",
+        problemDescription: "Screen crack",
+        diagnosisNotes: null,
+        resolutionNotes: null,
+        estimatedCost: null,
+        finalCost: null,
+        status: "Received",
+        receivedAtUtc: "2026-05-10T10:00:00Z",
+        completedAtUtc: null,
+        createdAtUtc: "2026-05-10T10:00:00Z",
+        updatedAtUtc: "2026-05-10T10:00:00Z",
+      },
+      isLoading: false,
+      isError: false,
+      error: null,
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/repair-jobs/job-1"]}>
+        <Routes>
+          <Route
+            path="/repair-jobs/:repairJobId"
+            element={<RepairJobDetail />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(
+      screen.getByLabelText("Update repair job status"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Update Status")).toBeInTheDocument();
+    expect(
+      screen.getByText("Detail edits require Admin role."),
+    ).toBeInTheDocument();
   });
 });
