@@ -103,7 +103,7 @@ Acceptance criteria:
 - Device lookup by identifier has clear found/not-found/forbidden states.
 - Identifier normalization across serial and IMEI fields is consistent in UI and API payloads.
 
-Status: IN_PROGRESS
+Status: DONE
 Branch name: ticket-c2-device-contract-completion
 Commit template: feat(frontend): complete device workflows with lookup and contract consistency
 
@@ -119,7 +119,7 @@ Acceptance criteria:
 - Status transitions use PATCH endpoint and update list/detail cache predictably.
 - Role visibility in UI matches backend role constraints for update actions.
 
-Status: TODO
+Status: IN_PROGRESS
 Branch name: ticket-c3-repair-job-mutations
 Commit template: feat(frontend): add repair job update and status transition flows
 

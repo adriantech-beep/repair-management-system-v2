@@ -2,6 +2,8 @@ import type {
   RepairJobListItem,
   RepairJobResponse,
   RepairJobStatus,
+  UpdateRepairJobRequest,
+  UpdateRepairJobStatusRequest,
 } from "@/types/repairJob";
 import type { CreateRepairJobRequest } from "@/types/serviceOrder";
 import apiClient from "./httpClient";
@@ -55,5 +57,29 @@ export async function getRepairJobById(repairJobId: string) {
 
 export async function createRepairJob(payload: CreateRepairJobRequest) {
   const response = await apiClient.post<unknown>("/api/repair-jobs", payload);
+  return extractRepairJob(response.data);
+}
+
+export async function updateRepairJob(
+  repairJobId: string,
+  payload: UpdateRepairJobRequest,
+) {
+  const response = await apiClient.put<unknown>(
+    `/api/repair-jobs/${repairJobId}`,
+    payload,
+  );
+
+  return extractRepairJob(response.data);
+}
+
+export async function updateRepairJobStatus(
+  repairJobId: string,
+  payload: UpdateRepairJobStatusRequest,
+) {
+  const response = await apiClient.patch<unknown>(
+    `/api/repair-jobs/${repairJobId}/status`,
+    payload,
+  );
+
   return extractRepairJob(response.data);
 }

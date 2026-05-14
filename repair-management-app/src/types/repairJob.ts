@@ -37,3 +37,15 @@ export type RepairJobResponse = {
   createdAtUtc: string;
   updatedAtUtc: string;
 };
+
+export type UpdateRepairJobRequest = {
+  problemDescription: string;
+  diagnosisNotes: string | null;
+  resolutionNotes: string | null;
+  estimatedCost: number | null;
+  finalCost: number | null;
+};
+
+export type UpdateRepairJobStatusRequest = {
+  status: RepairJobStatus;
+};
