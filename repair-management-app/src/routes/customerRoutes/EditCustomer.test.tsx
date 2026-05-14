@@ -181,4 +181,44 @@ describe("EditCustomerForm", () => {
       screen.getByText("You do not have permission to view this customer."),
     ).toBeInTheDocument();
   });
+
+  it("maps backend field validation errors to form fields on update", async () => {
+    const user = userEvent.setup();
+
+    mockMutateAsync.mockRejectedValue({
+      status: 400,
+      fieldErrors: {
+        fullName: ["Full name cannot be empty"],
+        email: ["Email must be valid"],
+      },
+    });
+
+    renderEditCustomer();
+
+    await user.click(screen.getByRole("button", { name: /Save Changes/i }));
+
+    expect(
+      await screen.findByText("Full name cannot be empty"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Email must be valid")).toBeInTheDocument();
+  });
+
+  it("shows generic error on update API failure", async () => {
+    const user = userEvent.setup();
+
+    mockMutateAsync.mockRejectedValue({
+      status: 500,
+      message: "Internal server error.",
+    });
+
+    renderEditCustomer();
+
+    await user.click(screen.getByRole("button", { name: /Save Changes/i }));
+
+    expect(
+      await screen.findByText("Internal server error."),
+    ).toBeInTheDocument();
+
+    expect(mockOnclose).not.toHaveBeenCalled();
+  });
 });
