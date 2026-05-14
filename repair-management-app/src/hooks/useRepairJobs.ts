@@ -1,6 +1,10 @@
-import { getRepairJobById, getRepairJobs } from "@/api/repairJobApi";
+import {
+  createRepairJob,
+  getRepairJobById,
+  getRepairJobs,
+} from "@/api/repairJobApi";
 import type { RepairJobStatus } from "@/types/repairJob";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useGetRepairJobs(status?: RepairJobStatus) {
   return useQuery({
@@ -14,5 +18,16 @@ export function useGetRepairJobById(repairJobId: string) {
     queryKey: ["repair-job", repairJobId],
     queryFn: () => getRepairJobById(repairJobId),
     enabled: Boolean(repairJobId),
+  });
+}
+
+export function useCreateRepairJob() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: createRepairJob,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["repair-jobs"] });
+    },
   });
 }

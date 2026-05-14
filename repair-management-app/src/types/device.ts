@@ -37,3 +37,14 @@ export type UpdateDeviceRequest = {
   imeiOrSerialNumber: string | null;
   deviceType: DeviceType;
 };
+
+export type DeviceLookupResponse = {
+  deviceId: string;
+  customerId: string;
+  customerName: string;
+  customerPhone: string;
+  brand: string;
+  model: string;
+  serialNumber: string | null;
+  deviceType: DeviceType;
+};

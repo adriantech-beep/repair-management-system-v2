@@ -8,6 +8,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 import CustomerPage from "./pages/CustomerPage";
 import RepairJobsPage from "./pages/RepairJobsPage";
 import RepairJobDetailPage from "./pages/RepairJobDetailPage";
+import CreateServiceOrderPage from "./pages/CreateServiceOrderPage";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,10 @@ const App = () => {
           >
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<DashboardPage />} />
+            <Route
+              path="service-orders/new"
+              element={<CreateServiceOrderPage />}
+            />
             <Route path="repair-jobs" element={<RepairJobsPage />} />
             <Route
               path="repair-jobs/:repairJobId"

@@ -1,5 +1,6 @@
 import type {
   CreateDeviceRequest,
+  DeviceLookupResponse,
   DeviceListItem,
   DeviceResponse,
   UpdateDeviceRequest,
@@ -21,6 +22,25 @@ type DeviceResponseApi = Omit<DeviceResponse, "imeiOrSerialNumber"> & {
 };
 
 type DeviceIdentifierSource = Record<string, unknown>;
+
+type DeviceLookupResponseApi = {
+  deviceId?: string;
+  DeviceId?: string;
+  customerId?: string;
+  CustomerId?: string;
+  customerName?: string;
+  CustomerName?: string;
+  customerPhone?: string;
+  CustomerPhone?: string;
+  brand?: string;
+  Brand?: string;
+  model?: string;
+  Model?: string;
+  serialNumber?: string | null;
+  SerialNumber?: string | null;
+  deviceType?: string;
+  DeviceType?: string;
+};
 
 function normalizeIdentifierKey(key: string): string {
   return key.toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -115,6 +135,47 @@ function extractDevicePayload(payload: unknown): DeviceResponseApi | undefined {
   return undefined;
 }
 
+function extractDeviceLookupPayload(
+  payload: unknown,
+): DeviceLookupResponseApi | undefined {
+  if (payload && typeof payload === "object") {
+    if (
+      "deviceId" in (payload as object) ||
+      "DeviceId" in (payload as object)
+    ) {
+      return payload as DeviceLookupResponseApi;
+    }
+
+    const nested = (payload as { data?: unknown }).data;
+    if (
+      nested &&
+      typeof nested === "object" &&
+      ("deviceId" in (nested as object) || "DeviceId" in (nested as object))
+    ) {
+      return nested as DeviceLookupResponseApi;
+    }
+  }
+
+  return undefined;
+}
+
+function normalizeDeviceLookupResponse(
+  raw: DeviceLookupResponseApi,
+): DeviceLookupResponse {
+  return {
+    deviceId: raw.deviceId ?? raw.DeviceId ?? "",
+    customerId: raw.customerId ?? raw.CustomerId ?? "",
+    customerName: raw.customerName ?? raw.CustomerName ?? "",
+    customerPhone: raw.customerPhone ?? raw.CustomerPhone ?? "",
+    brand: raw.brand ?? raw.Brand ?? "",
+    model: raw.model ?? raw.Model ?? "",
+    serialNumber: raw.serialNumber ?? raw.SerialNumber ?? null,
+    deviceType: (raw.deviceType ??
+      raw.DeviceType ??
+      "Other") as DeviceLookupResponse["deviceType"],
+  };
+}
+
 export async function createDevice(
   payload: CreateDeviceRequest,
 ): Promise<DeviceResponse> {
@@ -174,4 +235,19 @@ export async function updateDevice(
 
 export async function deleteDevice(deviceId: string): Promise<void> {
   await apiClient.delete(`/api/devices/${deviceId}`);
+}
+
+export async function lookupDeviceByIdentifier(
+  identifier: string,
+): Promise<DeviceLookupResponse> {
+  const response = await apiClient.get<unknown>("/api/devices/lookup", {
+    params: { identifier },
+  });
+
+  const normalized = extractDeviceLookupPayload(response.data);
+  if (!normalized) {
+    throw new Error("Unexpected lookupDeviceByIdentifier response shape.");
+  }
+
+  return normalizeDeviceLookupResponse(normalized);
 }

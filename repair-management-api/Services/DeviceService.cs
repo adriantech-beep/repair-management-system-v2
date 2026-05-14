@@ -101,6 +101,32 @@ public class DeviceService : IDeviceService
         await _db.SaveChangesAsync();
     }
 
+    public async Task<DeviceLookupResponseDto?> LookupDeviceByIdentifierAsync(string identifier)
+    {
+        // Normalize identifier for case-insensitive search
+        var normalizedIdentifier = identifier.ToUpperInvariant().Trim();
+
+        var device = await _db.Devices
+            .Include(d => d.Customer)
+            .FirstOrDefaultAsync(d => 
+                d.SerialNumber != null && d.SerialNumber.ToUpper() == normalizedIdentifier);
+
+        if (device is null)
+            return null;
+
+        return new DeviceLookupResponseDto
+        {
+            DeviceId = device.Id,
+            CustomerId = device.CustomerId,
+            CustomerName = device.Customer?.FullName ?? string.Empty,
+            CustomerPhone = device.Customer?.Phone ?? string.Empty,
+            Brand = device.Brand,
+            Model = device.Model,
+            SerialNumber = device.SerialNumber,
+            DeviceType = device.DeviceType
+        };
+    }
+
     private static DeviceResponseDto MapToDto(Device device)
     {
         return new DeviceResponseDto

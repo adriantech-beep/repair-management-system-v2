@@ -71,6 +71,32 @@ public class DevicesController : ControllerBase
         return Ok(devices);
     }
 
+    [HttpGet("lookup")]
+    [Authorize(Roles = "Admin,Technician")]
+    [ProducesResponseType(typeof(DeviceLookupResponseDto), 200)]
+    [ProducesResponseType(404)]
+    [ProducesResponseType(400)]
+    public async Task<ActionResult<DeviceLookupResponseDto>> LookupDevice([FromQuery] string identifier)
+    {
+        if (string.IsNullOrWhiteSpace(identifier))
+            return BadRequest(new { code = "Identifier_Required" });
+
+        var device = await _deviceService.LookupDeviceByIdentifierAsync(identifier);
+        if (device is null)
+            return NotFound(new { code = "Device_Not_Found" });
+
+        // Branch scope check: verify device belongs to user's branch
+        if (_branchContext.BranchId.HasValue)
+        {
+            // Load full device to check branch
+            var fullDevice = await _deviceService.GetDeviceByIdAsync(device.DeviceId);
+            if (fullDevice?.BranchId != _branchContext.BranchId.Value)
+                return Forbid();
+        }
+
+        return Ok(device);
+    }
+
     [HttpGet("{deviceId}")]
     [Authorize(Roles = "Admin,Technician")]
     [ProducesResponseType(typeof(DeviceResponseDto), 200)]
