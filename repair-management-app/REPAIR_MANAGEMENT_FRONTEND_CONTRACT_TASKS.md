@@ -87,7 +87,7 @@ Acceptance criteria:
 - Create and update forms map backend conflict and validation errors consistently.
 - Branch-scope forbidden and not-found states are user-readable and actionable.
 
-Status: TODO
+Status: IN_PROGRESS
 Branch name: ticket-c1-customer-contract-completion
 Commit template: feat(frontend): finalize customer module with contract-aligned states
 

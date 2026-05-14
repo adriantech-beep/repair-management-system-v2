@@ -33,6 +33,10 @@ vi.mock("@/store/authStore", () => ({
     selector({ user: mockUser }),
 }));
 
+vi.mock("@/api/parseApiError", () => ({
+  default: (error: unknown) => error,
+}));
+
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
 const renderCreateCustomer = () =>
@@ -91,13 +95,8 @@ describe("CreateCustomerForm", () => {
   it("shows phone field error and root error on 409 conflict", async () => {
     const user = userEvent.setup();
     mockMutateAsync.mockRejectedValue({
-      isAxiosError: true,
-      response: {
-        status: 409,
-        data: {
-          message: "Conflict.",
-        },
-      },
+      status: 409,
+      message: "Conflict.",
     });
 
     renderCreateCustomer();
@@ -116,7 +115,8 @@ describe("CreateCustomerForm", () => {
   it("shows root error when API call fails with no response", async () => {
     const user = userEvent.setup();
     mockMutateAsync.mockRejectedValue({
-      isAxiosError: true,
+      status: null,
+      message: "Cannot reach the server. Check your connection.",
     });
 
     renderCreateCustomer();
@@ -130,6 +130,47 @@ describe("CreateCustomerForm", () => {
       await screen.findByText(
         "Cannot reach the server. Check your connection.",
       ),
+    ).toBeInTheDocument();
+  });
+
+  it("maps backend field validation errors to form fields", async () => {
+    const user = userEvent.setup();
+    mockMutateAsync.mockRejectedValue({
+      status: 400,
+      message: "Validation failed.",
+      fieldErrors: {
+        fullName: ["Full name cannot be empty"],
+        phone: ["Phone format is invalid"],
+      },
+    });
+
+    renderCreateCustomer();
+    await user.type(screen.getByLabelText("Full Name"), "John Doe");
+    await user.type(screen.getByLabelText("Phone Number"), "1234567890");
+    await user.type(screen.getByLabelText("Email"), "john.doe@test.local");
+    await user.type(screen.getByLabelText("Address"), "123 Main St");
+    await user.click(screen.getByRole("button", { name: /Create Customer/i }));
+
+    expect(
+      await screen.findByText("Full name cannot be empty"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Phone format is invalid")).toBeInTheDocument();
+  });
+
+  it("shows root error on generic API error", async () => {
+    const user = userEvent.setup();
+    mockMutateAsync.mockRejectedValue({
+      status: 500,
+      message: "Internal server error.",
+    });
+
+    renderCreateCustomer();
+    await user.type(screen.getByLabelText("Full Name"), "John Doe");
+    await user.type(screen.getByLabelText("Phone Number"), "1234567890");
+    await user.click(screen.getByRole("button", { name: /Create Customer/i }));
+
+    expect(
+      await screen.findByText("Internal server error."),
     ).toBeInTheDocument();
   });
 });
