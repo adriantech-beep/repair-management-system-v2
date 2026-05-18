@@ -21,6 +21,7 @@ const navItems = [
   { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
   { label: "Repair Jobs", to: "/repair-jobs", icon: Wrench },
   { label: "Customers", to: "/customers", icon: Users },
+  { label: "Inventory", to: "/inventory", icon: Wrench },
 ];
 
 const AppSidebar = () => {

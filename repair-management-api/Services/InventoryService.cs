@@ -166,11 +166,8 @@ public class InventoryService : IInventoryService
 
     public async Task<CompatibilityResponseDto?> AddCompatibilityAsync(Guid partId, AddCompatibilityRequestDto request)
     {
-        var part = await _db.Parts
-            .Include(p => p.Compatibilities)
-            .FirstOrDefaultAsync(p => p.Id == partId);
-
-        if (part is null)
+        var partExists = await _db.Parts.AnyAsync(p => p.Id == partId);
+        if (!partExists)
             return null;
 
         var normalizedBrand = request.Brand.Trim();
@@ -195,8 +192,21 @@ public class InventoryService : IInventoryService
             ModelName = normalizedModel
         };
 
-        part.Compatibilities.Add(compatibility);
-        await _db.SaveChangesAsync();
+        _db.PartCompatibilities.Add(compatibility);
+        try
+        {
+            await _db.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex) when (
+            ex.InnerException?.Message.Contains("duplicate", StringComparison.OrdinalIgnoreCase) == true ||
+            ex.InnerException?.Message.Contains("unique", StringComparison.OrdinalIgnoreCase) == true)
+        {
+            throw new InvalidOperationException("DUPLICATE_COMPATIBILITY");
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            throw new InvalidOperationException("COMPATIBILITY_CONCURRENCY_CONFLICT");
+        }
 
         return new CompatibilityResponseDto
         {

@@ -1,7 +1,12 @@
 import type {
+  AddCompatibilityRequest,
+  CreatePartRequest,
   CreateWaitlistRequest,
   GetPartsParams,
+  PartCompatibility,
   PartResponse,
+  UpdatePartRequest,
+  UpdateStockPartRequest,
   WaitlistResponse,
   WaitlistStatus,
 } from "@/types/inventory";
@@ -37,6 +42,16 @@ function normalizePart(raw: Record<string, unknown>): PartResponse {
         brand: String(item.brand ?? item.Brand ?? ""),
         modelName: String(item.modelName ?? item.ModelName ?? ""),
       })),
+  };
+}
+
+function normalizeCompatibility(
+  raw: Record<string, unknown>,
+): PartCompatibility {
+  return {
+    id: String(raw.id ?? raw.Id ?? ""),
+    brand: String(raw.brand ?? raw.Brand ?? ""),
+    modelName: String(raw.modelName ?? raw.ModelName ?? ""),
   };
 }
 
@@ -129,4 +144,74 @@ export async function createWaitlistRequest(
   }
 
   return normalizeWaitlistResponse(response.data as Record<string, unknown>);
+}
+
+export async function createPart(
+  payload: CreatePartRequest,
+): Promise<PartResponse> {
+  const response = await apiClient.post<unknown>("/api/parts", payload);
+  if (!response.data || typeof response.data !== "object") {
+    throw new Error("Unexpected createPart response shape.");
+  }
+  return normalizePart(response.data as Record<string, unknown>);
+}
+
+export async function updatePart(
+  partId: string,
+  payload: UpdatePartRequest,
+): Promise<PartResponse> {
+  const requestBody: UpdatePartRequest = {
+    partNumber: payload.partNumber,
+    name: payload.name,
+    category: payload.category,
+    stockQuantity: payload.stockQuantity,
+    supplierPrice: payload.supplierPrice,
+    sellingPrice: payload.sellingPrice,
+  };
+
+  const response = await apiClient.put<unknown>(
+    `/api/parts/${partId}`,
+    requestBody,
+  );
+  if (!response.data || typeof response.data !== "object") {
+    throw new Error("Unexpected updatePart response shape.");
+  }
+  return normalizePart(response.data as Record<string, unknown>);
+}
+
+export async function updatePartStock(
+  partId: string,
+  payload: UpdateStockPartRequest,
+): Promise<PartResponse> {
+  const response = await apiClient.patch<unknown>(
+    `/api/parts/${partId}/stock`,
+    payload,
+  );
+  if (!response.data || typeof response.data !== "object") {
+    throw new Error("Unexpected updatePartStock response shape.");
+  }
+  return normalizePart(response.data as Record<string, unknown>);
+}
+
+export async function addPartCompatibility(
+  partId: string,
+  payload: AddCompatibilityRequest,
+): Promise<PartCompatibility> {
+  const response = await apiClient.post<unknown>(
+    `/api/parts/${partId}/compatibilities`,
+    payload,
+  );
+  if (!response.data || typeof response.data !== "object") {
+    throw new Error("Unexpected addPartCompatibility response shape.");
+  }
+  return normalizeCompatibility(response.data as Record<string, unknown>);
+}
+
+export async function removePartCompatibility(
+  partId: string,
+  compatibilityId: string,
+): Promise<void> {
+  await apiClient.delete<unknown>(
+    `/api/parts/${partId}/compatibilities/${compatibilityId}`,
+  );
 }

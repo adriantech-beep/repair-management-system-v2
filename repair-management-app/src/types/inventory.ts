@@ -56,3 +56,31 @@ export type WaitlistResponse = {
   resolvedAtUtc: string | null;
   notes: string | null;
 };
+
+export type CreatePartRequest = {
+  partNumber: string;
+  name: string;
+  category: string;
+  stockQuantity: number;
+  supplierPrice: number;
+  sellingPrice: number;
+};
+
+export type UpdatePartRequest = {
+  partNumber: string;
+  name: string;
+  category: string;
+  stockQuantity: number;
+  supplierPrice: number;
+  sellingPrice: number;
+};
+
+export type UpdateStockPartRequest = {
+  newQuantity: number;
+  reason: string | null;
+};
+
+export type AddCompatibilityRequest = {
+  brand: string;
+  modelName: string;
+};
