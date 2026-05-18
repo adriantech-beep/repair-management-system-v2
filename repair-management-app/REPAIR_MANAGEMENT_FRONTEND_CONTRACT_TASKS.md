@@ -1,6 +1,6 @@
 # Repair Management Frontend Contract-Locked Task List
 
-Last updated: 2026-05-14
+Last updated: 2026-05-18
 Status: Active planning tracker
 
 This file is the execution plan after F8 and F9 were merged.
@@ -119,7 +119,7 @@ Acceptance criteria:
 - Status transitions use PATCH endpoint and update list/detail cache predictably.
 - Role visibility in UI matches backend role constraints for update actions.
 
-Status: IN_PROGRESS
+Status: DONE
 Branch name: ticket-c3-repair-job-mutations
 Commit template: feat(frontend): add repair job update and status transition flows
 
@@ -136,7 +136,7 @@ Acceptance criteria:
 - Admin can add and remove compatibility entries per part.
 - Technician role can view parts list and part detail but cannot access admin-only actions.
 
-Status: TODO
+Status: DONE
 Branch name: ticket-c4-inventory-admin-essentials
 Commit template: feat(frontend): implement contract-backed inventory admin flows
 

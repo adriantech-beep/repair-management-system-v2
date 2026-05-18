@@ -103,6 +103,14 @@ public class PartsController : ControllerBase
                 message = "This compatibility already exists for the selected part."
             });
         }
+        catch (InvalidOperationException ex) when (ex.Message == "COMPATIBILITY_CONCURRENCY_CONFLICT")
+        {
+            return Conflict(new
+            {
+                code = "COMPATIBILITY_CONCURRENCY_CONFLICT",
+                message = "Compatibility could not be saved because the part changed during the request. Please retry."
+            });
+        }
     }
 
     [HttpDelete("{partId:guid}/compatibilities/{compatibilityId:guid}")]
