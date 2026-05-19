@@ -35,6 +35,10 @@ vi.mock("./ManagePartCompatibilityForm", () => ({
   default: () => <div>ManagePartCompatibilityForm</div>,
 }));
 
+vi.mock("./ManagePartWaitlistForm", () => ({
+  default: () => <div>ManagePartWaitlistForm</div>,
+}));
+
 vi.mock("./InventoryPartDetailView", () => ({
   default: () => <div>InventoryPartDetailView</div>,
 }));
@@ -86,7 +90,10 @@ describe("InventoryPartsList", () => {
     renderInventoryRow();
 
     expect(screen.getByRole("button", { name: "View" })).toBeInTheDocument();
-    expect(screen.getAllByRole("button")).toHaveLength(1);
+    expect(
+      screen.getByRole("button", { name: "Waitlist" }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByRole("button")).toHaveLength(2);
     expect(
       screen.queryByText("ManagePartCompatibilityForm"),
     ).not.toBeInTheDocument();
@@ -98,6 +105,9 @@ describe("InventoryPartsList", () => {
     renderInventoryRow();
 
     expect(screen.getByRole("button", { name: "View" })).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Waitlist" }),
+    ).not.toBeInTheDocument();
     expect(screen.getAllByRole("button")).toHaveLength(1);
   });
 
@@ -108,10 +118,11 @@ describe("InventoryPartsList", () => {
     renderInventoryRow();
 
     const buttons = screen.getAllByRole("button");
-    expect(buttons).toHaveLength(2);
+    expect(buttons).toHaveLength(3);
 
     const toggleButton = buttons.find(
-      (button) => button.textContent !== "View",
+      (button) =>
+        button.textContent !== "View" && button.textContent !== "Waitlist",
     );
     expect(toggleButton).toBeDefined();
 
@@ -134,9 +145,10 @@ describe("InventoryPartsList", () => {
     ).not.toBeInTheDocument();
 
     const buttons = screen.getAllByRole("button");
-    expect(buttons).toHaveLength(2);
+    expect(buttons).toHaveLength(3);
     const toggleButton = buttons.find(
-      (button) => button.textContent !== "View",
+      (button) =>
+        button.textContent !== "View" && button.textContent !== "Waitlist",
     );
 
     expect(toggleButton).toBeDefined();
@@ -152,14 +164,25 @@ describe("InventoryPartsList", () => {
     renderInventoryRow();
 
     const buttons = screen.getAllByRole("button");
-    expect(buttons).toHaveLength(2);
+    expect(buttons).toHaveLength(3);
     const toggleButton = buttons.find(
-      (button) => button.textContent !== "View",
+      (button) =>
+        button.textContent !== "View" && button.textContent !== "Waitlist",
     );
     expect(toggleButton).toBeDefined();
     await user.click(toggleButton!);
     await user.click(screen.getByText("Manage Compatibility"));
 
     expect(screen.getByText("ManagePartCompatibilityForm")).toBeInTheDocument();
+  });
+
+  it("opens the waitlist modal for technicians", async () => {
+    const user = userEvent.setup();
+
+    renderInventoryRow();
+
+    await user.click(screen.getByRole("button", { name: "Waitlist" }));
+
+    expect(screen.getByText("ManagePartWaitlistForm")).toBeInTheDocument();
   });
 });

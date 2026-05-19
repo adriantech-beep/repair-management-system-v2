@@ -1,6 +1,6 @@
 # Repair Management Frontend Contract-Locked Task List
 
-Last updated: 2026-05-18
+Last updated: 2026-05-19
 Status: Active planning tracker
 
 This file is the execution plan after F8 and F9 were merged.
@@ -152,7 +152,7 @@ Acceptance criteria:
 - Waitlist-by-part view supports status filtering and readable state labels.
 - Waitlist status update flow works for pending/notified/resolved/cancelled states.
 
-Status: TODO
+Status: IN_PROGRESS
 Branch name: ticket-c5-waitlist-operations
 Commit template: feat(frontend): complete waitlist lifecycle flows
 

@@ -7,6 +7,7 @@ import EditPartInventoryForm from "./EditPartInventoryForm";
 import UpdateStockPartForm from "./UpdateStockPartForm";
 import ManagePartCompatibilityForm from "./ManagePartCompatibilityForm";
 import InventoryPartDetailView from "./InventoryPartDetailView";
+import ManagePartWaitlistForm from "./ManagePartWaitlistForm";
 import { Button } from "@/components/ui/button";
 
 type InventoryPartsListProps = {
@@ -15,6 +16,10 @@ type InventoryPartsListProps = {
 
 const InventoryPartsList = ({ inventory }: InventoryPartsListProps) => {
   const isAdmin = useAuthStore((state) => state.user?.role === "Admin");
+  const canAccessWaitlist = useAuthStore(
+    (state) =>
+      state.user?.role === "Admin" || state.user?.role === "Technician",
+  );
 
   return (
     <TypedTable.Row>
@@ -31,6 +36,14 @@ const InventoryPartsList = ({ inventory }: InventoryPartsListProps) => {
               View
             </Button>
           </ModalWindow.Open>
+
+          {canAccessWaitlist ? (
+            <ModalWindow.Open opens={`waitlist-${inventory.id}`}>
+              <Button type="button" variant="outline" size="sm">
+                Waitlist
+              </Button>
+            </ModalWindow.Open>
+          ) : null}
 
           {isAdmin && (
             <TypedMenus.Menu>
@@ -54,6 +67,10 @@ const InventoryPartsList = ({ inventory }: InventoryPartsListProps) => {
 
         <ModalWindow.Window name={`detail-${inventory.id}`}>
           <InventoryPartDetailView part={inventory} />
+        </ModalWindow.Window>
+
+        <ModalWindow.Window name={`waitlist-${inventory.id}`}>
+          <ManagePartWaitlistForm part={inventory} />
         </ModalWindow.Window>
 
         <ModalWindow.Window name={`edit-${inventory.id}`}>
