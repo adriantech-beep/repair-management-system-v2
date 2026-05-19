@@ -80,6 +80,10 @@ export type UpdateStockPartRequest = {
   reason: string | null;
 };
 
+export type UpdateWaitlistStatusRequest = {
+  status: WaitlistStatus;
+};
+
 export type AddCompatibilityRequest = {
   brand: string;
   modelName: string;

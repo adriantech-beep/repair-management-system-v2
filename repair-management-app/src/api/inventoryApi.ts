@@ -7,6 +7,7 @@ import type {
   PartResponse,
   UpdatePartRequest,
   UpdateStockPartRequest,
+  UpdateWaitlistStatusRequest,
   WaitlistResponse,
   WaitlistStatus,
 } from "@/types/inventory";
@@ -141,6 +142,22 @@ export async function createWaitlistRequest(
 
   if (!response.data || typeof response.data !== "object") {
     throw new Error("Unexpected createWaitlistRequest response shape.");
+  }
+
+  return normalizeWaitlistResponse(response.data as Record<string, unknown>);
+}
+
+export async function updateWaitlistStatus(
+  waitlistRequestId: string,
+  payload: UpdateWaitlistStatusRequest,
+): Promise<WaitlistResponse> {
+  const response = await apiClient.patch<unknown>(
+    `/api/waitlist/${waitlistRequestId}/status`,
+    payload,
+  );
+
+  if (!response.data || typeof response.data !== "object") {
+    throw new Error("Unexpected updateWaitlistStatus response shape.");
   }
 
   return normalizeWaitlistResponse(response.data as Record<string, unknown>);

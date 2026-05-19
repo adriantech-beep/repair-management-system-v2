@@ -7,6 +7,7 @@ import {
   removePartCompatibility,
   updatePart,
   updatePartStock,
+  updateWaitlistStatus,
 } from "@/api/inventoryApi";
 import type {
   AddCompatibilityRequest,
@@ -15,6 +16,7 @@ import type {
   GetPartsParams,
   UpdatePartRequest,
   UpdateStockPartRequest,
+  UpdateWaitlistStatusRequest,
   WaitlistStatus,
 } from "@/types/inventory";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -48,6 +50,29 @@ export function useCreateWaitlistRequest() {
     onSuccess: (_, { partId }) => {
       queryClient.invalidateQueries({ queryKey: ["part-waitlist", partId] });
       queryClient.invalidateQueries({ queryKey: ["parts"] });
+    },
+  });
+}
+
+type UpdateWaitlistStatusMutationVariables = {
+  waitlistRequestId: string;
+  payload: UpdateWaitlistStatusRequest;
+};
+
+export function useUpdateWaitlistStatus() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      waitlistRequestId,
+      payload,
+    }: UpdateWaitlistStatusMutationVariables) =>
+      updateWaitlistStatus(waitlistRequestId, payload),
+    onSuccess: (_, { waitlistRequestId }) => {
+      queryClient.invalidateQueries({ queryKey: ["part-waitlist"] });
+      queryClient.invalidateQueries({
+        queryKey: ["waitlist", waitlistRequestId],
+      });
     },
   });
 }
