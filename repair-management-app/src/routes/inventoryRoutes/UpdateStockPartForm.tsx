@@ -86,7 +86,6 @@ const UpdateStockPartForm = ({
             {part.name} ({part.partNumber})
           </p>
         </header>
-
         <FormField
           control={form.control}
           name="newQuantity"
