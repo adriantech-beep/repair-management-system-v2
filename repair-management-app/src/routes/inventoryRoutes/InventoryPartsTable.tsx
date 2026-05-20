@@ -5,11 +5,10 @@ import { useGetParts } from "@/hooks/useInventory";
 import { Button } from "@/components/ui/button";
 import ModalWindow from "@/context/ModalWindow";
 import CreatePartInventoryForm from "./CreatePartInventoryForm";
-import useAuthStore from "@/store/authStore";
+import RoleGuard from "@/components/RoleGuard";
 
 const InventoryPartsTable = () => {
   const { data: parts, isLoading, error, isError } = useGetParts();
-  const isAdmin = useAuthStore((state) => state.user?.role === "Admin");
   const partsData = parts ?? [];
 
   if (isLoading) {
@@ -48,7 +47,7 @@ const InventoryPartsTable = () => {
   return (
     <>
       <div className="mb-4 mt-5 flex items-center justify-end p-2">
-        {isAdmin ? (
+        <RoleGuard allowedRoles={["Admin"]}>
           <ModalWindow>
             <ModalWindow.Open opens="create-part">
               <Button>Add Part</Button>
@@ -58,7 +57,7 @@ const InventoryPartsTable = () => {
               <CreatePartInventoryForm />
             </ModalWindow.Window>
           </ModalWindow>
-        ) : null}
+        </RoleGuard>
       </div>
 
       <TypedMenus>

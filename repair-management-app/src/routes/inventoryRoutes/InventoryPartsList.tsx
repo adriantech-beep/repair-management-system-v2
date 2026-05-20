@@ -1,26 +1,20 @@
 import type { PartResponse } from "@/types/inventory";
+import { Button } from "@/components/ui/button";
 import TypedTable from "@/context/Table";
 import ModalWindow from "@/context/ModalWindow";
 import TypedMenus from "@/context/Menus";
-import useAuthStore from "@/store/authStore";
 import EditPartInventoryForm from "./EditPartInventoryForm";
 import UpdateStockPartForm from "./UpdateStockPartForm";
 import ManagePartCompatibilityForm from "./ManagePartCompatibilityForm";
 import InventoryPartDetailView from "./InventoryPartDetailView";
 import ManagePartWaitlistForm from "./ManagePartWaitlistForm";
-import { Button } from "@/components/ui/button";
+import RoleGuard from "@/components/RoleGuard";
 
 type InventoryPartsListProps = {
   inventory: PartResponse;
 };
 
 const InventoryPartsList = ({ inventory }: InventoryPartsListProps) => {
-  const isAdmin = useAuthStore((state) => state.user?.role === "Admin");
-  const canAccessWaitlist = useAuthStore(
-    (state) =>
-      state.user?.role === "Admin" || state.user?.role === "Technician",
-  );
-
   return (
     <TypedTable.Row>
       <div className="font-medium text-gray-900">{inventory.name}</div>
@@ -37,15 +31,15 @@ const InventoryPartsList = ({ inventory }: InventoryPartsListProps) => {
             </Button>
           </ModalWindow.Open>
 
-          {canAccessWaitlist ? (
+          <RoleGuard allowedRoles={["Technician"]}>
             <ModalWindow.Open opens={`waitlist-${inventory.id}`}>
               <Button type="button" variant="outline" size="sm">
                 Waitlist
               </Button>
             </ModalWindow.Open>
-          ) : null}
+          </RoleGuard>
 
-          {isAdmin && (
+          <RoleGuard allowedRoles={["Admin"]}>
             <TypedMenus.Menu>
               <TypedMenus.Toggle id={inventory.id} />
               <TypedMenus.List id={inventory.id}>
@@ -62,7 +56,7 @@ const InventoryPartsList = ({ inventory }: InventoryPartsListProps) => {
                 </ModalWindow.Open>
               </TypedMenus.List>
             </TypedMenus.Menu>
-          )}
+          </RoleGuard>
         </div>
 
         <ModalWindow.Window name={`detail-${inventory.id}`}>
