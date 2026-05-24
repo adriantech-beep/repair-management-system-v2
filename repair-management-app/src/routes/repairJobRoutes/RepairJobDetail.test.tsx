@@ -286,4 +286,134 @@ describe("RepairJobDetail", () => {
       screen.getByText("Detail edits require Admin role."),
     ).toBeInTheDocument();
   });
+
+  it("submits the update form with valid data and calls the mutate API", async () => {
+    mockDefaultDependencies();
+
+    const mutateSpy = vi.fn().mockResolvedValue({ id: "job-1" });
+    mockUseUpdateRepairJob.mockReturnValue({
+      mutateAsync: mutateSpy,
+      isPending: false,
+    });
+
+    mockUseGetRepairJobById.mockReturnValue({
+      data: {
+        id: "job-1",
+        customerId: "customer-1",
+        deviceId: "device-1",
+        branchId: "branch-1",
+        jobNumber: "RJ-1",
+        problemDescription: "Original problem description",
+        diagnosisNotes: null,
+        resolutionNotes: null,
+        estimatedCost: null,
+        finalCost: null,
+        status: "Received",
+        receivedAtUtc: "2026-05-10T10:00:00Z",
+        completedAtUtc: null,
+        createdAtUtc: "2026-05-10T10:00:00Z",
+        updatedAtUtc: "2026-05-10T10:00:00Z",
+      },
+      isLoading: false,
+      isError: false,
+      error: null,
+    });
+
+    const { userEvent } = await import("@testing-library/user-event");
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter initialEntries={["/repair-jobs/job-1"]}>
+        <Routes>
+          <Route
+            path="/repair-jobs/:repairJobId"
+            element={<RepairJobDetail />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    const problemInput = screen.getByPlaceholderText("Problem Description");
+    const estimatedCostInput = screen.getByPlaceholderText("Estimated Cost");
+
+    expect(problemInput).toHaveValue("Original problem description");
+
+    await user.clear(problemInput);
+    await user.type(problemInput, "New problem description that is long enough");
+    await user.type(estimatedCostInput, "150");
+
+    const submitButton = screen.getByRole("button", { name: "Save Job Details" });
+    await user.click(submitButton);
+
+    expect(mutateSpy).toHaveBeenCalledWith({
+      repairJobId: "job-1",
+      payload: {
+        problemDescription: "New problem description that is long enough",
+        diagnosisNotes: null,
+        resolutionNotes: null,
+        estimatedCost: 150,
+        finalCost: null,
+      },
+    });
+
+    expect(await screen.findByText("Repair job details updated.")).toBeInTheDocument();
+  });
+
+  it("shows validation error and prevents submission when data is invalid", async () => {
+    mockDefaultDependencies();
+
+    const mutateSpy = vi.fn();
+    mockUseUpdateRepairJob.mockReturnValue({
+      mutateAsync: mutateSpy,
+      isPending: false,
+    });
+
+    mockUseGetRepairJobById.mockReturnValue({
+      data: {
+        id: "job-1",
+        customerId: "customer-1",
+        deviceId: "device-1",
+        branchId: "branch-1",
+        jobNumber: "RJ-1",
+        problemDescription: "Original problem",
+        diagnosisNotes: null,
+        resolutionNotes: null,
+        estimatedCost: null,
+        finalCost: null,
+        status: "Received",
+        receivedAtUtc: "2026-05-10T10:00:00Z",
+        completedAtUtc: null,
+        createdAtUtc: "2026-05-10T10:00:00Z",
+        updatedAtUtc: "2026-05-10T10:00:00Z",
+      },
+      isLoading: false,
+      isError: false,
+      error: null,
+    });
+
+    const { userEvent } = await import("@testing-library/user-event");
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter initialEntries={["/repair-jobs/job-1"]}>
+        <Routes>
+          <Route
+            path="/repair-jobs/:repairJobId"
+            element={<RepairJobDetail />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    const problemInput = screen.getByPlaceholderText("Problem Description");
+
+    await user.clear(problemInput);
+    await user.type(problemInput, "Bad");
+
+    const submitButton = screen.getByRole("button", { name: "Save Job Details" });
+    await user.click(submitButton);
+
+    expect(await screen.findByText("Problem description must be at least 5 characters")).toBeInTheDocument();
+    expect(mutateSpy).not.toHaveBeenCalled();
+  });
 });

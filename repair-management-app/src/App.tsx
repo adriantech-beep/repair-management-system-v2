@@ -34,10 +34,12 @@ const App = () => {
               element={<CreateServiceOrderPage />}
             />
             <Route path="repair-jobs" element={<RepairJobsPage />} />
+
             <Route
               path="repair-jobs/:repairJobId"
               element={<RepairJobDetailPage />}
             />
+
             <Route path="customers" element={<CustomerPage />} />
             <Route path="inventory" element={<InventoryPage />} />
           </Route>
