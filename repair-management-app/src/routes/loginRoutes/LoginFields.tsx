@@ -1,5 +1,4 @@
 import { Input } from "@/components/ui/input";
-import type { LoginFormData } from "../loginSchema";
 import { Mail, Lock } from "lucide-react";
 
 import { useFormContext } from "react-hook-form";
@@ -10,6 +9,7 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
+import type { LoginFormData } from "./loginSchema";
 
 type FieldConfig = {
   name: keyof LoginFormData;

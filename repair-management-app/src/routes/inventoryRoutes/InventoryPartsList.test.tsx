@@ -118,7 +118,7 @@ describe("InventoryPartsList", () => {
     renderInventoryRow();
 
     const buttons = screen.getAllByRole("button");
-    expect(buttons).toHaveLength(3);
+    expect(buttons).toHaveLength(2);
 
     const toggleButton = buttons.find(
       (button) =>
@@ -145,7 +145,7 @@ describe("InventoryPartsList", () => {
     ).not.toBeInTheDocument();
 
     const buttons = screen.getAllByRole("button");
-    expect(buttons).toHaveLength(3);
+    expect(buttons).toHaveLength(2);
     const toggleButton = buttons.find(
       (button) =>
         button.textContent !== "View" && button.textContent !== "Waitlist",
@@ -164,7 +164,7 @@ describe("InventoryPartsList", () => {
     renderInventoryRow();
 
     const buttons = screen.getAllByRole("button");
-    expect(buttons).toHaveLength(3);
+    expect(buttons).toHaveLength(2);
     const toggleButton = buttons.find(
       (button) =>
         button.textContent !== "View" && button.textContent !== "Waitlist",

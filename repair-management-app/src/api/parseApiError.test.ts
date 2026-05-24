@@ -62,7 +62,7 @@ describe("parseApiError", () => {
     expect(parseApiError(mockError)).toEqual(expected);
   });
 
-  it("returns 403 status and fallback message", () => {
+  it("returns 403 status and forbidden message", () => {
     const mockError = {
       isAxiosError: true,
       response: {
@@ -72,7 +72,7 @@ describe("parseApiError", () => {
     } as unknown as Error;
 
     const expected: ApiError = {
-      message: "An unknown error occurred",
+      message: "You do not have permission to perform this action.",
       fieldErrors: null,
       status: 403,
     };
