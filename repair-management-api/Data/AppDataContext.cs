@@ -272,6 +272,13 @@ public class AppDbContext : DbContext
         .WithMany()
         .HasForeignKey(r => r.BranchId)
         .OnDelete(DeleteBehavior.Restrict);
+
+        entity.HasIndex(r => r.AssignedTechnicianId);
+
+        entity.HasOne(r => r.AssignedTechnician)
+        .WithMany()
+        .HasForeignKey(r => r.AssignedTechnicianId)
+        .OnDelete(DeleteBehavior.Restrict);
 });
     
     

@@ -44,7 +44,7 @@ graph TD
   - Entity Framework Core migration generated: `AddAssignedTechnicianToRepairJob`.
   - Database updated successfully (`dotnet ef database update`).
   - Unit tests or database context builds successfully.
-* **Status:** TODO
+* **Status:** DONE
 * **Branch name:** `ticket-fs1-db-technician-link`
 * **Commit template:** `feat(backend): link repair job to user entity with database foreign key`
 
