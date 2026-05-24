@@ -1,8 +1,7 @@
-// import RepairJobDetail from "@/routes/repairJobRoutes/RepairJobDetail";
-import UpdateRepairJobForm from "@/routes/repairJobRoutes/UpdateRepairJobForm";
+import RepairJobDetail from "@/routes/repairJobRoutes/RepairJobDetail";
 
 const RepairJobDetailPage = () => {
-  return <UpdateRepairJobForm />;
+  return <RepairJobDetail />;
 };
 
 export default RepairJobDetailPage;

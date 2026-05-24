@@ -184,7 +184,7 @@ Acceptance criteria:
 - High-risk flow tests cover create/update/status/waitlist behaviors.
 - Regression checklist is completed for Admin and Technician role paths.
 
-Status: TODO
+Status: DONE
 Branch name: ticket-c7-contract-regression-gate
 Commit template: test(frontend): add regression coverage for contract-backed workflows
 

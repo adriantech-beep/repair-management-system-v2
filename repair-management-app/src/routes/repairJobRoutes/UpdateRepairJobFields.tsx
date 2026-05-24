@@ -14,6 +14,7 @@ type FieldConfig = {
   placeholder: string;
   type: string;
   parseAsNumber?: boolean;
+  rows?: number;
 };
 
 const updateRepairJobFields: FieldConfig[] = [
@@ -21,16 +22,19 @@ const updateRepairJobFields: FieldConfig[] = [
     name: "problemDescription",
     placeholder: "Problem Description",
     type: "text",
+    rows: 3,
   },
   {
     name: "diagnosisNotes",
     placeholder: "Diagnosis Notes",
     type: "text",
+    rows: 2,
   },
   {
     name: "resolutionNotes",
     placeholder: "Resolution Notes",
     type: "text",
+    rows: 2,
   },
   {
     name: "estimatedCost",
@@ -51,7 +55,7 @@ const UpdateRepairJobFields = () => {
   return (
     <div className="space-y-4">
       {updateRepairJobFields.map(
-        ({ name, placeholder, type, parseAsNumber }) => (
+        ({ name, placeholder, type, parseAsNumber, rows }) => (
           <FormField
             key={name}
             control={control}
@@ -62,25 +66,35 @@ const UpdateRepairJobFields = () => {
                   {placeholder}
                 </FormLabel>
                 <FormControl>
-                  <Input
-                    type={type}
-                    placeholder={placeholder}
-                    className="h-10 rounded-lg border-emerald-900/20 bg-white text-sm text-emerald-950 placeholder:text-emerald-900/40 focus-visible:border-emerald-600 focus-visible:ring-emerald-200"
-                    {...field}
-                    value={field.value ?? ""}
-                    onChange={(e) => {
-                      if (parseAsNumber) {
-                        field.onChange(
-                          e.target.value === ""
-                            ? undefined
-                            : e.target.valueAsNumber,
-                        );
-                        return;
-                      }
+                  {rows !== undefined ? (
+                    <textarea
+                      placeholder={placeholder}
+                      rows={rows}
+                      className="flex min-h-[80px] w-full rounded-lg border border-emerald-900/20 bg-white px-3 py-2 text-sm text-emerald-950 placeholder:text-emerald-900/40 focus-visible:border-emerald-600 focus-visible:ring-emerald-200 focus-visible:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      {...field}
+                      value={field.value ?? ""}
+                    />
+                  ) : (
+                    <Input
+                      type={type}
+                      placeholder={placeholder}
+                      className="h-10 rounded-lg border-emerald-900/20 bg-white text-sm text-emerald-950 placeholder:text-emerald-900/40 focus-visible:border-emerald-600 focus-visible:ring-emerald-200"
+                      {...field}
+                      value={field.value ?? ""}
+                      onChange={(e) => {
+                        if (parseAsNumber) {
+                          field.onChange(
+                            e.target.value === ""
+                              ? undefined
+                              : e.target.valueAsNumber,
+                          );
+                          return;
+                        }
 
-                      field.onChange(e.target.value);
-                    }}
-                  />
+                        field.onChange(e.target.value);
+                      }}
+                    />
+                  )}
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -93,3 +107,4 @@ const UpdateRepairJobFields = () => {
 };
 
 export default UpdateRepairJobFields;
+
