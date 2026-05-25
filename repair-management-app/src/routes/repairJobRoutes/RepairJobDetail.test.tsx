@@ -6,6 +6,7 @@ import RepairJobDetail from "./RepairJobDetail";
 const mockUseGetRepairJobById = vi.fn();
 const mockUseUpdateRepairJob = vi.fn();
 const mockUseUpdateRepairJobStatus = vi.fn();
+const mockUseGetTechnicians = vi.fn();
 const mockUseGetParts = vi.fn();
 const mockUseCreateWaitlistRequest = vi.fn();
 const mockUseGetCustomerById = vi.fn();
@@ -17,6 +18,7 @@ vi.mock("@/hooks/useRepairJobs", () => ({
     mockUseGetRepairJobById(repairJobId),
   useUpdateRepairJob: () => mockUseUpdateRepairJob(),
   useUpdateRepairJobStatus: () => mockUseUpdateRepairJobStatus(),
+  useGetTechnicians: () => mockUseGetTechnicians(),
 }));
 
 vi.mock("@/hooks/useInventory", () => ({
@@ -50,6 +52,11 @@ function mockDefaultDependencies() {
 
   mockUseUpdateRepairJobStatus.mockReturnValue({
     mutateAsync: vi.fn(),
+    isPending: false,
+  });
+
+  mockUseGetTechnicians.mockReturnValue({
+    data: [],
     isPending: false,
   });
 
@@ -416,5 +423,99 @@ describe("RepairJobDetail", () => {
 
     expect(await screen.findByText("Problem description must be at least 5 characters")).toBeInTheDocument();
     expect(mutateSpy).not.toHaveBeenCalled();
+  });
+
+  it("renders assigned technician name in details card and allows assignment update in form", async () => {
+    mockDefaultDependencies();
+
+    mockUseGetTechnicians.mockReturnValue({
+      data: [
+        { id: "e3b0c442-98fc-4c14-9c22-b89113371337", fullName: "John Tech", role: "Technician" },
+        { id: "f47ac10b-58cc-4372-a567-0e02b2c3d479", fullName: "Jane Tech", role: "Technician" },
+      ],
+      isPending: false,
+    });
+
+    const mutateSpy = vi.fn().mockResolvedValue({ id: "job-1" });
+    mockUseUpdateRepairJob.mockReturnValue({
+      mutateAsync: mutateSpy,
+      isPending: false,
+    });
+
+    mockUseGetRepairJobById.mockReturnValue({
+      data: {
+        id: "job-1",
+        customerId: "customer-1",
+        deviceId: "device-1",
+        branchId: "branch-1",
+        jobNumber: "RJ-1",
+        problemDescription: "Original problem description",
+        diagnosisNotes: null,
+        resolutionNotes: null,
+        estimatedCost: null,
+        finalCost: null,
+        assignedTechnicianId: "e3b0c442-98fc-4c14-9c22-b89113371337",
+        assignedTechnicianName: "John Tech",
+        status: "Received",
+        receivedAtUtc: "2026-05-10T10:00:00Z",
+        completedAtUtc: null,
+        createdAtUtc: "2026-05-10T10:00:00Z",
+        updatedAtUtc: "2026-05-10T10:00:00Z",
+      },
+      isLoading: false,
+      isError: false,
+      error: null,
+    });
+
+    const { userEvent } = await import("@testing-library/user-event");
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter initialEntries={["/repair-jobs/job-1"]}>
+        <Routes>
+          <Route
+            path="/repair-jobs/:repairJobId"
+            element={<RepairJobDetail />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    // 1. Assert assigned technician name renders in the details card (renders in both the card and select options)
+    expect(screen.getAllByText("John Tech")).toHaveLength(2);
+
+    // 2. Assert dropdown renders inside the edit form with the correct option preselected
+    const dropdown = screen.getByLabelText("Assigned Technician");
+    expect(dropdown).toHaveValue("e3b0c442-98fc-4c14-9c22-b89113371337");
+
+    // 3. Clear and type into problem description and estimated cost to ensure full form state update
+    const problemInput = screen.getByPlaceholderText("Problem Description");
+    const estimatedCostInput = screen.getByPlaceholderText("Estimated Cost");
+
+    await user.clear(problemInput);
+    await user.type(problemInput, "New problem description that is long enough");
+    await user.type(estimatedCostInput, "150");
+
+    // 4. Change assigned technician to Jane Tech
+    await user.selectOptions(dropdown, "f47ac10b-58cc-4372-a567-0e02b2c3d479");
+
+    const submitButton = screen.getByRole("button", { name: "Save Job Details" });
+    await user.click(submitButton);
+
+    // 5. Wait for the async submission to complete and verify success message is shown
+    expect(await screen.findByText("Repair job details updated.")).toBeInTheDocument();
+
+    // 6. Assert correct payload is submitted
+    expect(mutateSpy).toHaveBeenCalledWith({
+      repairJobId: "job-1",
+      payload: {
+        problemDescription: "New problem description that is long enough",
+        diagnosisNotes: null,
+        resolutionNotes: null,
+        estimatedCost: 150,
+        finalCost: null,
+        assignedTechnicianId: "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+      },
+    });
   });
 });

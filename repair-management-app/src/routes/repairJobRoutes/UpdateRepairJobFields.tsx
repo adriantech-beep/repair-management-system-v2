@@ -8,6 +8,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useGetTechnicians } from "@/hooks/useRepairJobs";
+
 
 type FieldConfig = {
   name: keyof UpdateRepairFormData;
@@ -52,6 +54,8 @@ const updateRepairJobFields: FieldConfig[] = [
 
 const UpdateRepairJobFields = () => {
   const { control } = useFormContext<UpdateRepairFormData>();
+  const { data: technicians, isPending: isLoadingTechnicians } = useGetTechnicians();
+
   return (
     <div className="space-y-4">
       {updateRepairJobFields.map(
@@ -102,6 +106,38 @@ const UpdateRepairJobFields = () => {
           />
         ),
       )}
+
+      <FormField
+        control={control}
+        name="assignedTechnicianId"
+        render={({ field }) => (
+          <FormItem className="space-y-1.5">
+            <FormLabel className="text-sm font-medium text-emerald-950/80">
+              Assigned Technician
+            </FormLabel>
+            <FormControl>
+              <select
+                className="h-10 w-full rounded-lg border border-emerald-900/20 bg-white px-3 text-sm text-emerald-950 focus:border-emerald-600 focus:ring-emerald-200 focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
+                {...field}
+                value={field.value ?? ""}
+              >
+                <option value="">Unassigned</option>
+                {isLoadingTechnicians ? (
+                  <option disabled>Loading technicians...</option>
+                ) : (
+                  technicians?.map((tech) => (
+                    <option key={tech.id} value={tech.id}>
+                      {tech.fullName}
+                    </option>
+                  ))
+                )}
+              </select>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
     </div>
   );
 };
