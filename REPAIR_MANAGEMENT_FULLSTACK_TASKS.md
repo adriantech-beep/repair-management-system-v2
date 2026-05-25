@@ -71,7 +71,7 @@ graph TD
   - Update `UpdateRepairJobRequestDto` to optionally accept `AssignedTechnicianId`.
   - Update `RepairJobsController` and backend service update handlers to parse and persist the `AssignedTechnicianId` into the database when editing a job.
   - Return the updated technician details in the API response.
-* **Status:** TODO
+* **Status:** DONE
 * **Branch name:** `ticket-fs3-repair-job-dto-extension`
 * **Commit template:** `feat(backend): extend repair job DTOs and controller for technician assignment`
 
