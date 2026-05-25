@@ -10,6 +10,7 @@ public interface IAuthService
 {
     Task<LoginResponseDto?> LoginAsync(LoginRequestDto request, string? ipAddress, string? deviceInfo);
     Task<AuthUserDto?> GetUserByIdAsync(Guid userId);
+    Task<List<AuthUserDto>> GetUsersAsync(string? role);
     Task<LoginResponseDto?> RefreshAsync(RefreshTokenRequestDto request, string? ipAddress, string? deviceInfo);
     Task LogoutAsync(RefreshTokenRequestDto request);
     Task<AuthUserDto?> CreateUserAsync(CreateUserRequestDto request);
@@ -109,6 +110,27 @@ public class AuthService : IAuthService
             Role = user.Role.ToString(),
             BranchId = user.BranchId
         };
+    }
+
+    public async Task<List<AuthUserDto>> GetUsersAsync(string? role)
+    {
+        var query = _db.Users
+            .AsNoTracking()
+            .Where(u => u.IsActive);
+
+        if (!string.IsNullOrWhiteSpace(role) && Enum.TryParse<Role>(role, ignoreCase: true, out var roleEnum))
+        {
+            query = query.Where(u => u.Role == roleEnum);
+        }
+
+        return await query.Select(u => new AuthUserDto
+        {
+            Id = u.Id,
+            FullName = u.FullName,
+            Email = u.Email,
+            Role = u.Role.ToString(),
+            BranchId = u.BranchId
+        }).ToListAsync();
     }
 
     public async Task<LoginResponseDto?> RefreshAsync(RefreshTokenRequestDto request, string? ipAddress, string? deviceInfo)

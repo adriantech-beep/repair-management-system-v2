@@ -11,6 +11,8 @@ public class RepairJob
     public Device? Device { get; set; }
     public Guid BranchId { get; set; }
     public Branch? Branch { get; set; }
+    public Guid? AssignedTechnicianId { get; set; }
+    public User? AssignedTechnician { get; set; }
     public string JobNumber { get; set; } = string.Empty;
     public string ProblemDescription { get; set; } = string.Empty;
     public string? DiagnosisNotes { get; set; }

@@ -44,7 +44,7 @@ graph TD
   - Entity Framework Core migration generated: `AddAssignedTechnicianToRepairJob`.
   - Database updated successfully (`dotnet ef database update`).
   - Unit tests or database context builds successfully.
-* **Status:** TODO
+* **Status:** DONE
 * **Branch name:** `ticket-fs1-db-technician-link`
 * **Commit template:** `feat(backend): link repair job to user entity with database foreign key`
 
@@ -58,7 +58,7 @@ graph TD
   - Returns a list of `AuthUserDto` records (ID, Full Name, Email, Role, Branch ID).
   - Endpoint is protected with `[Authorize]`.
   - Verified with an automated xUnit test or integration endpoint check.
-* **Status:** TODO
+* **Status:** DONE
 * **Branch name:** `ticket-fs2-list-users-endpoint`
 * **Commit template:** `feat(backend): add list users endpoint with role filtering`
 
