@@ -30,6 +30,7 @@ const UpdateRepairJobForm = ({ repairJob }: UpdateRepairJobFormProps) => {
       resolutionNotes: repairJob.resolutionNotes,
       estimatedCost: repairJob.estimatedCost,
       finalCost: repairJob.finalCost,
+      assignedTechnicianId: repairJob.assignedTechnicianId,
     },
   });
 

@@ -5,6 +5,7 @@ import {
   updateRepairJob,
   updateRepairJobStatus,
 } from "@/api/repairJobApi";
+import { getUsers } from "@/api/authApi";
 import type { RepairJobStatus } from "@/types/repairJob";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -67,5 +68,12 @@ export function useUpdateRepairJobStatus() {
       queryClient.setQueryData(["repair-job", repairJobId], updatedRepairJob);
       queryClient.invalidateQueries({ queryKey: ["repair-jobs"] });
     },
+  });
+}
+
+export function useGetTechnicians() {
+  return useQuery({
+    queryKey: ["users", "Technician"],
+    queryFn: () => getUsers("Technician"),
   });
 }

@@ -1,3 +1,4 @@
+import type { AuthUser } from "@/types/user";
 import apiClient, { type LoginResponse } from "./httpClient";
 
 export async function login(
@@ -32,3 +33,11 @@ export async function refreshTokens(
   });
   return response.data;
 }
+
+export async function getUsers(role?: string): Promise<AuthUser[]> {
+  const response = await apiClient.get<AuthUser[]>("/api/auth/users", {
+    params: role ? { role } : undefined,
+  });
+  return response.data;
+}
+

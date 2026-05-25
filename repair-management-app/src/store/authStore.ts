@@ -1,12 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
-interface AuthUser {
-  id: string;
-  email: string;
-  role: string;
-  branchId: string;
-}
+import type { AuthUser } from "@/types/user";
 
 interface AuthState {
   accessToken: string | null;
