@@ -296,6 +296,81 @@ public class RepairJobServiceTests
             Assert.Equal(180.00m, result.FinalCost);
         }
 
+
+        [Fact]
+        public async Task UpdateRepairJobAsync_WithValidTechnician_UpdatesTechnician()
+        {
+            await using var db = CreateDbContext();
+    
+            var branch = CreateBranch();
+            db.Branches.Add(branch);
+    
+            var customer = CreateCustomer(branch.Id);
+            db.Customers.Add(customer);
+    
+            var device = CreateDevice(customer.Id, branch.Id);
+            db.Devices.Add(device);
+    
+            var repairJob = CreateRepairJob(customer.Id, device.Id, branch.Id);
+            db.RepairJobs.Add(repairJob);
+
+            var technician = new User
+            {
+                Id = Guid.NewGuid(),
+                FullName = "John Technician",
+                Email = "john.tech@repairmanagement.local",
+                PasswordHash = "dummy_hash",
+                Role = Role.Technician,
+                IsActive = true
+            };
+            db.Users.Add(technician);
+    
+            await db.SaveChangesAsync();
+    
+            var service = new RepairJobService(db);
+    
+            var result = await service.UpdateRepairJobAsync(repairJob.Id, new UpdateRepairJobRequestDto
+            {
+                ProblemDescription = "Hardware repair needed",
+                AssignedTechnicianId = technician.Id 
+            });
+    
+            Assert.NotNull(result);
+            Assert.Equal(technician.Id, result!.AssignedTechnicianId);
+            Assert.Equal(technician.FullName, result.AssignedTechnicianName);
+        }
+
+        [Fact]
+        public async Task UpdateRepairJobAsync_WithInvalidTechnician_ThrowsTechnicianNotFound()
+        {
+            await using var db = CreateDbContext();
+    
+            var branch = CreateBranch();
+            db.Branches.Add(branch);
+    
+            var customer = CreateCustomer(branch.Id);
+            db.Customers.Add(customer);
+    
+            var device = CreateDevice(customer.Id, branch.Id);
+            db.Devices.Add(device);
+    
+            var repairJob = CreateRepairJob(customer.Id, device.Id, branch.Id);
+            db.RepairJobs.Add(repairJob);
+    
+            await db.SaveChangesAsync();
+    
+            var service = new RepairJobService(db);
+    
+            var ex = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                service.UpdateRepairJobAsync(repairJob.Id, new UpdateRepairJobRequestDto
+                {
+                    ProblemDescription = "Hardware repair needed",
+                    AssignedTechnicianId = Guid.NewGuid()
+                }));
+    
+            Assert.Equal("Technician_Not_Found.", ex.Message);
+        }
+
         [Fact]
         public async Task UpdateRepairJobStatusAsync_ExistingRepairJob_UpdatesStatus()
         {

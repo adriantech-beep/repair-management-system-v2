@@ -39,6 +39,9 @@ public class UpdateRepairJobRequestDto
 
     [Range(0, 999999.99)]
     public decimal? FinalCost { get; set; }
+
+    public Guid? AssignedTechnicianId { get; set; }
+
 }
 
 public class UpdateRepairJobStatusRequestDto
@@ -59,6 +62,8 @@ public class RepairJobResponseDto
     public string? ResolutionNotes { get; set; }
     public decimal? EstimatedCost { get; set; }
     public decimal? FinalCost { get; set; }
+    public Guid? AssignedTechnicianId { get; set; }
+public string? AssignedTechnicianName { get; set; }
     public RepairJobStatus Status { get; set; }
     public DateTime ReceivedAtUtc { get; set; }
     public DateTime? CompletedAtUtc { get; set; }

@@ -63,7 +63,10 @@ public class RepairJobService : IRepairJobService
 
     public async Task<RepairJobResponseDto?> GetRepairJobByIdAsync(Guid repairJobId)
     {
-        var repairJob = await _db.RepairJobs.FirstOrDefaultAsync(r => r.Id == repairJobId);
+        var repairJob = await _db.RepairJobs
+            .Include(r => r.AssignedTechnician)
+            .FirstOrDefaultAsync(r => r.Id == repairJobId);
+
         return repairJob == null ? null : MapToDto(repairJob);
     }
 
@@ -93,10 +96,18 @@ public class RepairJobService : IRepairJobService
 
     public async Task<RepairJobResponseDto> UpdateRepairJobAsync(Guid repairJobId, UpdateRepairJobRequestDto request)
     {
-        var repairJob = await _db.RepairJobs.FirstOrDefaultAsync(r => r.Id == repairJobId);
+        var repairJob = await _db.RepairJobs.Include(r => r.AssignedTechnician).FirstOrDefaultAsync(r => r.Id == repairJobId);
         if (repairJob is null)
             throw new InvalidOperationException("RepairJob_Not_Found.");
 
+        if (request.AssignedTechnicianId != null)
+        {
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == request.AssignedTechnicianId && u.Role == Role.Technician && u.IsActive);
+            if (user is null)
+                throw new InvalidOperationException("Technician_Not_Found.");
+        }
+
+        repairJob.AssignedTechnicianId = request.AssignedTechnicianId;
         repairJob.ProblemDescription = request.ProblemDescription;
         repairJob.DiagnosisNotes = request.DiagnosisNotes;
         repairJob.ResolutionNotes = request.ResolutionNotes;
@@ -106,7 +117,11 @@ public class RepairJobService : IRepairJobService
 
         await _db.SaveChangesAsync();
 
-        return MapToDto(repairJob);
+        var updatedJob = await _db.RepairJobs
+            .Include(r => r.AssignedTechnician)
+            .FirstAsync(r => r.Id == repairJobId);
+
+        return MapToDto(updatedJob);
     }
 
     public async Task<RepairJobResponseDto> UpdateRepairJobStatusAsync(Guid repairJobId, UpdateRepairJobStatusRequestDto request)
@@ -144,7 +159,9 @@ public class RepairJobService : IRepairJobService
             ReceivedAtUtc = repairJob.ReceivedAtUtc,
             CompletedAtUtc = repairJob.CompletedAtUtc,
             CreatedAtUtc = repairJob.CreatedAtUtc,
-            UpdatedAtUtc = repairJob.UpdatedAtUtc
+            UpdatedAtUtc = repairJob.UpdatedAtUtc,
+            AssignedTechnicianId = repairJob.AssignedTechnicianId,
+            AssignedTechnicianName = repairJob.AssignedTechnician?.FullName
         };
     }
 }
