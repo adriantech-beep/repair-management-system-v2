@@ -22,6 +22,7 @@ const RepairJobDetail = () => {
     isError,
     error,
   } = useGetRepairJobById(repairJobId);
+  console.log(repairJob?.assignedTechnicianName);
 
   const { data: customer } = useGetCustomerById(repairJob?.customerId ?? "");
   const { data: device } = useGetDeviceById(repairJob?.deviceId ?? "");
@@ -181,6 +182,14 @@ const RepairJobDetail = () => {
                 </dt>
                 <dd className="text-sm text-emerald-950">
                   {formatCurrency(repairJob.finalCost)}
+                </dd>
+              </div>
+              <div className="space-y-1">
+                <dt className="text-xs font-semibold uppercase tracking-wide text-emerald-900/50">
+                  Assigned Technician
+                </dt>
+                <dd className="text-sm font-medium text-emerald-950">
+                  {repairJob.assignedTechnicianName || "Unassigned"}
                 </dd>
               </div>
 
