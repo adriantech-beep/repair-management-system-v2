@@ -114,6 +114,48 @@ public class AuthServiceTests
         Assert.Null(reuseOldToken);
     }
 
+    [Fact]
+    public async Task GetUsersAsync_WithoutRoleFilter_ReturnsAllActiveUsers()
+    {
+        await using var db = CreateDbContext();
+        var service = CreateAuthService(db);
+
+        // 1. Seed two active users and one inactive user
+        var activeAdmin = CreateUser("admin@test.com", "Password123!", Role.Admin);
+        var activeTech = CreateUser("tech@test.com", "Password123!", Role.Technician);
+        var inactiveTech = CreateUser("inactive@test.com", "Password123!", Role.Technician);
+        inactiveTech.IsActive = false; // Deactivate this user!
+
+        db.Users.AddRange(activeAdmin, activeTech, inactiveTech);
+        await db.SaveChangesAsync();
+
+        var result = await service.GetUsersAsync(null);
+
+        Assert.NotNull(result);
+        Assert.Equal(2, result!.Count);
+        Assert.DoesNotContain(result, u => u.Email == "inactive@test.com");
+    }
+
+    [Fact]
+    public async Task GetUsersAsync_WithRoleFilter_ReturnsFilteredUsersOnly()
+    {
+        await using var db = CreateDbContext();
+        var service = CreateAuthService(db);
+
+        var admin = CreateUser("admin@test.com", "Password123!", Role.Admin);
+        var tech = CreateUser("tech@test.com", "Password123!", Role.Technician);
+
+        db.Users.AddRange(admin, tech);
+        await db.SaveChangesAsync();
+
+        var result = await service.GetUsersAsync("Technician");
+
+        Assert.Single(result);
+        Assert.Equal("Technician", result[0].Role);
+        Assert.Equal("tech@test.com", result[0].Email);
+    }
+
+
     private static AuthService CreateAuthService(AppDbContext db)
     {
         var config = new ConfigurationBuilder()

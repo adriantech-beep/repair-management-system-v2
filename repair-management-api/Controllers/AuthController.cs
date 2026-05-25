@@ -103,4 +103,12 @@ public class AuthController : ControllerBase
 
         return Ok(user);
     }
+
+    [HttpGet("users")]
+    [Authorize]
+    public async Task<ActionResult<List<AuthUserDto>>> GetUsers([FromQuery] string? role)
+    {
+        var users = await _authService.GetUsersAsync(role);
+        return Ok(users);
+    }
 }
