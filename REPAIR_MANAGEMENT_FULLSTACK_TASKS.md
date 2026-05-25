@@ -83,7 +83,7 @@ graph TD
   - Update typescript interfaces in `src/types/repairJob.ts` to include `assignedTechnicianId` and `assignedTechnicianName`.
   - Implement a new React Query hook `useGetTechnicians()` hitting `/auth/users?role=Technician`.
   - Update `updateRepairSchema.ts` Zod validation to allow `assignedTechnicianId` as a nullable/optional UUID string.
-* **Status:** TODO
+* **Status:** DONE
 * **Branch name:** `ticket-fs4-frontend-api-alignment`
 * **Commit template:** `feat(frontend): add technicians query and update form schema validations`
 

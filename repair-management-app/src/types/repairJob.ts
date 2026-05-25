@@ -32,6 +32,8 @@ export type RepairJobResponse = {
   estimatedCost: number | null;
   finalCost: number | null;
   status: RepairJobStatus;
+  assignedTechnicianId?: string | null;
+  assignedTechnicianName?: string | null;
   receivedAtUtc: string;
   completedAtUtc: string | null;
   createdAtUtc: string;
@@ -44,6 +46,7 @@ export type UpdateRepairJobRequest = {
   resolutionNotes: string | null;
   estimatedCost: number | null;
   finalCost: number | null;
+  assignedTechnicianId?: string | null;
 };
 
 export type UpdateRepairJobStatusRequest = {

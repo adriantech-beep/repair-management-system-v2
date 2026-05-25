@@ -353,6 +353,7 @@ describe("RepairJobDetail", () => {
         resolutionNotes: null,
         estimatedCost: 150,
         finalCost: null,
+        assignedTechnicianId: null,
       },
     });
 

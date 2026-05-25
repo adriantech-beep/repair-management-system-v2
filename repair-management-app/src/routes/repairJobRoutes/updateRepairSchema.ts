@@ -27,6 +27,10 @@ export const updateRepairSchema = z.object({
       .max(999999.99, "Final cost cannot exceed 999,999.99")
       .nullable()
   ),
+  assignedTechnicianId: z.preprocess(
+    (val) => (val === "" || val === undefined || val === null ? null : val),
+    z.string().uuid("Invalid technician ID format").nullable().optional()
+  ),
 });
 
 export type UpdateRepairFormData = {
@@ -35,5 +39,6 @@ export type UpdateRepairFormData = {
   resolutionNotes: string | null;
   estimatedCost: number | string | null;
   finalCost: number | string | null;
+  assignedTechnicianId?: string | null;
 };
 

@@ -1,14 +1,11 @@
 import axios from "axios";
+import type { AuthUser } from "@/types/user";
 
+// Unified with our backend DTO shape
 export interface LoginResponse {
   accessToken: string;
   refreshToken: string;
-  user: {
-    id: string;
-    email: string;
-    role: string;
-    branchId: string;
-  };
+  user: AuthUser;
 }
 
 const apiClient = axios.create({
