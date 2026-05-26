@@ -1,0 +1,55 @@
+name: Backend CI/CD (Azure)
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'repair-management-api/**'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'repair-management-api/**'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore repair-management-api/repair-management-api.sln
+
+    - name: Build
+      run: dotnet build repair-management-api/repair-management-api.sln --no-restore --configuration Release
+
+    - name: Run C# unit & integration tests
+      run: dotnet test repair-management-api/repair-management-api.sln --no-build --configuration Release --verbosity normal
+
+  deploy:
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Publish API
+      run: dotnet publish repair-management-api/repair-management-api.csproj --configuration Release --output ./publish
+
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v3
+      with:
+        app-name: 'repair-management-api' # Replace with your actual Azure App Service name
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        package: ./publish
