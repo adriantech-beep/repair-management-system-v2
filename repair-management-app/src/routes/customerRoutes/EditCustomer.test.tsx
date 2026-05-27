@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import EditCustomerForm from "./EditCustomerForm";
 import { MemoryRouter } from "react-router-dom";

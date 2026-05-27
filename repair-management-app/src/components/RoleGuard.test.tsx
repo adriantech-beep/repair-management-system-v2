@@ -11,6 +11,7 @@ vi.mock("@/store/authStore", () => ({
 describe("RoleGuard", () => {
   // Helper function to mock the Zustand selector's return value
   const mockAuthState = (user: { role: string } | null) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(useAuthStore).mockImplementation((selector: any) =>
       selector({ user }),
     );
