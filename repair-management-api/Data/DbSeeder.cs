@@ -17,6 +17,24 @@ namespace RepairManagementApi.Data
                 // Apply pending migrations
                 await dbContext.Database.MigrateAsync();
 
+                // Seed default Branch if none exists
+                var defaultBranch = await dbContext.Branches.FirstOrDefaultAsync();
+                if (defaultBranch is null)
+                {
+                    defaultBranch = new Branch
+                    {
+                        Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
+                        Code = "MAIN",
+                        Name = "Main Branch",
+                        Address = "123 Main Street",
+                        CreatedAtUtc = DateTime.UtcNow,
+                        UpdatedAtUtc = DateTime.UtcNow
+                    };
+                    dbContext.Branches.Add(defaultBranch);
+                    await dbContext.SaveChangesAsync();
+                    Console.WriteLine("✓ Default branch seeded: Main Branch");
+                }
+
                 // Seed Admin user if none exists
                 if (!dbContext.Users.Any())
                 {
@@ -31,7 +49,8 @@ namespace RepairManagementApi.Data
                         LockoutEndUtc = null,
                         MustChangePassword = false,
                         CreatedAtUtc = DateTime.UtcNow,
-                        UpdatedAtUtc = DateTime.UtcNow
+                        UpdatedAtUtc = DateTime.UtcNow,
+                        BranchId = defaultBranch.Id
                     };
 
                     dbContext.Users.Add(adminUser);
@@ -54,7 +73,8 @@ namespace RepairManagementApi.Data
                         LockoutEndUtc = null,
                         MustChangePassword = false,
                         CreatedAtUtc = DateTime.UtcNow,
-                        UpdatedAtUtc = DateTime.UtcNow
+                        UpdatedAtUtc = DateTime.UtcNow,
+                        BranchId = defaultBranch.Id
                     };
 
                     var tech2 = new User
@@ -68,13 +88,26 @@ namespace RepairManagementApi.Data
                         LockoutEndUtc = null,
                         MustChangePassword = false,
                         CreatedAtUtc = DateTime.UtcNow,
-                        UpdatedAtUtc = DateTime.UtcNow
+                        UpdatedAtUtc = DateTime.UtcNow,
+                        BranchId = defaultBranch.Id
                     };
 
                     dbContext.Users.AddRange(tech1, tech2);
                     await dbContext.SaveChangesAsync();
 
                     Console.WriteLine("✓ Technician users seeded: john.tech@repairmanagement.local & jane.tech@repairmanagement.local");
+                }
+
+                // Associate any existing users with no branch to the default branch (self-healing migration)
+                var usersWithNoBranch = await dbContext.Users.Where(u => u.BranchId == null).ToListAsync();
+                if (usersWithNoBranch.Any())
+                {
+                    foreach (var user in usersWithNoBranch)
+                    {
+                        user.BranchId = defaultBranch.Id;
+                    }
+                    await dbContext.SaveChangesAsync();
+                    Console.WriteLine($"✓ Associated {usersWithNoBranch.Count} existing users with the default branch");
                 }
             }
         }
