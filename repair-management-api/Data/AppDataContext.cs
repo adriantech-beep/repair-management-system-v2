@@ -3,13 +3,23 @@ using System.Runtime.InteropServices.Marshalling;
 using System.Security.AccessControl;
 using Microsoft.EntityFrameworkCore;
 using RepairManagementApi.Models;
+using RepairManagementApi.Services;
 
 namespace RepairManagementApi.Data;
 
 public class AppDbContext : DbContext
 {
+    private readonly ITenantContext? _tenantContext;
+    public Guid? CurrentTenantId => _tenantContext?.TenantId;
+
+    public AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext tenantContext) : base(options)
+    {
+        _tenantContext = tenantContext;
+    }
+
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
+        _tenantContext = null;
     }
 
     public DbSet<User> Users => Set<User>();
@@ -24,10 +34,57 @@ public class AppDbContext : DbContext
     public DbSet<Device> Devices => Set<Device>();
 
     public DbSet<RepairJob> RepairJobs => Set<RepairJob>();
+    public DbSet<Tenant> Tenants => Set<Tenant>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        // Global Multi-Tenant Query Filters
+        modelBuilder.Entity<Branch>().HasQueryFilter(b => CurrentTenantId == null || b.TenantId == CurrentTenantId);
+        modelBuilder.Entity<User>().HasQueryFilter(u => CurrentTenantId == null || u.TenantId == CurrentTenantId);
+        modelBuilder.Entity<Customer>().HasQueryFilter(c => CurrentTenantId == null || c.TenantId == CurrentTenantId);
+        modelBuilder.Entity<RepairJob>().HasQueryFilter(rj => CurrentTenantId == null || rj.TenantId == CurrentTenantId);
+
+        // Tenant configuration
+        modelBuilder.Entity<Tenant>(entity =>
+        {
+            entity.HasKey(t => t.Id);
+            entity.Property(t => t.CompanyName).IsRequired().HasMaxLength(150);
+            entity.Property(t => t.Subdomain).IsRequired().HasMaxLength(100);
+            entity.HasIndex(t => t.Subdomain).IsUnique();
+        });
+
+        // Configure Tenant relationships & Cascade deletion
+        modelBuilder.Entity<Branch>()
+            .HasOne(b => b.Tenant)
+            .WithMany(t => t.Branches)
+            .HasForeignKey(b => b.TenantId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<User>()
+            .HasOne(u => u.Tenant)
+            .WithMany(t => t.Users)
+            .HasForeignKey(u => u.TenantId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Customer>()
+            .HasOne(c => c.Tenant)
+            .WithMany(t => t.Customers)
+            .HasForeignKey(c => c.TenantId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<RepairJob>()
+            .HasOne(rj => rj.Tenant)
+            .WithMany(t => t.RepairJobs)
+            .HasForeignKey(rj => rj.TenantId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Indexes for performance
+        modelBuilder.Entity<Branch>().HasIndex(b => b.TenantId);
+        modelBuilder.Entity<User>().HasIndex(u => u.TenantId);
+        modelBuilder.Entity<Customer>().HasIndex(c => c.TenantId);
+        modelBuilder.Entity<RepairJob>().HasIndex(rj => rj.TenantId);
 
         // User configuration
         modelBuilder.Entity<User>(entity =>
@@ -280,8 +337,51 @@ public class AppDbContext : DbContext
         .HasForeignKey(r => r.AssignedTechnicianId)
         .OnDelete(DeleteBehavior.Restrict);
 });
-    
-    
-    
+    }
+
+    public override int SaveChanges()
+    {
+        if (_tenantContext != null && _tenantContext.TenantId.HasValue)
+        {
+            foreach (var entry in ChangeTracker.Entries())
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    var tenantIdProperty = entry.Entity.GetType().GetProperty("TenantId");
+                    if (tenantIdProperty != null)
+                    {
+                        var currentValue = (Guid)tenantIdProperty.GetValue(entry.Entity)!;
+                        if (currentValue == Guid.Empty)
+                        {
+                            tenantIdProperty.SetValue(entry.Entity, _tenantContext.TenantId.Value);
+                        }
+                    }
+                }
+            }
+        }
+        return base.SaveChanges();
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        if (_tenantContext != null && _tenantContext.TenantId.HasValue)
+        {
+            foreach (var entry in ChangeTracker.Entries())
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    var tenantIdProperty = entry.Entity.GetType().GetProperty("TenantId");
+                    if (tenantIdProperty != null)
+                    {
+                        var currentValue = (Guid)tenantIdProperty.GetValue(entry.Entity)!;
+                        if (currentValue == Guid.Empty)
+                        {
+                            tenantIdProperty.SetValue(entry.Entity, _tenantContext.TenantId.Value);
+                        }
+                    }
+                }
+            }
+        }
+        return base.SaveChangesAsync(cancellationToken);
     }
 }
