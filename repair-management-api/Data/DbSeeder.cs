@@ -17,7 +17,25 @@ namespace RepairManagementApi.Data
                 // Apply pending migrations
                 await dbContext.Database.MigrateAsync();
 
-                // Seed default Branch if none exists
+                // 1. Seed default Tenant if none exists
+                var defaultTenant = await dbContext.Tenants.FirstOrDefaultAsync();
+                if (defaultTenant is null)
+                {
+                    defaultTenant = new Tenant
+                    {
+                        Id = Guid.Parse("99999999-9999-9999-9999-999999999999"),
+                        CompanyName = "Atech Labs",
+                        Subdomain = "localhost",
+                        StripeCustomerId = null,
+                        SubscriptionStatus = "Active",
+                        CreatedAtUtc = DateTime.UtcNow
+                    };
+                    dbContext.Tenants.Add(defaultTenant);
+                    await dbContext.SaveChangesAsync();
+                    Console.WriteLine("✓ Default tenant seeded: Atech Labs (localhost)");
+                }
+
+                // 2. Seed default Branch if none exists
                 var defaultBranch = await dbContext.Branches.FirstOrDefaultAsync();
                 if (defaultBranch is null)
                 {
@@ -27,6 +45,7 @@ namespace RepairManagementApi.Data
                         Code = "MAIN",
                         Name = "Main Branch",
                         Address = "123 Main Street",
+                        TenantId = defaultTenant.Id,
                         CreatedAtUtc = DateTime.UtcNow,
                         UpdatedAtUtc = DateTime.UtcNow
                     };
@@ -35,7 +54,7 @@ namespace RepairManagementApi.Data
                     Console.WriteLine("✓ Default branch seeded: Main Branch");
                 }
 
-                // Seed Admin user if none exists
+                // 3. Seed Admin user if none exists
                 if (!dbContext.Users.Any())
                 {
                     var adminUser = new User
@@ -48,6 +67,7 @@ namespace RepairManagementApi.Data
                         FailedLoginAttempts = 0,
                         LockoutEndUtc = null,
                         MustChangePassword = false,
+                        TenantId = defaultTenant.Id,
                         CreatedAtUtc = DateTime.UtcNow,
                         UpdatedAtUtc = DateTime.UtcNow,
                         BranchId = defaultBranch.Id
@@ -59,7 +79,7 @@ namespace RepairManagementApi.Data
                     Console.WriteLine("✓ Admin user seeded: admin@repairmanagement.local / AdminPassword123!");
                 }
 
-                // Seed Technician users if none exist
+                // 4. Seed Technician users if none exist
                 if (!dbContext.Users.Any(u => u.Role == Role.Technician))
                 {
                     var tech1 = new User
@@ -72,6 +92,7 @@ namespace RepairManagementApi.Data
                         FailedLoginAttempts = 0,
                         LockoutEndUtc = null,
                         MustChangePassword = false,
+                        TenantId = defaultTenant.Id,
                         CreatedAtUtc = DateTime.UtcNow,
                         UpdatedAtUtc = DateTime.UtcNow,
                         BranchId = defaultBranch.Id
@@ -87,6 +108,7 @@ namespace RepairManagementApi.Data
                         FailedLoginAttempts = 0,
                         LockoutEndUtc = null,
                         MustChangePassword = false,
+                        TenantId = defaultTenant.Id,
                         CreatedAtUtc = DateTime.UtcNow,
                         UpdatedAtUtc = DateTime.UtcNow,
                         BranchId = defaultBranch.Id
@@ -98,7 +120,29 @@ namespace RepairManagementApi.Data
                     Console.WriteLine("✓ Technician users seeded: john.tech@repairmanagement.local & jane.tech@repairmanagement.local");
                 }
 
-                // Associate any existing users with no branch to the default branch (self-healing migration)
+                // 5. Self-Healing Migration: Associate any orphan records with the default branch & tenant
+                var branchesWithNoTenant = await dbContext.Branches.Where(b => b.TenantId == Guid.Empty).ToListAsync();
+                if (branchesWithNoTenant.Any())
+                {
+                    foreach (var branch in branchesWithNoTenant)
+                    {
+                        branch.TenantId = defaultTenant.Id;
+                    }
+                    await dbContext.SaveChangesAsync();
+                    Console.WriteLine($"✓ Associated {branchesWithNoTenant.Count} existing branches with default tenant");
+                }
+
+                var usersWithNoTenant = await dbContext.Users.Where(u => u.TenantId == Guid.Empty).ToListAsync();
+                if (usersWithNoTenant.Any())
+                {
+                    foreach (var user in usersWithNoTenant)
+                    {
+                        user.TenantId = defaultTenant.Id;
+                    }
+                    await dbContext.SaveChangesAsync();
+                    Console.WriteLine($"✓ Associated {usersWithNoTenant.Count} existing users with default tenant");
+                }
+
                 var usersWithNoBranch = await dbContext.Users.Where(u => u.BranchId == null).ToListAsync();
                 if (usersWithNoBranch.Any())
                 {
