@@ -17,4 +17,7 @@ public class Branch
     public List<User> Users { get; set; } = [];
 
     public List<Customer> Customers { get; set; } = [];
+
+    public Guid TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
 }

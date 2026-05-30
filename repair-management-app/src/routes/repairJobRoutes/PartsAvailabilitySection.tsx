@@ -10,8 +10,8 @@ import parseApiError from "@/api/parseApiError";
 
 interface PartsAvailabilitySectionProps {
   repairJob: RepairJobResponse;
-  customer?: any;
-  device?: any;
+  customer?: { fullName: string; email?: string | null; phone?: string | null } | null;
+  device?: { brand: string; model: string } | null;
 }
 
 function normalizeText(value: string | null | undefined) {

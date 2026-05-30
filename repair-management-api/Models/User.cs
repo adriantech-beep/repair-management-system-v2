@@ -30,4 +30,7 @@ public class User
 
     public Guid? BranchId { get; set; }
     public Branch? Branch { get; set; }
+
+    public Guid TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
 }

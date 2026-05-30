@@ -12,4 +12,7 @@ public class Customer
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAtUtc { get; set; } = DateTime.UtcNow;
 
+    public Guid TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
+
 }

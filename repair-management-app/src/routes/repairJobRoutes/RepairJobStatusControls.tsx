@@ -29,6 +29,7 @@ const RepairJobStatusControls = ({ repairJob }: RepairJobStatusControlsProps) =>
 
   useEffect(() => {
     if (repairJob) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setStatusDraft(repairJob.status);
     }
   }, [repairJob]);
