@@ -10,6 +10,7 @@ import {
 import UpdateRepairJobForm from "./UpdateRepairJobForm";
 import RepairJobStatusControls from "./RepairJobStatusControls";
 import PartsAvailabilitySection from "./PartsAvailabilitySection";
+import RepairJobPartsPanel from "./RepairJobPartsPanel";
 import useAuthStore from "@/store/authStore";
 
 const RepairJobDetail = () => {
@@ -81,86 +82,94 @@ const RepairJobDetail = () => {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[1.7fr_1fr]">
-        <article className="space-y-4 rounded-2xl border border-emerald-100 bg-white p-6 shadow-sm">
-          <div>
-            <h2 className="text-lg font-semibold text-emerald-950">
-              Work Summary
-            </h2>
-            <p className="mt-1 text-sm text-emerald-900/60">
-              Timeline-ready layout: this view reserves a dedicated activity
-              panel for the future backend timeline endpoint.
-            </p>
-          </div>
-
-          <section className="space-y-3 rounded-xl border border-emerald-100 bg-emerald-50/40 p-4">
-            <div>
-              <h3 className="text-sm font-semibold text-emerald-950">
-                Update Repair Job
-              </h3>
-              {canEditRepairJobDetails ? (
-                <p className="text-xs text-emerald-900/70">
-                  Contract-backed update fields for problem details and costs.
-                </p>
-              ) : (
-                <p className="text-xs text-emerald-900/70">
-                  Detail edits require Admin role.
-                </p>
-              )}
-            </div>
-            {canEditRepairJobDetails && (
-              <UpdateRepairJobForm repairJob={repairJob} />
-            )}
-          </section>
-
-          <dl className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-1">
-              <dt className="text-xs font-semibold uppercase tracking-wide text-emerald-900/50">
-                Customer ID
-              </dt>
-              <dd className="break-all text-sm text-emerald-950">
-                {repairJob.customerId}
-              </dd>
-            </div>
-
-            <div className="space-y-1">
-              <dt className="text-xs font-semibold uppercase tracking-wide text-emerald-900/50">
-                Device ID
-              </dt>
-              <dd className="break-all text-sm text-emerald-950">
-                {repairJob.deviceId}
-              </dd>
-            </div>
-
-            <div className="space-y-1 sm:col-span-2">
-              <dt className="text-xs font-semibold uppercase tracking-wide text-emerald-900/50">
-                Problem Description
-              </dt>
-              <dd className="text-sm text-emerald-950">
-                {repairJob.problemDescription}
-              </dd>
-            </div>
-
-            <div className="space-y-1 sm:col-span-2">
-              <dt className="text-xs font-semibold uppercase tracking-wide text-emerald-900/50">
-                Diagnosis Notes
-              </dt>
-              <dd className="whitespace-pre-wrap text-sm text-emerald-950">
-                {formatOptionalText(repairJob.diagnosisNotes)}
-              </dd>
-            </div>
-
-            <div className="space-y-1 sm:col-span-2">
-              <dt className="text-xs font-semibold uppercase tracking-wide text-emerald-900/50">
-                Resolution Notes
-              </dt>
-              <dd className="whitespace-pre-wrap text-sm text-emerald-950">
-                {formatOptionalText(repairJob.resolutionNotes)}
-              </dd>
-            </div>
-          </dl>
-        </article>
-
         <div className="space-y-4">
+          <article className="space-y-4 rounded-2xl border border-emerald-100 bg-white p-6 shadow-sm">
+            <div>
+              <h2 className="text-lg font-semibold text-emerald-950">
+                Work Summary
+              </h2>
+              <p className="mt-1 text-sm text-emerald-900/60">
+                Timeline-ready layout: this view reserves a dedicated activity
+                panel for the future backend timeline endpoint.
+              </p>
+            </div>
+
+            <section className="space-y-3 rounded-xl border border-emerald-100 bg-emerald-50/40 p-4">
+              <div>
+                <h3 className="text-sm font-semibold text-emerald-950">
+                  Update Repair Job
+                </h3>
+                {canEditRepairJobDetails ? (
+                  <p className="text-xs text-emerald-900/70">
+                    Contract-backed update fields for problem details and costs.
+                  </p>
+                ) : (
+                  <p className="text-xs text-emerald-900/70">
+                    Detail edits require Admin role.
+                  </p>
+                )}
+              </div>
+              {canEditRepairJobDetails && (
+                <UpdateRepairJobForm repairJob={repairJob} />
+              )}
+            </section>
+
+            <dl className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-1">
+                <dt className="text-xs font-semibold uppercase tracking-wide text-emerald-900/50">
+                  Customer ID
+                </dt>
+                <dd className="break-all text-sm text-emerald-950">
+                  {repairJob.customerId}
+                </dd>
+              </div>
+
+              <div className="space-y-1">
+                <dt className="text-xs font-semibold uppercase tracking-wide text-emerald-900/50">
+                  Device ID
+                </dt>
+                <dd className="break-all text-sm text-emerald-950">
+                  {repairJob.deviceId}
+                </dd>
+              </div>
+
+              <div className="space-y-1 sm:col-span-2">
+                <dt className="text-xs font-semibold uppercase tracking-wide text-emerald-900/50">
+                  Problem Description
+                </dt>
+                <dd className="text-sm text-emerald-950">
+                  {repairJob.problemDescription}
+                </dd>
+              </div>
+
+              <div className="space-y-1 sm:col-span-2">
+                <dt className="text-xs font-semibold uppercase tracking-wide text-emerald-900/50">
+                  Diagnosis Notes
+                </dt>
+                <dd className="whitespace-pre-wrap text-sm text-emerald-950">
+                  {formatOptionalText(repairJob.diagnosisNotes)}
+                </dd>
+              </div>
+
+              <div className="space-y-1 sm:col-span-2">
+                <dt className="text-xs font-semibold uppercase tracking-wide text-emerald-900/50">
+                  Resolution Notes
+                </dt>
+                <dd className="whitespace-pre-wrap text-sm text-emerald-950">
+                  {formatOptionalText(repairJob.resolutionNotes)}
+                </dd>
+              </div>
+            </dl>
+          </article>
+
+          <RepairJobPartsPanel
+            repairJobId={repairJob.id}
+            deviceBrand={device?.brand}
+            deviceModel={device?.model}
+          />
+        </div>
+
+        <div className="space-y-4 font-normal">
           <section className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-sm">
             <h2 className="text-lg font-semibold text-emerald-950">
               Costs and Dates
