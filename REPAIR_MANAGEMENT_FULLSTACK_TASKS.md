@@ -95,7 +95,7 @@ graph TD
   - Add `<select>` dropdown inside `<UpdateRepairJobFields />` populated by `useGetTechnicians()`.
   - Handled defaults cleanly (render "Unassigned" if ID is null).
   - Form submission successfully updates the assigned technician, invalidates cache, and renders the updated technician details on the detail page.
-* **Status:** TODO
+* **Status:** DONE
 * **Branch name:** `ticket-fs5-technician-dropdown-ui`
 * **Commit template:** `feat(frontend): implement technician assignment select dropdown UI`
 
