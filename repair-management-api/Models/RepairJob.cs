@@ -24,4 +24,7 @@ public class RepairJob
     public DateTime? CompletedAtUtc { get; set; }
     public DateTime CreatedAtUtc { get; set; }
     public DateTime UpdatedAtUtc { get; set; }
+
+    public Guid TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
 }
