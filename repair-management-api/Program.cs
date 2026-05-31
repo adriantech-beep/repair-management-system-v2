@@ -31,8 +31,8 @@ builder.Services.AddScoped<INotificationService, LoggingNotificationService>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IBranchContext, BranchContext>();
-builder.Services.AddScoped<ITenantContext, TenantContext>();
 builder.Services.AddScoped<TenantContext>();
+builder.Services.AddScoped<ITenantContext>(sp => sp.GetRequiredService<TenantContext>());
 
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 
