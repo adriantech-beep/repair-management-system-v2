@@ -22,7 +22,7 @@ public class CustomersController : ControllerBase
 
 
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Technician")]
     public async Task<ActionResult<CustomerResponseDto>> CreateCustomer([FromBody] CreateCustomerRequestDto request)
     {
         try
@@ -80,7 +80,7 @@ public class CustomersController : ControllerBase
     }
 
     [HttpPut("{customerId:guid}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Technician")]
     public async Task<ActionResult<CustomerResponseDto>> UpdateCustomer(
     Guid customerId,
     [FromBody] UpdateCustomerRequestDto request)

@@ -22,7 +22,7 @@ public class DevicesController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Technician")]
     [ProducesResponseType(typeof(DeviceResponseDto), 201)]
     [ProducesResponseType(404)]
     [ProducesResponseType(403)]
@@ -115,7 +115,7 @@ public class DevicesController : ControllerBase
     }
 
     [HttpPut("{deviceId}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Technician")]
     [ProducesResponseType(typeof(DeviceResponseDto), 200)]
     [ProducesResponseType(404)]
     [ProducesResponseType(403)]
