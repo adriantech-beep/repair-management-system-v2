@@ -21,7 +21,7 @@ public class RepairJobsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Technician")]
     [ProducesResponseType(typeof(RepairJobResponseDto), 201)]
     [ProducesResponseType(404)]
     [ProducesResponseType(403)]
@@ -81,7 +81,7 @@ public class RepairJobsController : ControllerBase
     }
 
     [HttpPut("{repairJobId}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Technician")]
     [ProducesResponseType(typeof(RepairJobResponseDto), 200)]
     [ProducesResponseType(404)]
     [ProducesResponseType(403)]

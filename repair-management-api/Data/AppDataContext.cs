@@ -35,6 +35,7 @@ public class AppDbContext : DbContext
 
     public DbSet<RepairJob> RepairJobs => Set<RepairJob>();
     public DbSet<Tenant> Tenants => Set<Tenant>();
+    public DbSet<RepairJobPart> RepairJobParts => Set<RepairJobPart>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -45,6 +46,7 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<User>().HasQueryFilter(u => CurrentTenantId == null || u.TenantId == CurrentTenantId);
         modelBuilder.Entity<Customer>().HasQueryFilter(c => CurrentTenantId == null || c.TenantId == CurrentTenantId);
         modelBuilder.Entity<RepairJob>().HasQueryFilter(rj => CurrentTenantId == null || rj.TenantId == CurrentTenantId);
+        modelBuilder.Entity<RepairJobPart>().HasQueryFilter(rjp => CurrentTenantId == null || rjp.TenantId == CurrentTenantId);
 
         // Tenant configuration
         modelBuilder.Entity<Tenant>(entity =>
@@ -80,11 +82,31 @@ public class AppDbContext : DbContext
             .HasForeignKey(rj => rj.TenantId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        modelBuilder.Entity<RepairJobPart>()
+            .HasOne(rjp => rjp.Tenant)
+            .WithMany()
+            .HasForeignKey(rjp => rjp.TenantId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<RepairJobPart>()
+            .HasOne(rjp => rjp.RepairJob)
+            .WithMany()
+            .HasForeignKey(rjp => rjp.RepairJobId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<RepairJobPart>()
+            .HasOne(rjp => rjp.Part)
+            .WithMany()
+            .HasForeignKey(rjp => rjp.PartId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         // Indexes for performance
         modelBuilder.Entity<Branch>().HasIndex(b => b.TenantId);
         modelBuilder.Entity<User>().HasIndex(u => u.TenantId);
         modelBuilder.Entity<Customer>().HasIndex(c => c.TenantId);
         modelBuilder.Entity<RepairJob>().HasIndex(rj => rj.TenantId);
+        modelBuilder.Entity<RepairJobPart>().HasIndex(rjp => rjp.TenantId);
+        modelBuilder.Entity<RepairJobPart>().HasIndex(rjp => new { rjp.TenantId, rjp.RepairJobId });
 
         // User configuration
         modelBuilder.Entity<User>(entity =>

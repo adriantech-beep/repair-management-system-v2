@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import RepairJobDetail from "./RepairJobDetail";
+import { formatCurrency } from "./repairJobFormatters";
 
 const mockUseGetRepairJobById = vi.fn();
 const mockUseUpdateRepairJob = vi.fn();
@@ -12,6 +13,9 @@ const mockUseCreateWaitlistRequest = vi.fn();
 const mockUseGetCustomerById = vi.fn();
 const mockUseGetDeviceById = vi.fn();
 const mockUseAuthStore = vi.fn();
+const mockUseGetRepairJobParts = vi.fn();
+const mockUseAllocateRepairJobPart = vi.fn();
+const mockUseRemoveRepairJobPart = vi.fn();
 
 vi.mock("@/hooks/useRepairJobs", () => ({
   useGetRepairJobById: (repairJobId: string) =>
@@ -33,6 +37,12 @@ vi.mock("@/hooks/useCustomers", () => ({
 
 vi.mock("@/hooks/useDevices", () => ({
   useGetDeviceById: (deviceId: string) => mockUseGetDeviceById(deviceId),
+}));
+
+vi.mock("@/hooks/useRepairJobParts", () => ({
+  useGetRepairJobParts: (jobId: string) => mockUseGetRepairJobParts(jobId),
+  useAllocateRepairJobPart: () => mockUseAllocateRepairJobPart(),
+  useRemoveRepairJobPart: () => mockUseRemoveRepairJobPart(),
 }));
 
 vi.mock("@/store/authStore", () => ({
@@ -76,6 +86,22 @@ function mockDefaultDependencies() {
 
   mockUseGetDeviceById.mockReturnValue({
     data: undefined,
+  });
+
+  mockUseGetRepairJobParts.mockReturnValue({
+    data: [],
+    isLoading: false,
+    isError: false,
+  });
+
+  mockUseAllocateRepairJobPart.mockReturnValue({
+    mutateAsync: vi.fn(),
+    isPending: false,
+  });
+
+  mockUseRemoveRepairJobPart.mockReturnValue({
+    mutateAsync: vi.fn(),
+    isPending: false,
   });
 }
 
@@ -518,4 +544,113 @@ describe("RepairJobDetail", () => {
       },
     });
   });
+
+  it("renders allocated parts list and allows adding a part", async () => {
+    mockDefaultDependencies();
+
+    // Mock allocated parts
+    mockUseGetRepairJobParts.mockReturnValue({
+      data: [
+        {
+          id: "alloc-1",
+          partId: "part-1",
+          partName: "Replacement Screen",
+          partNumber: "SCR-123",
+          quantity: 2,
+          unitPrice: 50.0,
+          totalPrice: 100.0,
+          allocatedAtUtc: "2026-05-10T10:00:00Z",
+        },
+      ],
+      isLoading: false,
+      isError: false,
+    });
+
+    // Mock inventory parts
+    mockUseGetParts.mockReturnValue({
+      data: [
+        {
+          id: "part-2",
+          partNumber: "BATT-456",
+          name: "OEM Battery",
+          category: "Power",
+          stockQuantity: 10,
+          supplierPrice: 15,
+          sellingPrice: 30,
+          isActive: true,
+          compatibilities: [],
+        },
+      ],
+      isLoading: false,
+      isError: false,
+    });
+
+    const allocateSpy = vi.fn().mockResolvedValue({ id: "alloc-2" });
+    mockUseAllocateRepairJobPart.mockReturnValue({
+      mutateAsync: allocateSpy,
+      isPending: false,
+    });
+
+    mockUseGetRepairJobById.mockReturnValue({
+      data: {
+        id: "job-1",
+        customerId: "customer-1",
+        deviceId: "device-1",
+        branchId: "branch-1",
+        jobNumber: "RJ-1",
+        problemDescription: "Original problem description",
+        diagnosisNotes: null,
+        resolutionNotes: null,
+        estimatedCost: null,
+        finalCost: 100.0,
+        status: "Received",
+        receivedAtUtc: "2026-05-10T10:00:00Z",
+        completedAtUtc: null,
+        createdAtUtc: "2026-05-10T10:00:00Z",
+        updatedAtUtc: "2026-05-10T10:00:00Z",
+      },
+      isLoading: false,
+      isError: false,
+      error: null,
+    });
+
+    const { userEvent } = await import("@testing-library/user-event");
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter initialEntries={["/repair-jobs/job-1"]}>
+        <Routes>
+          <Route
+            path="/repair-jobs/:repairJobId"
+            element={<RepairJobDetail />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    // 1. Assert parts panel is displayed
+    expect(screen.getByText("Allocated Parts & Materials")).toBeInTheDocument();
+    
+    // 2. Assert allocated parts table shows linked parts
+    expect(screen.getByText("Replacement Screen")).toBeInTheDocument();
+    expect(screen.getByText("SCR-123")).toBeInTheDocument();
+    expect(screen.getAllByText(formatCurrency(100.00))).toHaveLength(3);
+
+    // 3. Select inventory part and allocate it
+    const select = screen.getByRole("combobox", { name: "Select Inventory Part" });
+    await user.selectOptions(select, "part-2");
+
+    const addButton = screen.getByRole("button", { name: "Add Part" });
+    await user.click(addButton);
+
+    // 4. Verify mock mutation is triggered with correct arguments
+    expect(allocateSpy).toHaveBeenCalledWith({
+      jobId: "job-1",
+      payload: {
+        partId: "part-2",
+        quantity: 1,
+      },
+    });
+  });
 });
+
