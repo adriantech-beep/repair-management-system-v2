@@ -25,32 +25,35 @@ public class RepairJobPartService : IRepairJobPartService
         _db = db;
     }
 
+    private static RepairJobPartResponseDto MapToDto(RepairJobPart rjp) => new()
+    {
+        Id = rjp.Id,
+        PartId = rjp.PartId,
+        PartName = rjp.Part != null ? rjp.Part.Name : "Unknown Part",
+        PartNumber = rjp.Part != null ? rjp.Part.PartNumber : "N/A",
+        Quantity = rjp.Quantity,
+        UnitPrice = rjp.UnitPrice,
+        AllocatedAtUtc = rjp.AllocatedAtUtc
+    };
+
     public async Task<IEnumerable<RepairJobPartResponseDto>> GetJobPartsAsync(Guid jobId)
     {
         // 1. Verify that the repair job exists
-        var jobExists = await _db.RepairJobs.AnyAsync(rj => rj.Id == jobId);
+        var jobExists = await _db.RepairJobs.AsNoTracking().AnyAsync(rj => rj.Id == jobId);
         if (!jobExists)
         {
             throw new KeyNotFoundException("REPAIR_JOB_NOT_FOUND");
         }
 
         // 2. Fetch allocated parts (automatically filtered by multi-tenant global filter)
-        return await _db.RepairJobParts
+        var allocations = await _db.RepairJobParts
             .AsNoTracking()
             .Include(rjp => rjp.Part)
             .Where(rjp => rjp.RepairJobId == jobId)
             .OrderBy(rjp => rjp.AllocatedAtUtc)
-            .Select(rjp => new RepairJobPartResponseDto
-            {
-                Id = rjp.Id,
-                PartId = rjp.PartId,
-                PartName = rjp.Part != null ? rjp.Part.Name : "Unknown Part",
-                PartNumber = rjp.Part != null ? rjp.Part.PartNumber : "N/A",
-                Quantity = rjp.Quantity,
-                UnitPrice = rjp.UnitPrice,
-                AllocatedAtUtc = rjp.AllocatedAtUtc
-            })
             .ToListAsync();
+
+        return allocations.Select(MapToDto).ToList();
     }
 
     public async Task<RepairJobPartResponseDto> AllocatePartAsync(Guid jobId, AllocatePartRequestDto request)
