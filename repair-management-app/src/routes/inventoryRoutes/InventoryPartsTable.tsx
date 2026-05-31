@@ -38,9 +38,24 @@ const InventoryPartsTable = () => {
 
   if (partsData.length === 0) {
     return (
-      <div className="rounded-2xl border border-emerald-100 bg-white p-6 text-sm text-emerald-900/70 shadow-sm">
-        No inventory parts found.
-      </div>
+      <>
+        <div className="mb-4 mt-5 flex items-center justify-end p-2">
+          <RoleGuard allowedRoles={["Admin"]}>
+            <ModalWindow>
+              <ModalWindow.Open opens="create-part">
+                <Button>Add Part</Button>
+              </ModalWindow.Open>
+
+              <ModalWindow.Window name="create-part">
+                <CreatePartInventoryForm />
+              </ModalWindow.Window>
+            </ModalWindow>
+          </RoleGuard>
+        </div>
+        <div className="rounded-2xl border border-emerald-100 bg-white p-6 text-sm text-emerald-900/70 shadow-sm">
+          No inventory parts found.
+        </div>
+      </>
     );
   }
 
