@@ -1,4 +1,5 @@
 import parseApiError from "@/api/parseApiError";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCreateCustomer } from "@/hooks/useCustomers";
@@ -332,6 +333,7 @@ const CreateServiceOrder = () => {
       resetWizard();
       navigate(`/repair-jobs/${createdRepairJob.id}`, { replace: true });
     } catch (error) {
+      console.error("Failed to submit service order:", error);
       const parsed = parseApiError(error);
 
       if (parsed.fieldErrors) {
@@ -369,7 +371,17 @@ const CreateServiceOrder = () => {
         return;
       }
 
-      setSubmitError(parsed.message ?? "Unable to create service order.");
+      let displayMessage = parsed.message;
+      if (displayMessage === "An unknown error occurred" && axios.isAxiosError(error) && error.response?.status) {
+        const responseData = error.response.data;
+        if (typeof responseData === "string" && responseData.includes("<!DOCTYPE")) {
+          displayMessage = `Server HTML Error (${error.response.status}): ${error.response.statusText || "Internal Server Error"}`;
+        } else {
+          displayMessage = `Server Error (${error.response.status}): ${error.response.statusText || "Unknown Error"}`;
+        }
+      }
+
+      setSubmitError(displayMessage ?? "Unable to create service order.");
     }
   };
 
