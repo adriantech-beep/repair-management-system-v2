@@ -4,6 +4,7 @@ import type {
   DeviceListItem,
   DeviceResponse,
   UpdateDeviceRequest,
+  ImeiLookupResponse,
 } from "@/types/device";
 import apiClient from "./httpClient";
 
@@ -273,4 +274,12 @@ export async function lookupDeviceByIdentifier(
   }
 
   return normalizeDeviceLookupResponse(normalized);
+}
+
+
+export async function lookupImei(imei: string): Promise<ImeiLookupResponse> {
+  const response = await apiClient.get<ImeiLookupResponse>(
+    `/api/devices/imei-lookup/${encodeURIComponent(imei.trim())}`
+  );
+  return response.data;
 }

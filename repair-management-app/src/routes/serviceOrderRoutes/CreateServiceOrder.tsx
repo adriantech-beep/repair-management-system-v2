@@ -3,7 +3,7 @@ import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCreateCustomer } from "@/hooks/useCustomers";
-import { useLookupDeviceByIdentifier } from "@/hooks/useDevices";
+import { useLookupDeviceByIdentifier, useLookupImeiDetails } from "@/hooks/useDevices";
 import { useCreateDevice } from "@/hooks/useDevices";
 import { useCreateRepairJob } from "@/hooks/useRepairJobs";
 import {
@@ -124,7 +124,8 @@ const CreateServiceOrder = () => {
     (state) => state.clearLookupMatch,
   );
   const resetWizard = useServiceOrderWizardStore((state) => state.resetWizard);
-
+  const { mutateAsync: lookupImeiDetails, isPending: isImeiLookupPending } =
+    useLookupImeiDetails();
   const { mutateAsync: lookupDevice, isPending: isLookupPending } =
     useLookupDeviceByIdentifier();
   const { mutateAsync: createCustomer, isPending: isCreateCustomerPending } =
@@ -182,14 +183,38 @@ const CreateServiceOrder = () => {
       }
 
       if (parsed.status === 404) {
-        completeLookup(
-          "not-found",
-          "No device found with that IMEI / Serial Number.",
-        );
+        try {
+          completeLookup("loading", "Device not found locally. Checking IMEI registry...");
+
+          // Query our secure proxy API
+          const imeiDetails = await lookupImeiDetails(identifier.trim());
+
+          // 1. Auto-fill the new device form fields!
+          setNewDevice((prev) => ({
+            ...prev,
+            brand: imeiDetails.brand,
+            model: imeiDetails.model,
+            imeiOrSerialNumber: identifier.trim(),
+            deviceType: imeiDetails.deviceType,
+          }));
+
+          // 2. Report success, state change, and transition
+          completeLookup(
+            "not-found",
+            `Device registry check succeeded! Found ${imeiDetails.brand} ${imeiDetails.model}. Auto-populating details.`,
+          );
+          goToStep(2);
+        } catch (registryError) {
+          // If both local and registry check fail, let them enter it manually
+          completeLookup(
+            "not-found",
+            "No matching device found in local database or registry. You can create a new record.",
+          );
+          goToStep(2);
+        }
         return;
       }
 
-      completeLookup("error", parsed.message ?? "Lookup failed. Please retry.");
     }
   };
 
@@ -199,8 +224,13 @@ const CreateServiceOrder = () => {
       "not-found",
       "Proceeding with new customer/device intake for this Service Order.",
     );
+    setNewDevice((prev) => ({
+      ...prev,
+      imeiOrSerialNumber: identifier.trim(), // ➕ Auto-populate the entered serial number
+    }));
     goToStep(2);
   };
+
 
   const buildAndValidateServiceOrderInput =
     (): ServiceOrderCreateInput | null => {
@@ -460,11 +490,18 @@ const CreateServiceOrder = () => {
                 variant="link"
                 className="h-auto p-0 text-amber-600 hover:text-amber-700 hover:underline"
                 onClick={() => {
-                  // We pass the user's branch code (e.g. from user.branchId or a fallback like "MAIN")
                   const branchCode = user?.branchId ? user.branchId.slice(0, 4) : "GEN";
                   setNoIdentifierBypass(branchCode);
+
+                  // Read the newly generated temporary tracking ID from Zustand store and pre-fill form
+                  const tempTag = useServiceOrderWizardStore.getState().identifier;
+                  setNewDevice((prev) => ({
+                    ...prev,
+                    imeiOrSerialNumber: tempTag,
+                  }));
                   goToStep(2);
                 }}
+
               >
                 Generate Temporary ID & Skip Lookup
               </Button>
@@ -495,8 +532,8 @@ const CreateServiceOrder = () => {
           ) : null}
 
           <div className="flex justify-end">
-            <Button onClick={handleGoToStep2} disabled={isLookupPending}>
-              {isLookupPending
+            <Button onClick={handleGoToStep2} disabled={isLookupPending || isImeiLookupPending}>
+              {isLookupPending || isImeiLookupPending
                 ? "Looking up..."
                 : "Next: Customer Confirm/Edit"}
             </Button>

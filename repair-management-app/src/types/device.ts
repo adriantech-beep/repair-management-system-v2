@@ -48,3 +48,9 @@ export type DeviceLookupResponse = {
   serialNumber: string | null;
   deviceType: DeviceType;
 };
+
+export type ImeiLookupResponse = {
+  brand: string;
+  model: string;
+  deviceType: DeviceType;
+};
