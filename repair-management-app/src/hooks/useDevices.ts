@@ -5,6 +5,7 @@ import {
   getDevicesByCustomerId,
   lookupDeviceByIdentifier,
   updateDevice,
+  lookupImei
 } from "@/api/deviceApi";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -82,5 +83,12 @@ export function useDeleteDevice() {
 export function useLookupDeviceByIdentifier() {
   return useMutation({
     mutationFn: lookupDeviceByIdentifier,
+  });
+}
+
+
+export function useLookupImeiDetails() {
+  return useMutation({
+    mutationFn: lookupImei,
   });
 }
