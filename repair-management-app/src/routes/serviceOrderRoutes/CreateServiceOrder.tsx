@@ -82,6 +82,8 @@ const CreateServiceOrder = () => {
   });
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
+  const noIdentifierAvailable = useServiceOrderWizardStore((state) => state.noIdentifierAvailable);
+  const setNoIdentifierBypass = useServiceOrderWizardStore((state) => state.setNoIdentifierBypass);
 
   const currentStep = useServiceOrderWizardStore((state) => state.currentStep);
   const identifier = useServiceOrderWizardStore((state) => state.identifier);
@@ -299,9 +301,9 @@ const CreateServiceOrder = () => {
     try {
       let newIntakeResolvedIds:
         | {
-            customerId: string;
-            deviceId: string;
-          }
+          customerId: string;
+          deviceId: string;
+        }
         | undefined;
 
       if (validatedInput.mode === "new-intake") {
@@ -418,11 +420,10 @@ const CreateServiceOrder = () => {
         {steps.map((step, index) => (
           <li
             key={step}
-            className={`rounded-md border px-3 py-2 ${
-              index + 1 === currentStep
-                ? "border-emerald-300 bg-emerald-100/70 font-medium"
-                : "border-emerald-100 bg-emerald-50/40"
-            }`}
+            className={`rounded-md border px-3 py-2 ${index + 1 === currentStep
+              ? "border-emerald-300 bg-emerald-100/70 font-medium"
+              : "border-emerald-100 bg-emerald-50/40"
+              }`}
           >
             {step}
           </li>
@@ -449,7 +450,29 @@ const CreateServiceOrder = () => {
               placeholder="Enter IMEI or serial number"
               aria-label="IMEI or serial number"
             />
+
+            <div className="mt-2 flex items-center justify-between text-xs">
+              <span className="text-emerald-900/60">
+                Can't find or read the device identifier?
+              </span>
+              <Button
+                type="button"
+                variant="link"
+                className="h-auto p-0 text-amber-600 hover:text-amber-700 hover:underline"
+                onClick={() => {
+                  // We pass the user's branch code (e.g. from user.branchId or a fallback like "MAIN")
+                  const branchCode = user?.branchId ? user.branchId.slice(0, 4) : "GEN";
+                  setNoIdentifierBypass(branchCode);
+                  goToStep(2);
+                }}
+              >
+                Generate Temporary ID & Skip Lookup
+              </Button>
+            </div>
+
           </label>
+
+
 
           {lookUpStatus === "error" && lookUpMessage ? (
             <p className="rounded-md border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-700">
@@ -525,6 +548,17 @@ const CreateServiceOrder = () => {
                 Step 2 will collect new customer and device details, then create
                 those records before creating the Service Order.
               </p>
+
+              {noIdentifierAvailable && (
+                <div className="rounded-md border border-red-100 bg-red-50/50 p-3 text-sm text-red-800 space-y-1">
+                  <p className="font-semibold">⚠️ Bypass Mode Active</p>
+                  <p className="text-xs text-red-700">
+                    This device is registered under temporary tracking ID <strong>{identifier}</strong>.
+                    Remember to replace this with the real IMEI/Serial in the device detail view once the hardware is repaired or opened.
+                  </p>
+                </div>
+              )}
+
 
               <div className="grid gap-3 rounded-lg border border-emerald-100 bg-emerald-50/40 p-3">
                 <h3 className="text-sm font-semibold text-emerald-950">

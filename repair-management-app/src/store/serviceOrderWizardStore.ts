@@ -14,6 +14,8 @@ type ServiceOrderWizardState = {
   matchedCustomerPhone?: string | null;
   matchedDeviceId?: string | null;
   matchedDeviceLabel?: string | null;
+  noIdentifierAvailable: boolean;
+  setNoIdentifierBypass: (branchCode: string) => void;
   setIdentifier: (value: string) => void;
   goToStep: (step: ServiceOrderWizardStep) => void;
   resetWizard: () => void;
@@ -39,11 +41,29 @@ const initialState = {
   matchedCustomerPhone: null,
   matchedDeviceId: null,
   matchedDeviceLabel: null,
+  noIdentifierAvailable: false
 };
 
 const useServiceOrderWizardStore = create<ServiceOrderWizardState>((set) => ({
   ...initialState,
   setIdentifier: (identifier) => set({ identifier }),
+  setNoIdentifierBypass: (branchCode) => {
+    const cleanBranch = (branchCode || "GEN").toUpperCase().replace(/[^A-Z0-9]/g, "");
+    const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+    const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+    const tempTag = `TEMP-${cleanBranch}-${dateStr}-${randomSuffix}`;
+    set({
+      identifier: tempTag,
+      noIdentifierAvailable: true,
+      lookUpStatus: "not-found",
+      lookUpMessage: "Bypass active. System-generated tracking ID applied.",
+      matchedCustomerId: null,
+      matchedCustomerName: null,
+      matchedCustomerPhone: null,
+      matchedDeviceId: null,
+      matchedDeviceLabel: null,
+    });
+  },
   goToStep: (currentStep) => set({ currentStep }),
   resetWizard: () => set(initialState),
   startLookup: () => set({ lookUpStatus: "loading", lookUpMessage: null }),
@@ -71,6 +91,7 @@ const useServiceOrderWizardStore = create<ServiceOrderWizardState>((set) => ({
       matchedDeviceId: null,
       matchedDeviceLabel: null,
     }),
+
 }));
 
 export default useServiceOrderWizardStore;
