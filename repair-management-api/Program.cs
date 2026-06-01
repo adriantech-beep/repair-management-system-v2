@@ -40,6 +40,8 @@ builder.Services.AddScoped<IDeviceService, DeviceService>();
 
 builder.Services.AddScoped<IRepairJobService, RepairJobService>();
 builder.Services.AddScoped<IRepairJobPartService, RepairJobPartService>();
+builder.Services.AddScoped<IImeiLookupService, ImeiLookupService>();
+
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
