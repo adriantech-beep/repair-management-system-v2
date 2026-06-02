@@ -17,6 +17,7 @@ import type { DeviceType } from "@/types/device";
 import type { ServiceOrderCreateInput } from "@/types/serviceOrder";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { IntakeSuccessScreen } from "./IntakeSuccessScreen";
 
 const steps = [
   "1. Device Lookup (IMEI/Serial)",
@@ -124,6 +125,8 @@ const CreateServiceOrder = () => {
     (state) => state.clearLookupMatch,
   );
   const resetWizard = useServiceOrderWizardStore((state) => state.resetWizard);
+  const setCreateJob = useServiceOrderWizardStore((state) => state.setCreateJob);
+  const createJob = useServiceOrderWizardStore((state) => state.createJob);
   const { mutateAsync: lookupImeiDetails, isPending: isImeiLookupPending } =
     useLookupImeiDetails();
   const { mutateAsync: lookupDevice, isPending: isLookupPending } =
@@ -362,8 +365,21 @@ const CreateServiceOrder = () => {
 
       const createdRepairJob = await createRepairJob(request);
 
-      resetWizard();
-      navigate(`/repair-jobs/${createdRepairJob.id}`, { replace: true });
+      setCreateJob({
+        id: createdRepairJob.id,
+        jobNumber: createdRepairJob.jobNumber,
+        createdAtUtc: createdRepairJob.createdAtUtc,
+        customerName: validatedInput.mode === "new-intake" ? newCustomer.fullName : matchedCustomerName ?? "Unknown Customer",
+        customerPhone: validatedInput.mode === "new-intake" ? newCustomer.phone : matchedCustomerPhone ?? "N/A",
+        customerEmail: validatedInput.mode === "new-intake" ? newCustomer.email : null,
+        customerAddress: validatedInput.mode === "new-intake" ? newCustomer.address : null,
+        deviceBrand: validatedInput.mode === "new-intake" ? newDevice.brand : matchedDeviceLabel?.split(" ")[0] ?? "Unknown Brand",
+        deviceModel: validatedInput.mode === "new-intake" ? newDevice.model : matchedDeviceLabel?.split(" ").slice(1).join(" ") ?? "Unknown Model",
+        deviceType: validatedInput.mode === "new-intake" ? newDevice.deviceType : "Mobile",
+        imeiOrSerialNumber: validatedInput.mode === "new-intake" ? newDevice.imeiOrSerialNumber : identifier,
+        problemDescription: repairDetailsForm.problemDescription,
+        estimatedCost: repairDetailsForm.estimatedCost ? Number(repairDetailsForm.estimatedCost) : null,
+      });
     } catch (error) {
       console.error("Failed to submit service order:", error);
       const parsed = parseApiError(error);
@@ -417,6 +433,8 @@ const CreateServiceOrder = () => {
     }
   };
 
+
+
   /*
     Submission flow preview (not wired yet):
 
@@ -434,6 +452,20 @@ const CreateServiceOrder = () => {
     4) call createRepairJob(request)
     5) redirect to repair job detail/list on success
   */
+
+  if (createJob) {
+    return (
+      <IntakeSuccessScreen
+        createdJob={createJob}
+        onReset={() => {
+          const jobId = createJob.id;
+          resetWizard(); // 🧹 Zustand cleans up the store and resets createJob to null!
+          navigate(`/repair-jobs/${jobId}`, { replace: true });
+        }}
+      />
+    );
+  }
+
 
   return (
     <section className="space-y-4 rounded-2xl border border-emerald-100/70 bg-white p-6 shadow-sm">

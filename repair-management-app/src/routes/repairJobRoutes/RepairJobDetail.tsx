@@ -12,10 +12,21 @@ import RepairJobStatusControls from "./RepairJobStatusControls";
 import PartsAvailabilitySection from "./PartsAvailabilitySection";
 import RepairJobPartsPanel from "./RepairJobPartsPanel";
 import useAuthStore from "@/store/authStore";
+import { useRef } from "react"; // ➕ Add this
+import { useReactToPrint } from "react-to-print"; // ➕ Add this
+import { Button } from "@/components/ui/button"; // ➕ Add this
+import { IntakeJobSheet } from "@/components/printing/IntakeJobSheet"; // ➕ Add this
+import { InvoiceTemplate } from "@/components/printing/InvoiceTemplate"; // ➕ Add this
+import { useGetRepairJobParts } from "@/hooks/useRepairJobParts"; // ➕ Add this
+
 
 const RepairJobDetail = () => {
   const { repairJobId = "" } = useParams();
   const user = useAuthStore((state) => state.user);
+
+
+  const normalizedRole = user?.role?.toLowerCase() ?? "";
+  const canEditRepairJobDetails = normalizedRole === "admin";
 
   const {
     data: repairJob,
@@ -23,13 +34,71 @@ const RepairJobDetail = () => {
     isError,
     error,
   } = useGetRepairJobById(repairJobId);
-  console.log(repairJob?.assignedTechnicianName);
-
+  const { data: jobParts = [] } = useGetRepairJobParts(repairJobId);
   const { data: customer } = useGetCustomerById(repairJob?.customerId ?? "");
   const { data: device } = useGetDeviceById(repairJob?.deviceId ?? "");
+  const intakeRef = useRef<HTMLDivElement>(null);
 
-  const normalizedRole = user?.role?.toLowerCase() ?? "";
-  const canEditRepairJobDetails = normalizedRole === "admin";
+
+  const handlePrintIntake = useReactToPrint({
+    contentRef: intakeRef,
+  });
+
+  const invoiceRef = useRef<HTMLDivElement>(null);
+  const handlePrintInvoice = useReactToPrint({
+    contentRef: invoiceRef,
+  });
+
+  // Data Map for A4 Intake Sheet
+  // Data Map for A4 Intake Sheet
+  const intakeSheetData = {
+    ticketId: repairJob?.jobNumber ?? "",
+    createdAt: repairJob?.createdAtUtc ?? "",
+    customerName: customer?.fullName ?? "Unknown Customer",
+    customerPhone: customer?.phone ?? "N/A",
+    customerEmail: customer?.email ?? null,
+    customerAddress: customer?.address ?? null,
+    deviceBrand: device?.brand ?? "Unknown Brand",
+    deviceModel: device?.model ?? "Unknown Model",
+    imeiOrSerialNumber: device?.imeiOrSerialNumber ?? null, // 🔄 Fallback to null
+    deviceType: device?.deviceType ?? "Other", // 🔄 Fallback to "Other" (valid DeviceType)
+    problemDescription: repairJob?.problemDescription ?? "",
+    estimatedCost: repairJob?.estimatedCost ?? null, // 🔄 Fallback to null (number | null)
+    branchName: "Pines Multi-Telecom - Main",
+    branchPhone: "+63 74 442 1234",
+    branchAddress: "45 Session Road, Baguio City, Philippines",
+    customConsentNotes: repairJob?.diagnosisNotes ?? "",
+  };
+
+  // Data Map for A4 Sales Invoice
+  const invoiceData = {
+    ticketId: repairJob?.jobNumber ?? "",
+    receivedAt: repairJob?.receivedAtUtc ?? "",
+    completedAt: repairJob?.completedAtUtc ?? null, // 🔄 Fallback to null
+    customerName: customer?.fullName ?? "Unknown Customer",
+    customerPhone: customer?.phone ?? "N/A",
+    customerEmail: customer?.email ?? null,
+    customerAddress: customer?.address ?? null,
+    deviceBrand: device?.brand ?? "Unknown Brand",
+    deviceModel: device?.model ?? "Unknown Model",
+    imeiOrSerialNumber: device?.imeiOrSerialNumber ?? null, // 🔄 Fallback to null
+    deviceType: device?.deviceType ?? "Other", // 🔄 Fallback to "Other"
+    problemDescription: repairJob?.problemDescription ?? "",
+    resolutionNotes: repairJob?.resolutionNotes ?? null,
+    laborCost: repairJob?.estimatedCost ?? 0.0,
+    parts: (jobParts || []).map((jp) => ({
+      partName: `${jp.partName} (${jp.partNumber})`,
+      unitPrice: jp.unitPrice,
+      quantity: jp.quantity,
+      subtotal: jp.totalPrice,
+    })),
+    finalCost: repairJob?.finalCost ?? 0.0,
+    status: repairJob?.status ?? "Received",
+    isPaid: repairJob?.status === "Completed", // Stamped Paid on check out completion!
+    branchName: "Pines Multi-Telecom - Main",
+    branchPhone: "+63 74 442 1234",
+    branchAddress: "45 Session Road, Baguio City, Philippines",
+  };
 
   if (isLoading) {
     return (
@@ -113,6 +182,38 @@ const RepairJobDetail = () => {
                 <UpdateRepairJobForm repairJob={repairJob} />
               )}
             </section>
+
+            {/* Print Panel Upgrade */}
+            <section className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-sm space-y-3">
+              <h2 className="text-lg font-semibold text-emerald-950">
+                Print & Job Documents
+              </h2>
+              <p className="text-xs text-emerald-900/60 leading-relaxed">
+                Generate and print standard A4 coupon bond sheets for customer signatures, condition reports, and billing records.
+              </p>
+              <div className="flex flex-col gap-2 pt-1.5">
+                <Button
+                  variant="outline"
+                  className="w-full flex items-center justify-center gap-2 border-zinc-200 text-zinc-700 hover:bg-zinc-50 cursor-pointer animate-duration-200"
+                  onClick={() => handlePrintIntake()}
+                >
+                  📋 Print Intake Job Sheet
+                </Button>
+                <Button
+                  className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold cursor-pointer animate-duration-200"
+                  onClick={() => handlePrintInvoice()}
+                >
+                  🖨️ Print Sales Invoice
+                </Button>
+              </div>
+            </section>
+
+            {/* Hidden templates for printing iframe */}
+            <div style={{ display: "none" }}>
+              <IntakeJobSheet ref={intakeRef} data={intakeSheetData} />
+              <InvoiceTemplate ref={invoiceRef} data={invoiceData} />
+            </div>
+
 
             <dl className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1">
