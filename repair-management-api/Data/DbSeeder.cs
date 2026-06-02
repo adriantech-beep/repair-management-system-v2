@@ -32,7 +32,14 @@ namespace RepairManagementApi.Data
                     };
                     dbContext.Tenants.Add(defaultTenant);
                     await dbContext.SaveChangesAsync();
-                    Console.WriteLine("✓ Default tenant seeded: Atech Labs (localhost)");
+                    Console.WriteLine("✓ Default tenant seeded: Atech Labs (default)");
+                }
+                else if (defaultTenant.Subdomain == "localhost")
+                {
+                    // Self-healing: Automatically migrate existing default tenant subdomain to 'default'
+                    defaultTenant.Subdomain = "default";
+                    await dbContext.SaveChangesAsync();
+                    Console.WriteLine("✓ Self-healed: Updated existing default tenant subdomain from 'localhost' to 'default'");
                 }
 
                 // 2. Seed default Branch if none exists
