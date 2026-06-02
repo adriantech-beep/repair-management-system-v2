@@ -25,7 +25,7 @@ namespace RepairManagementApi.Data
                     {
                         Id = Guid.Parse("99999999-9999-9999-9999-999999999999"),
                         CompanyName = "Atech Labs",
-                        Subdomain = "localhost",
+                        Subdomain = "default",
                         StripeCustomerId = null,
                         SubscriptionStatus = "Active",
                         CreatedAtUtc = DateTime.UtcNow
