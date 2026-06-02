@@ -15,6 +15,8 @@ type ServiceOrderWizardState = {
   matchedDeviceId?: string | null;
   matchedDeviceLabel?: string | null;
   noIdentifierAvailable: boolean;
+  createJob: any | null;
+  setCreateJob: (job: any | null) => void;
   setNoIdentifierBypass: (branchCode: string) => void;
   setIdentifier: (value: string) => void;
   goToStep: (step: ServiceOrderWizardStep) => void;
@@ -41,7 +43,8 @@ const initialState = {
   matchedCustomerPhone: null,
   matchedDeviceId: null,
   matchedDeviceLabel: null,
-  noIdentifierAvailable: false
+  noIdentifierAvailable: false,
+  createJob: null,
 };
 
 const useServiceOrderWizardStore = create<ServiceOrderWizardState>((set) => ({
@@ -83,6 +86,7 @@ const useServiceOrderWizardStore = create<ServiceOrderWizardState>((set) => ({
       matchedDeviceId: deviceId,
       matchedDeviceLabel: deviceLabel,
     }),
+
   clearLookupMatch: () =>
     set({
       matchedCustomerId: null,
@@ -91,6 +95,7 @@ const useServiceOrderWizardStore = create<ServiceOrderWizardState>((set) => ({
       matchedDeviceId: null,
       matchedDeviceLabel: null,
     }),
+  setCreateJob: (createJob) => set({ createJob }),
 
 }));
 

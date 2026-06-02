@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using RepairManagementApi.Enums; // ➕ Add this so DeviceType is recognized!
+using RepairManagementApi.Enums; 
 using RepairManagementApi.DTOs;
 
-namespace RepairManagementApi.Services; // ➕ Added semicolon here
+namespace RepairManagementApi.Services;
 
 public class ImeiLookupService : IImeiLookupService
 {
