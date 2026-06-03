@@ -138,10 +138,54 @@ public class OnboardingController : ControllerBase
         }
         StripeConfiguration.ApiKey = stripeSecretKey;
 
-        // Determine success & cancel redirect URLs
-        var clientAppUrl = _config["Stripe:SuccessUrl"] ?? "https://atechlabs.it.com"; // Redirect base
+        // Determine success & cancel redirect URLs dynamically based on Request Origin or Referer header
+        string? clientAppUrl = null;
+        if (Request.Headers.TryGetValue("Origin", out var originHeader) && !string.IsNullOrEmpty(originHeader))
+        {
+            clientAppUrl = originHeader.ToString().TrimEnd('/');
+        }
+        else if (Request.Headers.TryGetValue("Referer", out var refererHeader) && !string.IsNullOrEmpty(refererHeader))
+        {
+            try
+            {
+                var uri = new Uri(refererHeader.ToString());
+                clientAppUrl = $"{uri.Scheme}://{uri.Authority}";
+            }
+            catch
+            {
+                // Ignore invalid referer uri format
+            }
+        }
+
+        // Validate the dynamically discovered clientAppUrl to prevent open-redirect vulnerabilities
+        bool isAllowed = false;
+        if (!string.IsNullOrEmpty(clientAppUrl))
+        {
+            try
+            {
+                var uri = new Uri(clientAppUrl);
+                var host = uri.Host.ToLowerInvariant();
+                isAllowed = host == "localhost" ||
+                            host.EndsWith(".localhost") ||
+                            host == "127.0.0.1" ||
+                            host == "atechlabs.it.com" ||
+                            host.EndsWith(".atechlabs.it.com") ||
+                            host.EndsWith(".vercel.app");
+            }
+            catch
+            {
+                isAllowed = false;
+            }
+        }
+
+        if (!isAllowed)
+        {
+            clientAppUrl = _config["Stripe:SuccessUrl"]?.TrimEnd('/') ?? "https://atechlabs.it.com";
+        }
+
         var successUrl = $"{clientAppUrl}/onboarding/success?session_id={{CHECKOUT_SESSION_ID}}";
         var cancelUrl = $"{clientAppUrl}/signup";
+
 
         // 4. Build Session Options (Subscription Mode with Dynamic Price Details)
         var options = new SessionCreateOptions
