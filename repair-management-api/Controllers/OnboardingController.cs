@@ -26,6 +26,78 @@ public class OnboardingController : ControllerBase
         _config = config;
     }
 
+    [HttpGet("check-subdomain")]
+    public async Task<IActionResult> CheckSubdomain([FromQuery] string subdomain)
+    {
+        if (string.IsNullOrWhiteSpace(subdomain))
+        {
+            return BadRequest(new { available = false, message = "Subdomain cannot be empty." });
+        }
+
+        var normalized = subdomain.Trim().ToLowerInvariant();
+        var isReserved = normalized == "api" || normalized == "www" || normalized == "default" || normalized == "localhost";
+        if (isReserved)
+        {
+            return Ok(new { available = false, message = "Subdomain is reserved for system use." });
+        }
+
+        // Validate subdomain characters (only lowercase letters, numbers, and hyphens)
+        var isValid = System.Text.RegularExpressions.Regex.IsMatch(normalized, @"^[a-z0-9\-]+$");
+        if (!isValid)
+        {
+            return Ok(new { available = false, message = "Subdomain can only contain lowercase letters, numbers, and hyphens." });
+        }
+
+        var exists = await _db.Tenants.AnyAsync(t => t.Subdomain == normalized);
+        if (exists)
+        {
+            return Ok(new { available = false, message = "This subdomain is already taken." });
+        }
+
+        return Ok(new { available = true, message = "Subdomain is available!" });
+    }
+
+    [HttpGet("session-details")]
+    public async Task<IActionResult> GetSessionDetails([FromQuery] string sessionId)
+    {
+        if (string.IsNullOrWhiteSpace(sessionId))
+        {
+            return BadRequest(new { message = "Session ID is required." });
+        }
+
+        var stripeSecretKey = _config["Stripe:SecretKey"];
+        if (string.IsNullOrEmpty(stripeSecretKey))
+        {
+            return BadRequest(new { message = "SaaS billing integration key is not configured." });
+        }
+        StripeConfiguration.ApiKey = stripeSecretKey;
+
+        try
+        {
+            var service = new SessionService();
+            Session session = await service.GetAsync(sessionId);
+
+            if (session?.Metadata == null || !session.Metadata.TryGetValue("Subdomain", out var subdomain))
+            {
+                return NotFound(new { message = "Onboarding metadata not found for this checkout session." });
+            }
+
+            session.Metadata.TryGetValue("CompanyName", out var companyName);
+            session.Metadata.TryGetValue("AdminEmail", out var email);
+
+            return Ok(new
+            {
+                subdomain,
+                companyName = companyName ?? "Your Shop",
+                email = email ?? ""
+            });
+        }
+        catch (StripeException ex)
+        {
+            return BadRequest(new { message = $"Stripe error: {ex.Message}" });
+        }
+    }
+
     [HttpPost("signup")]
     public async Task<ActionResult<OnboardingSignupResponseDto>> Signup([FromBody] OnboardingSignupRequestDto request)
     {

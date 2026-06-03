@@ -10,6 +10,8 @@ import RepairJobsPage from "./pages/RepairJobsPage";
 import RepairJobDetailPage from "./pages/RepairJobDetailPage";
 import CreateServiceOrderPage from "./pages/CreateServiceOrderPage";
 import InventoryPage from "./pages/InventoryPage";
+import SignupPage from "./pages/SignupPage";
+import OnboardingSuccessPage from "./pages/OnboardingSuccessPage";
 
 const queryClient = new QueryClient();
 
@@ -19,6 +21,8 @@ const App = () => {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/onboarding/success" element={<OnboardingSuccessPage />} />
           <Route
             element={
               <ProtectedRoute>

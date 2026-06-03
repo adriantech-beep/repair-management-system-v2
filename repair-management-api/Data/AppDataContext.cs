@@ -164,14 +164,14 @@ public class AppDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(20);
 
-            entity.HasIndex(b => b.Code)
+            entity.HasIndex(b => new { b.TenantId, b.Code })
                 .IsUnique();
 
             entity.Property(b => b.Name)
                 .IsRequired()
                 .HasMaxLength(120);
 
-            entity.HasIndex(b => b.Name)
+            entity.HasIndex(b => new { b.TenantId, b.Name })
                 .IsUnique();
 
             entity.Property(b => b.Address)

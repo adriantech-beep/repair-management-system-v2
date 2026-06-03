@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { FormProvider } from "react-hook-form";
+import { Link } from "react-router-dom";
 import { useLogin } from "@/hooks/useLogin";
 import CompanyLogo from "@/image-assets/PINES_MULTI_TELECOM.jpg";
 import LoginFields from "./LoginFields";
@@ -65,12 +66,12 @@ const Login = () => {
 
               <p className="text-center text-sm text-emerald-950/80">
                 Don&apos;t have an account?{" "}
-                <a
-                  href="#"
+                <Link
+                  to="/signup"
                   className="font-semibold text-emerald-950 hover:underline"
                 >
                   Sign Up Now.
-                </a>
+                </Link>
               </p>
             </CardFooter>
           </form>

@@ -108,6 +108,7 @@ builder.Services.AddCors(options =>
             var host = uri.Host.ToLowerInvariant();
             
             return host == "localhost" ||
+                   host.EndsWith(".localhost") ||
                    host == "127.0.0.1" ||
                    host == "atechlabs.it.com" ||
                    host.EndsWith(".atechlabs.it.com") ||

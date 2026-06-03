@@ -53,6 +53,10 @@ public class TenantResolverMiddleware
             {
                 subdomain = hostParts[0].ToLowerInvariant();
             }
+            else if (hostParts.Length == 2 && hostParts[1].Equals("localhost", StringComparison.OrdinalIgnoreCase))
+            {
+                subdomain = hostParts[0].ToLowerInvariant();
+            }
             else if (host.Equals("localhost", StringComparison.OrdinalIgnoreCase) || host.Equals("127.0.0.1"))
             {
                 subdomain = "localhost";
