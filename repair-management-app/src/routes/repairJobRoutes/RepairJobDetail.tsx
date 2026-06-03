@@ -94,7 +94,7 @@ const RepairJobDetail = () => {
     })),
     finalCost: repairJob?.finalCost ?? 0.0,
     status: repairJob?.status ?? "Received",
-    isPaid: repairJob?.status === "Completed", // Stamped Paid on check out completion!
+    isPaid: repairJob?.status === "Completed", 
     branchName: "Pines Multi-Telecom - Main",
     branchPhone: "+63 74 442 1234",
     branchAddress: "45 Session Road, Baguio City, Philippines",
