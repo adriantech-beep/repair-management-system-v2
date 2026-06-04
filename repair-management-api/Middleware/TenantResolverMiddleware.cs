@@ -19,6 +19,18 @@ public class TenantResolverMiddleware
 
     public async Task InvokeAsync(HttpContext context, AppDbContext db, TenantContext tenantContext)
     {
+        // Bypass tenant resolution for global endpoints (onboarding, webhooks, and swagger)
+        var path = context.Request.Path;
+        if (path.StartsWithSegments("/api/onboarding") || 
+            path.StartsWithSegments("/api/webhooks") ||
+            path.StartsWithSegments("/swagger"))
+        {
+            tenantContext.TenantId = null;
+            tenantContext.Subdomain = "default";
+            await _next(context);
+            return;
+        }
+
         string? subdomain = null;
 
         // 1. Resolve tenant subdomain:
@@ -39,7 +51,10 @@ public class TenantResolverMiddleware
                 // Ensure it is a tenant subdomain and not a root domain like "atechlabs.it.com"
                 if (originParts.Length > 2 && originParts[0] != "www" && originParts[0] != "api")
                 {
-                    subdomain = originParts[0].ToLowerInvariant();
+                    if (!(originHost.EndsWith("atechlabs.it.com", StringComparison.OrdinalIgnoreCase) && originParts.Length <= 3))
+                    {
+                        subdomain = originParts[0].ToLowerInvariant();
+                    }
                 }
             }
         }
@@ -51,7 +66,10 @@ public class TenantResolverMiddleware
             var hostParts = host.Split('.');
             if (hostParts.Length > 2 && hostParts[0] != "api" && hostParts[0] != "www")
             {
-                subdomain = hostParts[0].ToLowerInvariant();
+                if (!(host.EndsWith("atechlabs.it.com", StringComparison.OrdinalIgnoreCase) && hostParts.Length <= 3))
+                {
+                    subdomain = hostParts[0].ToLowerInvariant();
+                }
             }
             else if (hostParts.Length == 2 && hostParts[1].Equals("localhost", StringComparison.OrdinalIgnoreCase))
             {
