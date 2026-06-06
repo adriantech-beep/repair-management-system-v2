@@ -36,7 +36,7 @@ public class WebhookController : ControllerBase
 
         try
         {
-            var stripeEvent = EventUtility.ConstructEvent(json, signatureHeader, webhookSecret);
+            var stripeEvent = EventUtility.ConstructEvent(json, signatureHeader, webhookSecret, throwOnApiVersionMismatch: false);
 
             if (stripeEvent.Type == EventTypes.CheckoutSessionCompleted)
             {
