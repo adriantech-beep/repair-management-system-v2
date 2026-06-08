@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { useCreateCustomer } from "@/hooks/useCustomers";
+import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { useLookupDeviceByIdentifier, useLookupImeiDetails } from "@/hooks/useDevices";
 import { useCreateDevice } from "@/hooks/useDevices";
 import { useCreateRepairJob } from "@/hooks/useRepairJobs";
@@ -491,12 +492,12 @@ const CreateServiceOrder = () => {
       </div>
 
       {currentStep === 1 ? (
-        <section className="space-y-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
+        <section className="space-y-6 bg-slate-50/20 dark:bg-zinc-900/10 p-6 rounded-xl border border-slate-100 dark:border-zinc-800/40">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-zinc-50">
             Step 1: Device Lookup
           </h2>
 
-          <label className="space-y-1 text-sm text-slate-700 dark:text-zinc-300">
+          <label className="space-y-2 text-sm text-slate-700 dark:text-zinc-300 block">
             <span>IMEI / Serial Number</span>
             <Input
               value={identifier}
@@ -555,22 +556,31 @@ const CreateServiceOrder = () => {
 
           {lookUpStatus === "not-found" ? (
             <div className="flex justify-end">
-              <Button variant="outline" onClick={handleContinueWithoutMatch} className="cursor-pointer">
+              <Button variant="outline" onClick={handleContinueWithoutMatch} className="h-10 px-5 rounded-xl border-slate-200 dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer font-medium">
                 Continue With New Customer/Device
               </Button>
             </div>
           ) : null}
 
-          <div className="flex justify-end">
-            <Button onClick={handleGoToStep2} disabled={isLookupPending || isImeiLookupPending} className="cursor-pointer">
-              {isLookupPending || isImeiLookupPending
-                ? "Looking up..."
-                : "Next: Customer Confirm/Edit"}
+          <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-zinc-800/40">
+            <Button 
+              onClick={handleGoToStep2} 
+              disabled={isLookupPending || isImeiLookupPending} 
+              className="h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white dark:bg-indigo-500 dark:hover:bg-indigo-600 transition-colors cursor-pointer font-medium"
+            >
+              {isLookupPending || isImeiLookupPending ? (
+                "Looking up..."
+              ) : (
+                <span className="flex items-center gap-2">
+                  Next: Customer Confirm/Edit
+                  <ArrowRight className="h-4 w-4" />
+                </span>
+              )}
             </Button>
           </div>
         </section>
       ) : currentStep === 2 ? (
-        <section className="space-y-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
+        <section className="space-y-6 bg-slate-50/20 dark:bg-zinc-900/10 p-6 rounded-xl border border-slate-100 dark:border-zinc-800/40">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-zinc-50">Step 2: Customer Confirm/Edit</h2>
           {matchedDeviceId ? (
             <>
@@ -578,7 +588,7 @@ const CreateServiceOrder = () => {
                 Existing Match Mode: confirm this existing customer and device
                 for the new Service Order.
               </p>
-              <div className="grid gap-2 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950/20 p-3 text-sm text-slate-700 dark:text-zinc-300">
+              <div className="grid gap-2 rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-3 text-sm text-slate-700 dark:text-zinc-300 shadow-xs">
                 <p>
                   Lookup identifier: <strong>{identifier}</strong>
                 </p>
@@ -597,12 +607,25 @@ const CreateServiceOrder = () => {
                 (Repair Job Details).
               </p>
 
-              <div className="flex justify-between">
-                <Button variant="outline" onClick={() => goToStep(1)} className="cursor-pointer">
-                  Back to Step 1
+              <div className="flex justify-between pt-4 border-t border-slate-100 dark:border-zinc-800/40">
+                <Button 
+                  variant="outline" 
+                  onClick={() => goToStep(1)} 
+                  className="h-10 px-5 rounded-xl border-slate-200 dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer font-medium"
+                >
+                  <span className="flex items-center gap-2">
+                    <ArrowLeft className="h-4 w-4" />
+                    Back to Step 1
+                  </span>
                 </Button>
-                <Button onClick={() => goToStep(3)} className="cursor-pointer">
-                  Next: Repair Job Details
+                <Button 
+                  onClick={() => goToStep(3)} 
+                  className="h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white dark:bg-indigo-500 dark:hover:bg-indigo-600 transition-colors cursor-pointer font-medium"
+                >
+                  <span className="flex items-center gap-2">
+                    Next: Repair Job Details
+                    <ArrowRight className="h-4 w-4" />
+                  </span>
                 </Button>
               </div>
             </>
@@ -627,7 +650,7 @@ const CreateServiceOrder = () => {
               )}
 
 
-              <div className="grid gap-3 rounded-lg border border-slate-200/60 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-900/10 p-3">
+              <div className="grid gap-4 rounded-xl border border-slate-200/40 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 p-5 shadow-2xs">
                 <h3 className="text-sm font-semibold text-slate-900 dark:text-zinc-50">
                   Customer Intake
                 </h3>
@@ -673,7 +696,7 @@ const CreateServiceOrder = () => {
                 />
               </div>
 
-              <div className="grid gap-3 rounded-lg border border-slate-200/60 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-900/10 p-3">
+              <div className="grid gap-4 rounded-xl border border-slate-200/40 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 p-5 shadow-2xs">
                 <h3 className="text-sm font-semibold text-slate-900 dark:text-zinc-50">
                   Device Intake
                 </h3>
@@ -726,22 +749,35 @@ const CreateServiceOrder = () => {
                 </select>
               </div>
 
-              <div className="flex justify-between">
-                <Button variant="outline" onClick={() => goToStep(1)} className="cursor-pointer">
-                  Back to Step 1
+              <div className="flex justify-between pt-4 border-t border-slate-100 dark:border-zinc-800/40">
+                <Button 
+                  variant="outline" 
+                  onClick={() => goToStep(1)} 
+                  className="h-10 px-5 rounded-xl border-slate-200 dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer font-medium"
+                >
+                  <span className="flex items-center gap-2">
+                    <ArrowLeft className="h-4 w-4" />
+                    Back to Step 1
+                  </span>
                 </Button>
-                <Button onClick={() => goToStep(3)} className="cursor-pointer">
-                  Next: Repair Job Details
+                <Button 
+                  onClick={() => goToStep(3)} 
+                  className="h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white dark:bg-indigo-500 dark:hover:bg-indigo-600 transition-colors cursor-pointer font-medium"
+                >
+                  <span className="flex items-center gap-2">
+                    Next: Repair Job Details
+                    <ArrowRight className="h-4 w-4" />
+                  </span>
                 </Button>
               </div>
             </>
           )}
         </section>
       ) : currentStep === 3 ? (
-        <section className="space-y-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
+        <section className="space-y-6 bg-slate-50/20 dark:bg-zinc-900/10 p-6 rounded-xl border border-slate-100 dark:border-zinc-800/40">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-zinc-50">Step 3: Repair Job Details</h2>
 
-          <div className="grid gap-3 rounded-lg border border-slate-200/60 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-900/10 p-3">
+          <div className="grid gap-4 rounded-xl border border-slate-200/40 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 p-5 shadow-2xs">
             <h3 className="text-sm font-semibold text-slate-900 dark:text-zinc-50">
               Repair Details
             </h3>
@@ -770,12 +806,27 @@ const CreateServiceOrder = () => {
             />
           </div>
 
-          <div className="flex justify-between">
-            <Button variant="outline" onClick={() => goToStep(2)} className="cursor-pointer">
-              Back to Step 2
+          <div className="flex justify-between pt-4 border-t border-slate-100 dark:border-zinc-800/40">
+            <Button 
+              variant="outline" 
+              onClick={() => goToStep(2)} 
+              className="h-10 px-5 rounded-xl border-slate-200 dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer font-medium"
+            >
+              <span className="flex items-center gap-2">
+                <ArrowLeft className="h-4 w-4" />
+                Back to Step 2
+              </span>
             </Button>
 
-            <Button onClick={handleGoToStep4} className="cursor-pointer">Next: Review and Submit</Button>
+            <Button 
+              onClick={handleGoToStep4} 
+              className="h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white dark:bg-indigo-500 dark:hover:bg-indigo-600 transition-colors cursor-pointer font-medium"
+            >
+              <span className="flex items-center gap-2">
+                Next: Review and Submit
+                <ArrowRight className="h-4 w-4" />
+              </span>
+            </Button>
           </div>
 
           {inputPreviewError ? (
@@ -785,13 +836,13 @@ const CreateServiceOrder = () => {
           ) : null}
 
           {inputPreview ? (
-            <pre className="overflow-x-auto rounded-md border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950/20 p-3 text-xs text-slate-800 dark:text-zinc-300">
+            <pre className="overflow-x-auto rounded-md border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-3 text-xs text-slate-800 dark:text-zinc-300 shadow-xs">
               {inputPreview}
             </pre>
           ) : null}
         </section>
       ) : (
-        <section className="space-y-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
+        <section className="space-y-6 bg-slate-50/20 dark:bg-zinc-900/10 p-6 rounded-xl border border-slate-100 dark:border-zinc-800/40">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-zinc-50">Step 4: Confirmation</h2>
           <p className="text-sm text-slate-500 dark:text-zinc-400">
             Review the built input, then create the service order.
@@ -802,7 +853,7 @@ const CreateServiceOrder = () => {
           </h3>
 
           {inputPreview ? (
-            <pre className="overflow-x-auto rounded-md border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950/20 p-3 text-xs text-slate-800 dark:text-zinc-300">
+            <pre className="overflow-x-auto rounded-md border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-3 text-xs text-slate-800 dark:text-zinc-300 shadow-xs">
               {inputPreview}
             </pre>
           ) : (
@@ -812,18 +863,30 @@ const CreateServiceOrder = () => {
             </p>
           )}
 
-          <div className="flex justify-between">
-            <Button variant="outline" onClick={() => goToStep(3)} className="cursor-pointer">
-              Back to Step 3
+          <div className="flex justify-between pt-4 border-t border-slate-100 dark:border-zinc-800/40">
+            <Button 
+              variant="outline" 
+              onClick={() => goToStep(3)} 
+              className="h-10 px-5 rounded-xl border-slate-200 dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer font-medium"
+            >
+              <span className="flex items-center gap-2">
+                <ArrowLeft className="h-4 w-4" />
+                Back to Step 3
+              </span>
             </Button>
             <Button
               onClick={handleSubmitServiceOrder}
               disabled={isSubmittingServiceOrder}
-              className="cursor-pointer"
+              className="h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white dark:bg-indigo-500 dark:hover:bg-indigo-600 transition-colors cursor-pointer font-medium"
             >
-              {isSubmittingServiceOrder
-                ? "Creating Service Order..."
-                : "Create Service Order"}
+              {isSubmittingServiceOrder ? (
+                "Creating Service Order..."
+              ) : (
+                <span className="flex items-center gap-2">
+                  Create Service Order
+                  <Check className="h-4 w-4" />
+                </span>
+              )}
             </Button>
           </div>
 
