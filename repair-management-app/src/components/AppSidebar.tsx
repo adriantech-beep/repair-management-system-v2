@@ -10,7 +10,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, PlusCircle, Users, Wrench, Settings } from "lucide-react";
+import { LayoutDashboard, PlusCircle, Users, Wrench, Settings, LogOut } from "lucide-react";
 
 import { NavLink, useNavigate } from "react-router-dom";
 import { logout } from "@/api/authApi";
@@ -116,10 +116,14 @@ const AppSidebar = () => {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter>
+      <SidebarFooter className="border-t border-sidebar-border p-2">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={handleLogout}>
+            <SidebarMenuButton 
+              onClick={handleLogout}
+              className="text-slate-500 hover:text-red-650 hover:bg-red-50 dark:text-zinc-400 dark:hover:text-red-400 dark:hover:bg-red-950/20 transition-all font-medium cursor-pointer"
+            >
+              <LogOut className="h-4.5 w-4.5" />
               <span>Logout</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
