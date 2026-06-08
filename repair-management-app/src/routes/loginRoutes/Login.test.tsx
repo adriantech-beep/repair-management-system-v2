@@ -29,6 +29,16 @@ vi.mock("@/store/authStore", () => ({
     selector({ setAuth: mockSetAuth }),
 }));
 
+vi.mock("@/hooks/useTenants", () => ({
+  useGetPublicTenant: () => ({
+    data: {
+      companyName: "Pines Multi Telecom Shop",
+      logoUrl: "http://logo.url",
+    },
+    isLoading: false,
+  }),
+}));
+
 describe("Login", () => {
   beforeEach(() => {
     vi.clearAllMocks();

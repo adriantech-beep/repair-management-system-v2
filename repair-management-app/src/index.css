@@ -209,3 +209,8 @@ span {
     @apply font-sans;
   }
 }
+
+@utility bg-grid-pattern {
+  background-image: radial-gradient(circle at 1px 1px, var(--color-border) 1px, transparent 0);
+  background-size: 24px 24px;
+}

@@ -6,3 +6,9 @@ export interface TenantSettings {
   subscriptionStatus: string;
   createdAtUtc: string;
 }
+
+export interface PublicTenantSettings {
+  companyName: string;
+  logoUrl: string | null;
+}
+

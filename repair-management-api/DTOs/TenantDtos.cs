@@ -24,3 +24,10 @@ public class UpdateTenantRequestDto
     [StringLength(150, MinimumLength = 2, ErrorMessage = "Company name must be between 2 and 150 characters.")]
     public string CompanyName { get; set; } = string.Empty;
 }
+
+public class PublicTenantDto
+{
+    public string CompanyName { get; set; } = string.Empty;
+    public string? LogoUrl { get; set; }
+}
+

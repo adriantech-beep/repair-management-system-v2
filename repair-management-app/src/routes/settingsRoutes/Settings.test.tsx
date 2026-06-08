@@ -3,7 +3,7 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import Settings from "./Settings";
 import useSettingsStore from "@/store/settingsStore";
 import useAuthStore from "@/store/authStore";
-import { useGetTenant, useUpdateTenant, useUploadTenantLogo } from "@/hooks/useTenants";
+import { useGetTenant, useUpdateTenant, useUploadTenantLogo, useDeleteTenantLogo } from "@/hooks/useTenants";
 
 // 1. Mock the Zustand stores
 vi.mock("@/store/authStore", () => ({
@@ -19,6 +19,7 @@ vi.mock("@/hooks/useTenants", () => ({
   useGetTenant: vi.fn(),
   useUpdateTenant: vi.fn(),
   useUploadTenantLogo: vi.fn(),
+  useDeleteTenantLogo: vi.fn(),
 }));
 
 describe("Settings Page Component Tests", () => {
@@ -79,6 +80,11 @@ describe("Settings Page Component Tests", () => {
     } as any);
 
     vi.mocked(useUploadTenantLogo).mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    } as any);
+
+    vi.mocked(useDeleteTenantLogo).mockReturnValue({
       mutate: vi.fn(),
       isPending: false,
     } as any);
