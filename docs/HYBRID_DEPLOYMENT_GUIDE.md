@@ -86,60 +86,42 @@ This guide details the step-by-step process of deploying the Repair Management S
 
 ---
 
-### 3. Bind Wildcard Custom Domain in Netlify
+#### 3. Subdomain Configuration (Netlify Manual Management)
 
-You can bind your Namecheap domain (`atechlabs.it.com`) and wildcard (`*.atechlabs.it.com`) using one of two methods:
+> [!WARNING]
+> Netlify **does not** support wildcard subdomains (`*.yourdomain.com`) on its Free tier. It requires a paid team plan (Pro or above) to configure wildcard routing and wildcard SSL certificates.
+> If you wish to remain on Netlify's free plan, you must manually add each new tenant's subdomain as a **Domain Alias** in the Netlify UI.
 
-#### Method A: Using Netlify DNS (Highly Recommended & Automatic)
-This is the easiest path. You hand over DNS management of the domain to Netlify, and Netlify automatically takes care of all wildcard routing and SSL generation.
-
-1. **Add Custom Domain in Netlify:**
-   * In your Netlify site dashboard, go to **Site configuration** -> **Domain management** -> **Custom domains** section.
-   * Click **Add custom domain**.
-   * Enter `atechlabs.it.com` and click **Verify**.
-   * When prompted that the domain is already registered, click **Add domain**.
-2. **Set up Netlify DNS:**
-   * Right after adding the domain, Netlify will show a warning: *"Netlify DNS is not active"*. Click the link that says **Set up Netlify DNS** (or go to **Domains** on your global Netlify sidebar -> click **Add domain**).
-   * Click through the screens until Netlify displays a list of **4 Nameservers** (e.g., `dns1.p01.nsone.net`, `dns2.p01.nsone.net`, etc.). Copy these 4 server names.
-3. **Configure Namecheap Nameservers:**
-   * Log into **Namecheap** and go to your **Domain List**.
-   * Click **Manage** next to `atechlabs.it.com`.
-   * Under the **Nameservers** section (on the main tab), click the dropdown and change from *Namecheap BasicDNS* to **Custom DNS**.
-   * Paste all 4 nameservers from Netlify into the rows.
-   * Click the **green checkmark** to save. (Note: DNS propagation can take from 10 minutes to a few hours).
-4. **Add Wildcard Subdomain in Netlify:**
-   * Go back to your Netlify site's **Domain management** page.
-   * Click **Add custom domain** again.
-   * Enter `*.atechlabs.it.com` and click **Verify** -> **Add domain**.
-   * Since Netlify DNS is active, Netlify will automatically configure the routing and provision a Let's Encrypt SSL certificate covering both the root domain and all wildcards!
+#### How to Manually Add a Subdomain Alias on Netlify:
+1. Log in to the [Netlify Dashboard](https://app.netlify.com/).
+2. Select your React app site.
+3. In the left-hand sidebar, navigate to **Site configuration** -> **Domain management**.
+4. Scroll down to the **Custom domains** section and click the **Add custom domain** button.
+5. Enter your new tenant's subdomain (e.g. `newstore.atechlabs.it.com`) and click **Verify**.
+6. When prompted that the domain is already registered, click **Add domain**.
+7. Netlify will automatically request and bind a Let's Encrypt SSL certificate for this subdomain.
 
 ---
 
-#### Method B: Keeping Namecheap DNS (External DNS Management)
-Use this if you have other subdomains hosted outside of Netlify and do not want to delegate the entire domain's DNS control to Netlify.
+### Alternative: Automated Wildcards via Vercel (100% Free)
 
-1. **Add Custom Domain & Wildcard in Netlify:**
-   * In your Netlify site dashboard, go to **Site configuration** -> **Domain management** -> **Custom domains**.
-   * Click **Add custom domain**, enter `atechlabs.it.com`, and add it.
-   * Click **Add custom domain** again, enter `*.atechlabs.it.com`, and click verify.
-2. **Verify Domain Ownership (Required by Netlify for wildcards on External DNS):**
-   * Netlify will show a warning next to the wildcard domain: *"Verify domain ownership"*. Click it.
-   * Netlify will show you a specific **TXT record key** and **value** that you must add (e.g. host: `_netlify.atechlabs.it.com`, value: `some-unique-string`).
-3. **Configure Namecheap Advanced DNS:**
-   * Log into **Namecheap** -> **Domain List** -> **Manage** next to `atechlabs.it.com` -> **Advanced DNS** tab.
-   * Delete any existing default DNS records (like CNAME or URL redirects for `@` or `www` that point elsewhere).
-   * Click **Add New Record** -> **TXT Record**:
-     * **Host:** `_netlify`
-     * **Value:** *Paste the unique string provided by Netlify*
-   * Click **Add New Record** -> **CNAME Record** (for the root domain fallback):
-     * **Host:** `www`
-     * **Value:** `your-app-subdomain.netlify.app`
-   * Click **Add New Record** -> **CNAME Record** (for the wildcard routing):
-     * **Host:** `*`
-     * **Value:** `your-app-subdomain.netlify.app`
-4. **Complete Verification on Netlify:**
-   * Go back to Netlify and click **Verify** on your domain ownership popup.
-   * Once verified, Netlify will configure the wildcard routing and generate the SSL certificate.
+If you want to automate tenant onboarding without manually adding subdomains, we recommend migrating your React frontend hosting to **Vercel** (the Hobby plan is 100% free and natively supports wildcard subdomains).
+
+We have already added the [vercel.json](file:///d:/Project-For-Portfolio/Repair-Management/repair-management-app/vercel.json) configuration file to your repository, meaning your React app is ready to deploy on Vercel out of the box.
+
+#### Steps to Set Up Wildcards on Vercel:
+1. **Import Project to Vercel:**
+   * Go to the [Vercel Dashboard](https://vercel.com/) and import your `Repair-Management` repository.
+   * Set the root/base directory to `repair-management-app`.
+   * Add the Environment Variable `VITE_API_BASE_URL` with your Azure API URL.
+   * Deploy the site.
+2. **Add Wildcard Domain in Vercel:**
+   * In your Vercel project, go to **Settings** -> **Domains**.
+   * Add `*.atechlabs.it.com` (with the asterisk).
+   * Vercel will ask you to change your nameservers to Vercel's nameservers at your registrar (Namecheap).
+3. **Configure Nameservers in Namecheap:**
+   * In Namecheap, update the nameservers for `atechlabs.it.com` to the custom Vercel nameservers provided by Vercel.
+   * Once updated, Vercel will automatically route **any** subdomain to your React app and provision SSL dynamically on-the-fly. No manual configuration will be required for new tenants ever again!
 
 ---
 
