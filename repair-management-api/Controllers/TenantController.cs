@@ -140,4 +140,27 @@ public class TenantController : ControllerBase
 
         return Ok(new { logoUrl = tenant.LogoUrl });
     }
+
+    [HttpDelete("logo")]
+    [Authorize(Roles = "Admin")] // Only administrators can remove a logo
+    public async Task<IActionResult> DeleteLogo()
+    {
+        var tenantId = _tenantContext.TenantId;
+        if (!tenantId.HasValue)
+        {
+            return BadRequest(new { code = "NO_TENANT_CONTEXT", message = "Request is not associated with any active tenant." });
+        }
+
+        var tenant = await _db.Tenants.FirstOrDefaultAsync(t => t.Id == tenantId.Value);
+        if (tenant == null)
+        {
+            return NotFound(new { code = "TENANT_NOT_FOUND", message = "Tenant not found." });
+        }
+
+        tenant.LogoUrl = null;
+        tenant.UpdatedAtUtc = DateTime.UtcNow;
+        await _db.SaveChangesAsync();
+
+        return NoContent();
+    }
 }

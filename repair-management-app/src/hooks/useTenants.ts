@@ -1,4 +1,4 @@
-import { getTenantSettings, updateTenantSettings, uploadTenantLogo, getPublicTenantSettings } from "@/api/tenantApi";
+import { getTenantSettings, updateTenantSettings, uploadTenantLogo, getPublicTenantSettings, deleteTenantLogo } from "@/api/tenantApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useGetTenant() {
@@ -31,6 +31,16 @@ export function useUploadTenantLogo() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (file: File) => uploadTenantLogo(file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tenantSettings"] });
+    },
+  });
+}
+
+export function useDeleteTenantLogo() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteTenantLogo,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tenantSettings"] });
     },

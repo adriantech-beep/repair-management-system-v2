@@ -31,3 +31,7 @@ export async function uploadTenantLogo(file: File): Promise<string> {
 
   return response.data.logoUrl;
 }
+
+export async function deleteTenantLogo(): Promise<void> {
+  await apiClient.delete("/api/tenant/logo");
+}

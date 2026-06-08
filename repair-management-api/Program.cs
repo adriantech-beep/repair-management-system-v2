@@ -110,6 +110,8 @@ builder.Services.AddCors(options =>
             
             return host == "localhost" ||
                    host.EndsWith(".localhost") ||
+                   host == "lvh.me" ||
+                   host.EndsWith(".lvh.me") ||
                    host == "127.0.0.1" ||
                    host == "atechlabs.it.com" ||
                    host.EndsWith(".atechlabs.it.com") ||
