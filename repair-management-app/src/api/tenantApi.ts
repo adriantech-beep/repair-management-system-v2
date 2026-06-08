@@ -1,8 +1,13 @@
-import type { TenantSettings } from "@/types/tenant";
+import type { TenantSettings, PublicTenantSettings } from "@/types/tenant";
 import apiClient from "./httpClient";
 
 export async function getTenantSettings(): Promise<TenantSettings> {
   const response = await apiClient.get<TenantSettings>("/api/tenant");
+  return response.data;
+}
+
+export async function getPublicTenantSettings(): Promise<PublicTenantSettings> {
+  const response = await apiClient.get<PublicTenantSettings>("/api/tenant/public");
   return response.data;
 }
 

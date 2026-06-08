@@ -58,6 +58,32 @@ public class TenantController : ControllerBase
         });
     }
 
+    [HttpGet("public")]
+    [AllowAnonymous]
+    public async Task<ActionResult<PublicTenantDto>> GetPublicTenantSettings()
+    {
+        var tenantId = _tenantContext.TenantId;
+        if (!tenantId.HasValue)
+        {
+            return BadRequest(new { code = "NO_TENANT_CONTEXT", message = "Request is not associated with any active tenant." });
+        }
+
+        var tenant = await _db.Tenants
+            .AsNoTracking()
+            .FirstOrDefaultAsync(t => t.Id == tenantId.Value);
+
+        if (tenant == null)
+        {
+            return NotFound(new { code = "TENANT_NOT_FOUND", message = "Tenant settings not found." });
+        }
+
+        return Ok(new PublicTenantDto
+        {
+            CompanyName = tenant.CompanyName,
+            LogoUrl = tenant.LogoUrl
+        });
+    }
+
     [HttpPut]
     [Authorize(Roles = "Admin")] // Only administrators can update settings
     public async Task<IActionResult> UpdateTenantSettings([FromBody] UpdateTenantRequestDto request)

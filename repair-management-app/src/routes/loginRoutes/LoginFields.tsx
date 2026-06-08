@@ -41,22 +41,22 @@ const LoginFields = () => {
           name={name}
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-base font-medium text-emerald-950/80">
+              <FormLabel className="text-base font-medium text-slate-800 dark:text-zinc-300">
                 {name === "email" ? "Username or Email" : "Password"}
               </FormLabel>
 
               <div className="relative">
                 {name === "email" ? (
-                  <Mail className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-emerald-900/45" />
+                  <Mail className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-zinc-500" />
                 ) : (
-                  <Lock className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-emerald-900/45" />
+                  <Lock className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-zinc-500" />
                 )}
 
                 <FormControl>
                   <Input
                     type={type}
                     placeholder={placeholder}
-                    className="h-11 rounded-xl border-emerald-900/15 bg-white/70 pl-10 text-[15px] placeholder:text-emerald-900/40 focus-visible:border-emerald-600 focus-visible:ring-emerald-200"
+                    className="h-11 rounded-xl border-slate-200 dark:border-zinc-800 bg-white/70 dark:bg-zinc-800/40 pl-10 text-[15px] placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus-visible:border-indigo-500 focus-visible:ring-indigo-100 dark:focus-visible:ring-indigo-950"
                     {...field}
                     value={(field.value as string | undefined) ?? ""}
                     onChange={(e) => field.onChange(e.target.value)}
@@ -64,7 +64,7 @@ const LoginFields = () => {
                 </FormControl>
               </div>
 
-              <FormMessage className="mt-1 text-sm text-red-600" />
+              <FormMessage className="mt-1 text-sm text-destructive" />
             </FormItem>
           )}
         />
