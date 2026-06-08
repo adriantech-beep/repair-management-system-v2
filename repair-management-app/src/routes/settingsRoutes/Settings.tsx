@@ -119,9 +119,9 @@ const Settings = () => {
 
   if (isLoading) {
     return (
-      <div className="flex h-96 items-center justify-center">
-        <Loader2 className="h-10 w-10 text-blue-500 animate-spin" />
-        <span className="ml-3 text-slate-300">Loading store settings...</span>
+      <div className="flex h-96 items-center justify-center animate-pulse">
+        <Loader2 className="h-10 w-10 text-indigo-600 dark:text-indigo-400 animate-spin" />
+        <span className="ml-3 text-slate-500 dark:text-zinc-400">Loading store settings...</span>
       </div>
     );
   }
@@ -138,12 +138,12 @@ const Settings = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 text-slate-100">
+    <div className="max-w-4xl mx-auto px-4 py-8 text-slate-900 dark:text-zinc-100">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-white flex items-center gap-2">
-          <Building className="h-8 w-8 text-blue-500" /> Store Profile & Settings
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-zinc-50 flex items-center gap-2">
+          <Building className="h-8 w-8 text-indigo-600 dark:text-indigo-400" /> Store Profile & Settings
         </h1>
-        <p className="text-slate-400 mt-1 text-sm">
+        <p className="text-slate-500 dark:text-zinc-400 mt-1 text-sm">
           Customize your isolated workspace profile, subdomain identifier, and logo branding.
         </p>
       </div>
@@ -170,10 +170,10 @@ const Settings = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 
         {/* Left Side: Logo Branding Section */}
-        <div className="md:col-span-1 bg-slate-900/50 border border-slate-800 rounded-3xl p-6 flex flex-col items-center justify-between text-center relative overflow-hidden">
+        <div className="md:col-span-1 bg-slate-50/20 dark:bg-zinc-900/10 border border-slate-200/60 dark:border-zinc-800 rounded-3xl p-6 flex flex-col items-center justify-between text-center relative overflow-hidden">
           <div className="space-y-4 w-full">
-            <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">Store Logo</h3>
-            <div className="relative group w-40 h-40 mx-auto rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-center overflow-hidden">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-zinc-50 uppercase tracking-wider">Store Logo</h3>
+            <div className="relative group w-40 h-40 mx-auto rounded-2xl bg-slate-100 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 flex items-center justify-center overflow-hidden">
               {filePreview ? (
                 <img
                   src={filePreview}
@@ -181,17 +181,17 @@ const Settings = () => {
                   className="w-full h-full object-contain p-2"
                 />
               ) : (
-                <Building className="h-16 w-16 text-slate-700" />
+                <Building className="h-16 w-16 text-slate-400 dark:text-zinc-650" />
               )}
             </div>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-500 dark:text-zinc-400">
               Only JPG, PNG, or WEBP files under 5MB.
             </p>
           </div>
 
           <RoleGuard allowedRoles={["Admin"]}>
             <div className="mt-6 w-full space-y-3">
-              <label className="flex flex-col items-center justify-center px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium rounded-xl border border-slate-700 cursor-pointer transition">
+              <label className="flex flex-col items-center justify-center px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-200 text-sm font-medium rounded-xl border border-slate-200 dark:border-zinc-700 cursor-pointer transition">
                 <UploadCloud className="h-4 w-4 mr-2 inline" />
                 Select New Logo
                 <Input
@@ -207,7 +207,7 @@ const Settings = () => {
                   type="button"
                   disabled={uploadLogoMutation.isPending}
                   onClick={handleLogoUpload}
-                  className="w-full py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2 transition"
+                  className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-800 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2 transition cursor-pointer"
                 >
                   {uploadLogoMutation.isPending ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -219,21 +219,21 @@ const Settings = () => {
         </div>
 
         {/* Right Side: Store Details Profile */}
-        <div className="md:col-span-2 bg-slate-900/50 border border-slate-800 rounded-3xl p-8 space-y-6">
+        <div className="md:col-span-2 bg-slate-50/20 dark:bg-zinc-900/10 border border-slate-200/60 dark:border-zinc-800 rounded-3xl p-8 space-y-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSaveName)} className="space-y-6">
 
               {/* Subdomain Block (Read-only metadata info) */}
               <div className="space-y-2">
-                <FormLabel className="text-sm font-medium text-slate-300">
+                <FormLabel className="text-sm font-medium text-slate-700 dark:text-zinc-300">
                   Subdomain Namespace
                 </FormLabel>
-                <div className="flex rounded-xl shadow-sm bg-slate-950 border border-slate-800 p-3 items-center">
-                  <Globe className="h-5 w-5 text-slate-500 mr-2" />
-                  <span className="text-slate-400 font-semibold">{tenant?.subdomain}</span>
-                  <span className="text-slate-600">.atechlabs.it.com</span>
+                <div className="flex rounded-xl shadow-sm bg-slate-100 dark:bg-zinc-950 border border-slate-200/60 dark:border-zinc-800 p-3 items-center">
+                  <Globe className="h-5 w-5 text-slate-400 dark:text-zinc-500 mr-2" />
+                  <span className="text-slate-900 dark:text-zinc-200 font-semibold">{tenant?.subdomain}</span>
+                  <span className="text-slate-500 dark:text-zinc-500">.atechlabs.it.com</span>
                 </div>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-500 dark:text-zinc-400">
                   Subdomains are fixed on Stripe provisioning and cannot be edited.
                 </p>
               </div>
@@ -244,7 +244,7 @@ const Settings = () => {
                 name="companyName"
                 render={({ field }) => (
                   <FormItem className="space-y-2">
-                    <FormLabel className="text-sm font-medium text-slate-300">
+                    <FormLabel className="text-sm font-medium text-slate-700 dark:text-zinc-300">
                       Company Name
                     </FormLabel>
                     <FormControl>
@@ -252,13 +252,13 @@ const Settings = () => {
                         type="text"
                         disabled={!isAdmin}
                         placeholder="Enter store name"
-                        className="h-12 rounded-xl bg-slate-950 border-slate-800 text-white placeholder:text-slate-600 focus-visible:border-blue-500 focus-visible:ring-blue-500/20 disabled:text-slate-500 disabled:bg-slate-950/50 disabled:cursor-not-allowed transition"
+                        className="h-12 rounded-xl bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-800 text-slate-900 dark:text-zinc-50 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus-visible:border-indigo-500 focus-visible:ring-indigo-500/20 disabled:text-slate-400 disabled:bg-slate-50/50 dark:disabled:bg-zinc-950/50 disabled:cursor-not-allowed transition"
                         {...field}
                         value={field.value ?? ""}
                         onChange={(e) => field.onChange(e.target.value)}
                       />
                     </FormControl>
-                    <FormMessage className="text-xs text-red-400" />
+                    <FormMessage className="text-xs text-destructive" />
                   </FormItem>
                 )}
               />
@@ -268,7 +268,7 @@ const Settings = () => {
                   <button
                     type="submit"
                     disabled={updateInfoMutation.isPending}
-                    className="px-6 py-3 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-blue-500/10 flex items-center gap-2 transition"
+                    className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-800 text-white font-semibold rounded-xl shadow-md hover:shadow-indigo-500/10 flex items-center gap-2 transition cursor-pointer"
                   >
                     {updateInfoMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
                     Save Settings
