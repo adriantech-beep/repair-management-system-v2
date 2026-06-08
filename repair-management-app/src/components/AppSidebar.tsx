@@ -53,25 +53,25 @@ const AppSidebar = () => {
 
   return (
     <Sidebar>
-      <SidebarHeader className="border-b border-slate-800/50 py-3 px-4">
+      <SidebarHeader className="border-b border-sidebar-border py-3 px-4">
         {state === "expanded" ? (
           <div className="flex items-center gap-3">
             {tenant?.logoUrl ? (
               <img 
                 src={tenant.logoUrl} 
                 alt="Logo" 
-                className="h-8 w-8 rounded-lg object-contain bg-slate-950 p-1 border border-slate-800"
+                className="h-8 w-8 rounded-lg object-contain bg-white dark:bg-zinc-950 p-1 border border-sidebar-border shadow-xs"
               />
             ) : (
-              <div className="h-8 w-8 rounded-lg bg-blue-600/10 border border-blue-500/20 flex items-center justify-center font-bold text-blue-500 text-sm">
+              <div className="h-8 w-8 rounded-lg bg-indigo-600/10 border border-indigo-500/20 flex items-center justify-center font-bold text-indigo-600 dark:text-indigo-400 text-sm">
                 {tenant?.companyName ? tenant.companyName.substring(0, 2).toUpperCase() : "RM"}
               </div>
             )}
             <div className="flex flex-col min-w-0">
-              <span className="text-sm font-bold text-white truncate leading-tight">
+              <span className="text-sm font-bold text-sidebar-foreground truncate leading-tight">
                 {tenant?.companyName ?? "Repair Management"}
               </span>
-              <span className="text-[10px] text-slate-500 truncate leading-none mt-0.5">
+              <span className="text-[10px] text-sidebar-foreground/60 truncate leading-none mt-0.5">
                 {tenant?.subdomain}.atechlabs.it.com
               </span>
             </div>
@@ -82,10 +82,10 @@ const AppSidebar = () => {
               <img 
                 src={tenant.logoUrl} 
                 alt="Logo" 
-                className="h-7 w-7 rounded-lg object-contain bg-slate-950 p-1 border border-slate-800"
+                className="h-7 w-7 rounded-lg object-contain bg-white dark:bg-zinc-950 p-1 border border-sidebar-border shadow-xs"
               />
             ) : (
-              <div className="h-7 w-7 rounded-lg bg-blue-600/10 border border-blue-500/20 flex items-center justify-center font-bold text-blue-500 text-xs">
+              <div className="h-7 w-7 rounded-lg bg-indigo-600/10 border border-indigo-500/20 flex items-center justify-center font-bold text-indigo-600 dark:text-indigo-400 text-xs">
                 {tenant?.companyName ? tenant.companyName.substring(0, 2).toUpperCase() : "RM"}
               </div>
             )}
@@ -101,8 +101,11 @@ const AppSidebar = () => {
               <SidebarMenuItem key={item.to}>
                 <NavLink to={item.to}>
                   {({ isActive }) => (
-                    <SidebarMenuButton isActive={isActive}>
-                      <item.icon />
+                    <SidebarMenuButton 
+                      isActive={isActive}
+                      className={isActive ? "bg-indigo-50/80 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 font-semibold" : ""}
+                    >
+                      <item.icon className={isActive ? "text-indigo-600 dark:text-indigo-400" : ""} />
                       <span>{item.label}</span>
                     </SidebarMenuButton>
                   )}
