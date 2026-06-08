@@ -2,6 +2,7 @@ import parseApiError from "@/api/parseApiError";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
 import { useCreateCustomer } from "@/hooks/useCustomers";
 import { useLookupDeviceByIdentifier, useLookupImeiDetails } from "@/hooks/useDevices";
 import { useCreateDevice } from "@/hooks/useDevices";
@@ -467,38 +468,35 @@ const CreateServiceOrder = () => {
   }
 
 
+  const progressValue = (currentStep / steps.length) * 100;
+
   return (
-    <section className="space-y-4 rounded-2xl border border-emerald-100/70 bg-white p-6 shadow-sm">
+    <section className="space-y-6 rounded-2xl border border-slate-200/60 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-sm">
       <header>
-        <h1 className="text-2xl font-semibold text-emerald-950">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-zinc-50">
           Create Service Order
         </h1>
-        <p className="mt-1 text-sm text-emerald-900/70">
+        <p className="mt-1 text-sm text-slate-500 dark:text-zinc-400">
           F8 scaffold: wizard shell only. We will implement one step at a time.
         </p>
       </header>
 
-      <ol className="space-y-2 text-sm text-emerald-900">
-        {steps.map((step, index) => (
-          <li
-            key={step}
-            className={`rounded-md border px-3 py-2 ${index + 1 === currentStep
-              ? "border-emerald-300 bg-emerald-100/70 font-medium"
-              : "border-emerald-100 bg-emerald-50/40"
-              }`}
-          >
-            {step}
-          </li>
-        ))}
-      </ol>
+      {/* Modern Progress Bar UI */}
+      <div className="space-y-2 rounded-xl border border-slate-100 dark:border-zinc-800/40 bg-slate-50/50 dark:bg-zinc-900/30 p-4">
+        <div className="flex justify-between items-center text-xs font-semibold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">
+          <span>{steps[currentStep - 1]}</span>
+          <span>Step {currentStep} of {steps.length}</span>
+        </div>
+        <Progress value={progressValue} className="h-2 bg-slate-100 dark:bg-zinc-800" />
+      </div>
 
       {currentStep === 1 ? (
-        <section className="space-y-4 rounded-xl border border-emerald-100 bg-white p-4">
-          <h2 className="text-lg font-semibold text-emerald-950">
+        <section className="space-y-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-zinc-50">
             Step 1: Device Lookup
           </h2>
 
-          <label className="space-y-1 text-sm text-emerald-950">
+          <label className="space-y-1 text-sm text-slate-700 dark:text-zinc-300">
             <span>IMEI / Serial Number</span>
             <Input
               value={identifier}
@@ -514,13 +512,13 @@ const CreateServiceOrder = () => {
             />
 
             <div className="mt-2 flex items-center justify-between text-xs">
-              <span className="text-emerald-900/60">
+              <span className="text-slate-500 dark:text-zinc-400">
                 Can't find or read the device identifier?
               </span>
               <Button
                 type="button"
                 variant="link"
-                className="h-auto p-0 text-amber-600 hover:text-amber-700 hover:underline"
+                className="h-auto p-0 text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 hover:underline"
                 onClick={() => {
                   const branchCode = user?.branchId ? user.branchId.slice(0, 4) : "GEN";
                   setNoIdentifierBypass(branchCode);
@@ -544,27 +542,27 @@ const CreateServiceOrder = () => {
 
 
           {lookUpStatus === "error" && lookUpMessage ? (
-            <p className="rounded-md border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-700">
+            <p className="rounded-md border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm text-destructive">
               {lookUpMessage}
             </p>
           ) : null}
 
           {lookUpStatus === "not-found" && lookUpMessage ? (
-            <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+            <p className="rounded-md border border-amber-300/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-700 dark:text-amber-400">
               {lookUpMessage}
             </p>
           ) : null}
 
           {lookUpStatus === "not-found" ? (
             <div className="flex justify-end">
-              <Button variant="outline" onClick={handleContinueWithoutMatch}>
+              <Button variant="outline" onClick={handleContinueWithoutMatch} className="cursor-pointer">
                 Continue With New Customer/Device
               </Button>
             </div>
           ) : null}
 
           <div className="flex justify-end">
-            <Button onClick={handleGoToStep2} disabled={isLookupPending || isImeiLookupPending}>
+            <Button onClick={handleGoToStep2} disabled={isLookupPending || isImeiLookupPending} className="cursor-pointer">
               {isLookupPending || isImeiLookupPending
                 ? "Looking up..."
                 : "Next: Customer Confirm/Edit"}
@@ -572,15 +570,15 @@ const CreateServiceOrder = () => {
           </div>
         </section>
       ) : currentStep === 2 ? (
-        <section className="space-y-4 rounded-xl border border-emerald-100 bg-white p-4">
-          <h2 className="text-lg font-semibold text-emerald-950">Step 2</h2>
+        <section className="space-y-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-zinc-50">Step 2: Customer Confirm/Edit</h2>
           {matchedDeviceId ? (
             <>
-              <p className="text-sm text-emerald-900/70">
+              <p className="text-sm text-slate-500 dark:text-zinc-400">
                 Existing Match Mode: confirm this existing customer and device
                 for the new Service Order.
               </p>
-              <div className="grid gap-2 rounded-lg border border-emerald-100 bg-emerald-50/40 p-3 text-sm text-emerald-900">
+              <div className="grid gap-2 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950/20 p-3 text-sm text-slate-700 dark:text-zinc-300">
                 <p>
                   Lookup identifier: <strong>{identifier}</strong>
                 </p>
@@ -594,34 +592,34 @@ const CreateServiceOrder = () => {
                   Device: <strong>{matchedDeviceLabel ?? "-"}</strong>
                 </p>
               </div>
-              <p className="text-sm text-emerald-900/70">
+              <p className="text-sm text-slate-500 dark:text-zinc-400">
                 Next slice: add optional edit controls, then continue to Step 3
                 (Repair Job Details).
               </p>
 
               <div className="flex justify-between">
-                <Button variant="outline" onClick={() => goToStep(1)}>
+                <Button variant="outline" onClick={() => goToStep(1)} className="cursor-pointer">
                   Back to Step 1
                 </Button>
-                <Button onClick={() => goToStep(3)}>
+                <Button onClick={() => goToStep(3)} className="cursor-pointer">
                   Next: Repair Job Details
                 </Button>
               </div>
             </>
           ) : (
             <>
-              <p className="text-sm text-emerald-900/70">
+              <p className="text-sm text-slate-500 dark:text-zinc-400">
                 New Intake Mode: no existing device/customer match selected.
               </p>
-              <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+              <p className="rounded-md border border-amber-300/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-700 dark:text-amber-400">
                 Step 2 will collect new customer and device details, then create
                 those records before creating the Service Order.
               </p>
 
               {noIdentifierAvailable && (
-                <div className="rounded-md border border-red-100 bg-red-50/50 p-3 text-sm text-red-800 space-y-1">
+                <div className="rounded-md border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive space-y-1">
                   <p className="font-semibold">⚠️ Bypass Mode Active</p>
-                  <p className="text-xs text-red-700">
+                  <p className="text-xs text-destructive/90">
                     This device is registered under temporary tracking ID <strong>{identifier}</strong>.
                     Remember to replace this with the real IMEI/Serial in the device detail view once the hardware is repaired or opened.
                   </p>
@@ -629,8 +627,8 @@ const CreateServiceOrder = () => {
               )}
 
 
-              <div className="grid gap-3 rounded-lg border border-emerald-100 bg-emerald-50/40 p-3">
-                <h3 className="text-sm font-semibold text-emerald-950">
+              <div className="grid gap-3 rounded-lg border border-slate-200/60 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-900/10 p-3">
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-zinc-50">
                   Customer Intake
                 </h3>
                 <Input
@@ -675,8 +673,8 @@ const CreateServiceOrder = () => {
                 />
               </div>
 
-              <div className="grid gap-3 rounded-lg border border-emerald-100 bg-emerald-50/40 p-3">
-                <h3 className="text-sm font-semibold text-emerald-950">
+              <div className="grid gap-3 rounded-lg border border-slate-200/60 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-900/10 p-3">
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-zinc-50">
                   Device Intake
                 </h3>
                 <Input
@@ -710,7 +708,7 @@ const CreateServiceOrder = () => {
                   placeholder="IMEI / Serial Number (optional)"
                 />
                 <select
-                  className="h-10 rounded-md border border-emerald-200 bg-white px-3 text-sm text-emerald-950 outline-none"
+                  className="h-10 rounded-md border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-3 text-sm text-slate-900 dark:text-zinc-50 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-100"
                   value={newDevice.deviceType}
                   onChange={(event) =>
                     setNewDevice((prev) => ({
@@ -729,10 +727,10 @@ const CreateServiceOrder = () => {
               </div>
 
               <div className="flex justify-between">
-                <Button variant="outline" onClick={() => goToStep(1)}>
+                <Button variant="outline" onClick={() => goToStep(1)} className="cursor-pointer">
                   Back to Step 1
                 </Button>
-                <Button onClick={() => goToStep(3)}>
+                <Button onClick={() => goToStep(3)} className="cursor-pointer">
                   Next: Repair Job Details
                 </Button>
               </div>
@@ -740,11 +738,11 @@ const CreateServiceOrder = () => {
           )}
         </section>
       ) : currentStep === 3 ? (
-        <section className="space-y-4 rounded-xl border border-emerald-100 bg-white p-4">
-          <h2 className="text-lg font-semibold text-emerald-950">Step 3</h2>
+        <section className="space-y-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-zinc-50">Step 3: Repair Job Details</h2>
 
-          <div className="grid gap-3 rounded-lg border border-emerald-100 bg-emerald-50/40 p-3">
-            <h3 className="text-sm font-semibold text-emerald-950">
+          <div className="grid gap-3 rounded-lg border border-slate-200/60 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-900/10 p-3">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-zinc-50">
               Repair Details
             </h3>
             <Input
@@ -773,54 +771,55 @@ const CreateServiceOrder = () => {
           </div>
 
           <div className="flex justify-between">
-            <Button variant="outline" onClick={() => goToStep(2)}>
+            <Button variant="outline" onClick={() => goToStep(2)} className="cursor-pointer">
               Back to Step 2
             </Button>
 
-            <Button onClick={handleGoToStep4}>Next: Review and Submit</Button>
+            <Button onClick={handleGoToStep4} className="cursor-pointer">Next: Review and Submit</Button>
           </div>
 
           {inputPreviewError ? (
-            <p className="rounded-md border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-700">
+            <p className="rounded-md border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm text-destructive">
               {inputPreviewError}
             </p>
           ) : null}
 
           {inputPreview ? (
-            <pre className="overflow-x-auto rounded-md border border-emerald-100 bg-emerald-50/40 p-3 text-xs text-emerald-950">
+            <pre className="overflow-x-auto rounded-md border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950/20 p-3 text-xs text-slate-800 dark:text-zinc-300">
               {inputPreview}
             </pre>
           ) : null}
         </section>
       ) : (
-        <section className="space-y-4 rounded-xl border border-emerald-100 bg-white p-4">
-          <h2 className="text-lg font-semibold text-emerald-950">Step 4</h2>
-          <p className="text-sm text-emerald-900/70">
+        <section className="space-y-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-zinc-50">Step 4: Confirmation</h2>
+          <p className="text-sm text-slate-500 dark:text-zinc-400">
             Review the built input, then create the service order.
           </p>
 
-          <h3 className="text-sm font-semibold text-emerald-950">
+          <h3 className="text-sm font-semibold text-slate-900 dark:text-zinc-50">
             Service Order Summary
           </h3>
 
           {inputPreview ? (
-            <pre className="overflow-x-auto rounded-md border border-emerald-100 bg-emerald-50/40 p-3 text-xs text-emerald-950">
+            <pre className="overflow-x-auto rounded-md border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950/20 p-3 text-xs text-slate-800 dark:text-zinc-300">
               {inputPreview}
             </pre>
           ) : (
-            <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+            <p className="rounded-md border border-amber-300/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-700 dark:text-amber-400">
               Service order details are not ready yet. Go back to Step 3 and
               complete required fields.
             </p>
           )}
 
           <div className="flex justify-between">
-            <Button variant="outline" onClick={() => goToStep(3)}>
+            <Button variant="outline" onClick={() => goToStep(3)} className="cursor-pointer">
               Back to Step 3
             </Button>
             <Button
               onClick={handleSubmitServiceOrder}
               disabled={isSubmittingServiceOrder}
+              className="cursor-pointer"
             >
               {isSubmittingServiceOrder
                 ? "Creating Service Order..."
@@ -829,7 +828,7 @@ const CreateServiceOrder = () => {
           </div>
 
           {submitError ? (
-            <p className="rounded-md border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-700">
+            <p className="rounded-md border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm text-destructive">
               {submitError}
             </p>
           ) : null}
