@@ -11,6 +11,12 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    host: true,
+    port: 5177,
+    allowedHosts: [".lvh.me"],
+  },
+
   test: {
     environment: "jsdom",
     setupFiles: "./src/test/setup.ts",

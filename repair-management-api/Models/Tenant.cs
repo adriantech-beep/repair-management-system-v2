@@ -15,6 +15,8 @@ public class Tenant
     
     public string SubscriptionStatus { get; set; } = "Trialing"; // Active, Suspended, Trialing, Cancelled
 
+    public string? LogoUrl { get; set; }
+
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
 
     public DateTime UpdatedAtUtc { get; set; } = DateTime.UtcNow;

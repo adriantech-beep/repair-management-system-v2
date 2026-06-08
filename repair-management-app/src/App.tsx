@@ -12,6 +12,7 @@ import CreateServiceOrderPage from "./pages/CreateServiceOrderPage";
 import InventoryPage from "./pages/InventoryPage";
 import SignupPage from "./pages/SignupPage";
 import OnboardingSuccessPage from "./pages/OnboardingSuccessPage";
+import SettingsPage from "./pages/SettingsPage";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const App = () => {
 
             <Route path="customers" element={<CustomerPage />} />
             <Route path="inventory" element={<InventoryPage />} />
+            <Route path="settings" element={<SettingsPage />} />
           </Route>
 
           <Route path="*" element={<NotFoundPage />} />
