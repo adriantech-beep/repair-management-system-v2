@@ -54,7 +54,6 @@ const RepairJobDetail = () => {
   });
 
   // Data Map for A4 Intake Sheet
-  // Data Map for A4 Intake Sheet
   const intakeSheetData = {
     ticketId: repairJob?.jobNumber ?? "",
     createdAt: repairJob?.createdAtUtc ?? "",
@@ -73,6 +72,9 @@ const RepairJobDetail = () => {
     branchAddress: "45 Session Road, Baguio City, Philippines",
     customConsentNotes: repairJob?.diagnosisNotes ?? "",
     companyName: companyName,
+    website: tenant?.website ?? null,
+    businessNumber: tenant?.businessNumber ?? null,
+    contactNumber: tenant?.contactNumber ?? null,
   };
 
   // Data Map for A4 Sales Invoice
@@ -104,6 +106,9 @@ const RepairJobDetail = () => {
     branchPhone: "+63 74 442 1234",
     branchAddress: "45 Session Road, Baguio City, Philippines",
     companyName: companyName,
+    website: tenant?.website ?? null,
+    businessNumber: tenant?.businessNumber ?? null,
+    contactNumber: tenant?.contactNumber ?? null,
   };
 
   if (isLoading) {

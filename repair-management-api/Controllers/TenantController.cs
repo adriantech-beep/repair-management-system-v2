@@ -54,7 +54,10 @@ public class TenantController : ControllerBase
             Subdomain = tenant.Subdomain,
             LogoUrl = tenant.LogoUrl,
             SubscriptionStatus = tenant.SubscriptionStatus,
-            CreatedAtUtc = tenant.CreatedAtUtc
+            CreatedAtUtc = tenant.CreatedAtUtc,
+            ContactNumber = tenant.ContactNumber,
+            Website = tenant.Website,
+            BusinessNumber = tenant.BusinessNumber
         });
     }
 
@@ -80,7 +83,10 @@ public class TenantController : ControllerBase
         return Ok(new PublicTenantDto
         {
             CompanyName = tenant.CompanyName,
-            LogoUrl = tenant.LogoUrl
+            LogoUrl = tenant.LogoUrl,
+            ContactNumber = tenant.ContactNumber,
+            Website = tenant.Website,
+            BusinessNumber = tenant.BusinessNumber
         });
     }
 
@@ -101,6 +107,9 @@ public class TenantController : ControllerBase
         }
 
         tenant.CompanyName = request.CompanyName;
+        tenant.ContactNumber = request.ContactNumber;
+        tenant.Website = request.Website;
+        tenant.BusinessNumber = request.BusinessNumber;
         tenant.UpdatedAtUtc = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();

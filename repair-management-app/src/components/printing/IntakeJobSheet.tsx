@@ -19,6 +19,9 @@ export type IntakeJobSheetData = {
   branchAddress?: string;
   customConsentNotes?: string; // Custom risk warnings (e.g. reballing risk, liquid damage)
   companyName?: string; // ➕ Add this
+  website?: string | null;
+  businessNumber?: string | null;
+  contactNumber?: string | null;
 };
 
 interface IntakeJobSheetProps {
@@ -41,7 +44,21 @@ export const IntakeJobSheet = React.forwardRef<HTMLDivElement, IntakeJobSheetPro
             </h1>
             <p className="text-zinc-600 font-medium">{data.branchName}</p>
             {data.branchAddress && <p className="text-[10px] text-zinc-500 leading-snug">{data.branchAddress}</p>}
-            {data.branchPhone && <p className="text-[10px] text-zinc-500">Tel: {data.branchPhone}</p>}
+            {(data.branchPhone || data.contactNumber) && (
+              <p className="text-[10px] text-zinc-500">
+                Tel: {data.branchPhone || data.contactNumber}
+              </p>
+            )}
+            {data.website && (
+              <p className="text-[10px] text-zinc-500">
+                Web: {data.website}
+              </p>
+            )}
+            {data.businessNumber && (
+              <p className="text-[10px] text-zinc-500 font-semibold">
+                Business Reg / TIN: {data.businessNumber}
+              </p>
+            )}
           </div>
           <div className="text-right space-y-1">
             <div className="inline-block bg-zinc-950 text-white px-3 py-1 text-xs font-bold tracking-wider rounded uppercase">
@@ -192,7 +209,7 @@ export const IntakeJobSheet = React.forwardRef<HTMLDivElement, IntakeJobSheetPro
             1. **Risk Acknowledgement:** The customer acknowledges that devices submitted for diagnostics or repair—especially those with pre-existing liquid exposure, physical trauma, or motherboard/power issues—carry a high inherent risk of further degradation or complete power failure during the diagnostics process.
           </p>
           <p>
-            2. **Data Policy:** {data.companyName || "Atechlabs"} takes no responsibility for user files, operating software, or cloud account linkages. The customer is solely responsible for backing up their data prior to submission.
+            2. **Data Policy:** {data.companyName || "Pines Multi-Telecom"} takes no responsibility for user files, operating software, or cloud account linkages. The customer is solely responsible for backing up their data prior to submission.
           </p>
           <p>
             3. **Unclaimed Devices:** All repair jobs completed or declared unrepairable must be picked up within ninety (90) calendar days of notification. Devices left beyond 90 days will be disposed of or sold to recover cost of diagnostics and storage.

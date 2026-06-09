@@ -2,27 +2,10 @@ import React, { useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
 import { Button } from "@/components/ui/button";
 import { IntakeJobSheet } from "@/components/printing/IntakeJobSheet";
-import type { DeviceType } from "@/types/device";
-import { useGetPublicTenant } from "@/hooks/useTenants"; // ➕ Add this
+import { useGetPublicTenant } from "@/hooks/useTenants";
+import type { IntakeSuccessScreenProps } from "@/types/tenant";
 
-interface IntakeSuccessScreenProps {
-  createdJob: {
-    id: string;
-    jobNumber: string;
-    createdAtUtc: string;
-    customerName: string;
-    customerPhone: string;
-    customerEmail?: string | null;
-    customerAddress?: string | null;
-    deviceBrand: string;
-    deviceModel: string;
-    deviceType: DeviceType;
-    imeiOrSerialNumber: string | null;
-    problemDescription: string;
-    estimatedCost: number | null;
-  };
-  onReset: () => void;
-}
+
 
 export const IntakeSuccessScreen: React.FC<IntakeSuccessScreenProps> = ({
   createdJob,
@@ -30,7 +13,7 @@ export const IntakeSuccessScreen: React.FC<IntakeSuccessScreenProps> = ({
 }) => {
   const [customConsentNotes, setCustomConsentNotes] = useState<string>("");
   const { data: tenant } = useGetPublicTenant();
-  const companyName = tenant?.companyName || "Atechlabs";
+  const companyName = tenant?.companyName || "Pines Multi-Telecom";
 
   const intakeRef = useRef<HTMLDivElement>(null);
   const handlePrintIntake = useReactToPrint({
@@ -60,7 +43,7 @@ export const IntakeSuccessScreen: React.FC<IntakeSuccessScreenProps> = ({
         </p>
       </header>
 
-      {/* Condition / Diagnostic Consent Overrides */}
+
       <div className="border border-zinc-200 rounded-xl p-4 text-left space-y-3 bg-zinc-50/50">
         <h3 className="text-xs font-black uppercase text-zinc-500 tracking-wider">
           ⚙ ... Print Consent Customization
@@ -94,7 +77,7 @@ export const IntakeSuccessScreen: React.FC<IntakeSuccessScreenProps> = ({
         </Button>
       </div>
 
-      {/* Hidden template for printing */}
+
       <div style={{ display: "none" }}>
         <IntakeJobSheet
           ref={intakeRef}
@@ -116,6 +99,9 @@ export const IntakeSuccessScreen: React.FC<IntakeSuccessScreenProps> = ({
             branchAddress: "45 Session Road, Baguio City, Philippines",
             customConsentNotes: customConsentNotes,
             companyName: companyName,
+            website: tenant?.website ?? null,
+            businessNumber: tenant?.businessNumber ?? null,
+            contactNumber: tenant?.contactNumber ?? null,
           }}
         />
       </div>
