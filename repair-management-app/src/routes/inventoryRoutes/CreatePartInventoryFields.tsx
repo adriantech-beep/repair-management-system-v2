@@ -62,7 +62,7 @@ const partInventoryFields: FieldConfig[] = [
 const CreatePartInventoryFields = () => {
   const { control } = useFormContext<CreatePartInventoryFormData>();
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-6 gap-4 bg-white">
+    <div className="grid grid-cols-1 sm:grid-cols-6 gap-4 bg-white p-4">
       {partInventoryFields.map(({ name, placeholder, type, parseAsNumber, className }) => (
         <FormField
           key={name}
