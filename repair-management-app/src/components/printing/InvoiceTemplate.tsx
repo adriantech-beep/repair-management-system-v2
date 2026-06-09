@@ -30,6 +30,7 @@ export type InvoiceData = {
   branchName: string;
   branchPhone?: string;
   branchAddress?: string;
+  companyName?: string; // ➕ Add this
 };
 
 interface InvoiceTemplateProps {
@@ -50,8 +51,8 @@ export const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateP
         {/* Header Section */}
         <header className="flex justify-between items-start border-b-2 border-zinc-950 pb-4">
           <div className="space-y-1">
-            <h1 className="text-xl font-black tracking-tight text-emerald-950">
-              PINES MULTI-TELECOM
+            <h1 className="text-xl font-black tracking-tight text-emerald-950 uppercase">
+              {data.companyName || "PINES MULTI-TELECOM"}
             </h1>
             <p className="text-zinc-600 font-medium">{data.branchName}</p>
             {data.branchAddress && <p className="text-[10px] text-zinc-500 leading-snug">{data.branchAddress}</p>}
@@ -189,7 +190,7 @@ export const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateP
             🛡️ Replacement Parts & Labor Warranty:
           </p>
           <p>
-            1. **Parts Warranty:** Pines Multi-Telecom offers a thirty (30) day warranty on the specific hardware parts replaced in this invoice (e.g. replaced screen, battery, IC chip). This warranty covers manufacturer defects only.
+            1. **Parts Warranty:** {data.companyName || "Pines Multi-Telecom"} offers a thirty (30) day warranty on the specific hardware parts replaced in this invoice (e.g. replaced screen, battery, IC chip). This warranty covers manufacturer defects only.
           </p>
           <p>
             2. **Exclusions:** This warranty is immediately declared **VOID** if the device has signs of subsequent physical impact, drop damage, bent chassis, custom software tampering, or liquid exposure after checkout.
@@ -210,14 +211,14 @@ export const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateP
           <div className="flex flex-col items-center">
             <div className="w-full border-b border-zinc-400 h-6"></div>
             <span className="mt-1.5 text-[8px] font-black tracking-widest text-zinc-700 uppercase">
-              Authorized Pines Representative
+              Authorized {data.companyName || "Pines"} Representative
             </span>
           </div>
         </section>
 
         {/* Footer */}
         <footer className="mt-8 border-t border-zinc-100 pt-3 text-center text-[8.5px] text-zinc-400 font-medium">
-          <p>Thank you for choosing Pines Multi-Telecom! We appreciate your business.</p>
+          <p>Thank you for choosing {data.companyName || "Pines Multi-Telecom"}! We appreciate your business.</p>
           <p className="mt-0.5 text-zinc-300">Powered by Beep Repair Management SaaS</p>
         </footer>
       </div>

@@ -3,6 +3,7 @@ import { useReactToPrint } from "react-to-print";
 import { Button } from "@/components/ui/button";
 import { IntakeJobSheet } from "@/components/printing/IntakeJobSheet";
 import type { DeviceType } from "@/types/device";
+import { useGetPublicTenant } from "@/hooks/useTenants"; // ➕ Add this
 
 interface IntakeSuccessScreenProps {
   createdJob: {
@@ -28,6 +29,8 @@ export const IntakeSuccessScreen: React.FC<IntakeSuccessScreenProps> = ({
   onReset,
 }) => {
   const [customConsentNotes, setCustomConsentNotes] = useState<string>("");
+  const { data: tenant } = useGetPublicTenant();
+  const companyName = tenant?.companyName || "Pines Multi-Telecom";
 
   const intakeRef = useRef<HTMLDivElement>(null);
   const handlePrintIntake = useReactToPrint({
@@ -108,10 +111,11 @@ export const IntakeSuccessScreen: React.FC<IntakeSuccessScreenProps> = ({
             imeiOrSerialNumber: createdJob.imeiOrSerialNumber,
             problemDescription: createdJob.problemDescription,
             estimatedCost: createdJob.estimatedCost,
-            branchName: "Pines Multi-Telecom - Main",
+            branchName: `${companyName} - Main`,
             branchPhone: "+63 74 442 1234",
             branchAddress: "45 Session Road, Baguio City, Philippines",
             customConsentNotes: customConsentNotes,
+            companyName: companyName,
           }}
         />
       </div>

@@ -18,6 +18,7 @@ export type IntakeJobSheetData = {
   branchPhone?: string;
   branchAddress?: string;
   customConsentNotes?: string; // Custom risk warnings (e.g. reballing risk, liquid damage)
+  companyName?: string; // ➕ Add this
 };
 
 interface IntakeJobSheetProps {
@@ -35,8 +36,8 @@ export const IntakeJobSheet = React.forwardRef<HTMLDivElement, IntakeJobSheetPro
         {/* Header Grid */}
         <header className="flex justify-between items-start border-b-2 border-zinc-950 pb-4">
           <div className="space-y-1">
-            <h1 className="text-xl font-black tracking-tight text-emerald-950">
-              PINES MULTI-TELECOM
+            <h1 className="text-xl font-black tracking-tight text-emerald-950 uppercase">
+              {data.companyName || "PINES MULTI-TELECOM"}
             </h1>
             <p className="text-zinc-600 font-medium">{data.branchName}</p>
             {data.branchAddress && <p className="text-[10px] text-zinc-500 leading-snug">{data.branchAddress}</p>}
@@ -191,7 +192,7 @@ export const IntakeJobSheet = React.forwardRef<HTMLDivElement, IntakeJobSheetPro
             1. **Risk Acknowledgement:** The customer acknowledges that devices submitted for diagnostics or repair—especially those with pre-existing liquid exposure, physical trauma, or motherboard/power issues—carry a high inherent risk of further degradation or complete power failure during the diagnostics process.
           </p>
           <p>
-            2. **Data Policy:** Pines Multi-Telecom takes no responsibility for user files, operating software, or cloud account linkages. The customer is solely responsible for backing up their data prior to submission.
+            2. **Data Policy:** {data.companyName || "Pines Multi-Telecom"} takes no responsibility for user files, operating software, or cloud account linkages. The customer is solely responsible for backing up their data prior to submission.
           </p>
           <p>
             3. **Unclaimed Devices:** All repair jobs completed or declared unrepairable must be picked up within ninety (90) calendar days of notification. Devices left beyond 90 days will be disposed of or sold to recover cost of diagnostics and storage.
@@ -218,7 +219,7 @@ export const IntakeJobSheet = React.forwardRef<HTMLDivElement, IntakeJobSheetPro
 
         {/* Footer */}
         <footer className="mt-8 border-t border-zinc-100 pt-3 text-center text-[8.5px] text-zinc-400 font-medium">
-          <p>Thank you for trusting Pines Multi-Telecom with your device!</p>
+          <p>Thank you for trusting {data.companyName || "Pines Multi-Telecom"} with your device!</p>
           <p className="mt-0.5 text-zinc-300">Powered by Beep Repair Management SaaS</p>
         </footer>
       </div>

@@ -16,6 +16,11 @@ const mockUseAuthStore = vi.fn();
 const mockUseGetRepairJobParts = vi.fn();
 const mockUseAllocateRepairJobPart = vi.fn();
 const mockUseRemoveRepairJobPart = vi.fn();
+const mockUseGetPublicTenant = vi.fn(); // ➕ Add this
+
+vi.mock("@/hooks/useTenants", () => ({
+  useGetPublicTenant: () => mockUseGetPublicTenant(),
+})); // ➕ Add this
 
 vi.mock("@/hooks/useRepairJobs", () => ({
   useGetRepairJobById: (repairJobId: string) =>
@@ -53,6 +58,14 @@ vi.mock("@/store/authStore", () => ({
 function mockDefaultDependencies() {
   mockUseAuthStore.mockReturnValue({
     user: { role: "Admin" },
+  });
+
+  mockUseGetPublicTenant.mockReturnValue({
+    data: {
+      companyName: "Pines Multi-Telecom",
+      logoUrl: null,
+    },
+    isLoading: false,
   });
 
   mockUseUpdateRepairJob.mockReturnValue({

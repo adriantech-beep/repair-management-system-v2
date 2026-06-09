@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button"; // ➕ Add this
 import { IntakeJobSheet } from "@/components/printing/IntakeJobSheet"; // ➕ Add this
 import { InvoiceTemplate } from "@/components/printing/InvoiceTemplate"; // ➕ Add this
 import { useGetRepairJobParts } from "@/hooks/useRepairJobParts"; // ➕ Add this
+import { useGetPublicTenant } from "@/hooks/useTenants"; // ➕ Add this
 
 
 const RepairJobDetail = () => {
@@ -27,6 +28,9 @@ const RepairJobDetail = () => {
 
   const normalizedRole = user?.role?.toLowerCase() ?? "";
   const canEditRepairJobDetails = normalizedRole === "admin";
+
+  const { data: tenant } = useGetPublicTenant();
+  const companyName = tenant?.companyName || "Pines Multi-Telecom";
 
   const {
     data: repairJob,
@@ -64,10 +68,11 @@ const RepairJobDetail = () => {
     deviceType: device?.deviceType ?? "Other", // 🔄 Fallback to "Other" (valid DeviceType)
     problemDescription: repairJob?.problemDescription ?? "",
     estimatedCost: repairJob?.estimatedCost ?? null, // 🔄 Fallback to null (number | null)
-    branchName: "Pines Multi-Telecom - Main",
+    branchName: `${companyName} - Main`,
     branchPhone: "+63 74 442 1234",
     branchAddress: "45 Session Road, Baguio City, Philippines",
     customConsentNotes: repairJob?.diagnosisNotes ?? "",
+    companyName: companyName,
   };
 
   // Data Map for A4 Sales Invoice
@@ -95,9 +100,10 @@ const RepairJobDetail = () => {
     finalCost: repairJob?.finalCost ?? 0.0,
     status: repairJob?.status ?? "Received",
     isPaid: repairJob?.status === "Completed", 
-    branchName: "Pines Multi-Telecom - Main",
+    branchName: `${companyName} - Main`,
     branchPhone: "+63 74 442 1234",
     branchAddress: "45 Session Road, Baguio City, Philippines",
+    companyName: companyName,
   };
 
   if (isLoading) {
