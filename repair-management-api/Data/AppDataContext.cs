@@ -47,6 +47,8 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Customer>().HasQueryFilter(c => CurrentTenantId == null || c.TenantId == CurrentTenantId);
         modelBuilder.Entity<RepairJob>().HasQueryFilter(rj => CurrentTenantId == null || rj.TenantId == CurrentTenantId);
         modelBuilder.Entity<RepairJobPart>().HasQueryFilter(rjp => CurrentTenantId == null || rjp.TenantId == CurrentTenantId);
+        modelBuilder.Entity<Part>().HasQueryFilter(p => CurrentTenantId == null || p.TenantId == CurrentTenantId);
+        modelBuilder.Entity<Device>().HasQueryFilter(d => CurrentTenantId == null || d.TenantId == CurrentTenantId);
 
         // Tenant configuration
         modelBuilder.Entity<Tenant>(entity =>
@@ -65,6 +67,18 @@ public class AppDbContext : DbContext
             .HasOne(b => b.Tenant)
             .WithMany(t => t.Branches)
             .HasForeignKey(b => b.TenantId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Part>()
+            .HasOne(p => p.Tenant)
+            .WithMany()
+            .HasForeignKey(p => p.TenantId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Device>()
+            .HasOne(d => d.Tenant)
+            .WithMany()
+            .HasForeignKey(d => d.TenantId)
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<User>()
@@ -196,8 +210,10 @@ public class AppDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(50);
 
-            entity.HasIndex(p => p.PartNumber)
+            entity.HasIndex(p => new { p.TenantId, p.PartNumber })
                 .IsUnique();
+
+            entity.HasIndex(p => p.TenantId);
 
             entity.Property(p => p.Name)
                 .IsRequired()
@@ -308,6 +324,7 @@ public class AppDbContext : DbContext
 
         entity.HasIndex(d => d.CustomerId);
         entity.HasIndex(d => d.BranchId);
+        entity.HasIndex(d => d.TenantId);
 
         entity.HasOne(d => d.Customer)
         .WithMany()

@@ -51,14 +51,9 @@ public class CustomersController : ControllerBase
     [HttpGet]
     [Authorize(Roles = "Admin,Technician")]
     public async Task<ActionResult<List<CustomerResponseDto>>> GetCustomers(
-    [FromQuery] string? search)
+        [FromQuery] string? search)
     {
-        if (_branchContext.BranchId is null)
-        {
-            return Forbid();
-        }
-
-        var customers = await _customerService.GetCustomersAsync(_branchContext.BranchId.Value, search);
+        var customers = await _customerService.GetCustomersAsync(_branchContext.BranchId, search);
         return Ok(customers);
     }
 
