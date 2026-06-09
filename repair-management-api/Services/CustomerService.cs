@@ -11,7 +11,7 @@ namespace RepairManagementApi.Services;
 public interface ICustomerService
 {
     Task<CustomerResponseDto> CreateCustomerAsync(CreateCustomerRequestDto request);
-    Task<List<CustomerResponseDto>> GetCustomersAsync(Guid branchId, string? search);
+    Task<List<CustomerResponseDto>> GetCustomersAsync(Guid? branchId, string? search);
     Task<CustomerResponseDto?> UpdateCustomerAsync(Guid customerId, UpdateCustomerRequestDto request);
 
     Task<CustomerResponseDto?> GetCustomerByIdAsync(Guid customerId);
@@ -81,21 +81,24 @@ public class CustomerService : ICustomerService
             return customer == null ? null : MapToDto(customer);
         }
 
-    public async Task<List<CustomerResponseDto>> GetCustomersAsync(Guid branchId, string? search)
+    public async Task<List<CustomerResponseDto>> GetCustomersAsync(Guid? branchId, string? search)
     {
-        var query = _db.Customers
-        .Where(c => c.BranchId == branchId)
-        .AsQueryable();
+        var query = _db.Customers.AsQueryable();
+
+        if (branchId.HasValue)
+        {
+            query = query.Where(c => c.BranchId == branchId.Value);
+        }
 
         if (!string.IsNullOrEmpty(search))
-    {
-        query = query.Where(c => c.FullName.Contains(search) || c.Phone.Contains(search));
-    }
+        {
+            query = query.Where(c => c.FullName.Contains(search) || c.Phone.Contains(search));
+        }
 
         var customers = await query
-        .OrderBy(c => c.FullName)
-        .AsNoTracking()
-        .ToListAsync();
+            .OrderBy(c => c.FullName)
+            .AsNoTracking()
+            .ToListAsync();
 
         return customers.Select(MapToDto).ToList();
     }

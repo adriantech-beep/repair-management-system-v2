@@ -5,6 +5,8 @@ namespace RepairManagementApi.Models;
 public class Device
 {
     public Guid Id { get; set; }
+    public Guid TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
     public Guid CustomerId { get; set; }
     public Customer? Customer { get; set; }
     public Guid BranchId { get; set; }

@@ -4,6 +4,9 @@ public class Part
 {
     public Guid Id { get; set; } = Guid.NewGuid();
 
+    public Guid TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
+
     public string PartNumber { get; set; } = string.Empty;
 
     public string Name { get; set; } = string.Empty;

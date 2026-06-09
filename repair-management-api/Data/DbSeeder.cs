@@ -160,6 +160,28 @@ namespace RepairManagementApi.Data
                     await dbContext.SaveChangesAsync();
                     Console.WriteLine($"✓ Associated {usersWithNoBranch.Count} existing users with the default branch");
                 }
+
+                var partsWithNoTenant = await dbContext.Parts.Where(p => p.TenantId == Guid.Empty).ToListAsync();
+                if (partsWithNoTenant.Any())
+                {
+                    foreach (var part in partsWithNoTenant)
+                    {
+                        part.TenantId = defaultTenant.Id;
+                    }
+                    await dbContext.SaveChangesAsync();
+                    Console.WriteLine($"✓ Associated {partsWithNoTenant.Count} existing parts with default tenant");
+                }
+
+                var devicesWithNoTenant = await dbContext.Devices.Where(d => d.TenantId == Guid.Empty).ToListAsync();
+                if (devicesWithNoTenant.Any())
+                {
+                    foreach (var device in devicesWithNoTenant)
+                    {
+                        device.TenantId = defaultTenant.Id;
+                    }
+                    await dbContext.SaveChangesAsync();
+                    Console.WriteLine($"✓ Associated {devicesWithNoTenant.Count} existing devices with default tenant");
+                }
             }
         }
     }
