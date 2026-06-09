@@ -15,7 +15,9 @@ type ServiceOrderWizardState = {
   matchedDeviceId?: string | null;
   matchedDeviceLabel?: string | null;
   noIdentifierAvailable: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   createJob: any | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setCreateJob: (job: any | null) => void;
   setNoIdentifierBypass: (branchCode: string) => void;
   setIdentifier: (value: string) => void;

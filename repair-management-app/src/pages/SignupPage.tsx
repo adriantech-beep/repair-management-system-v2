@@ -35,7 +35,7 @@ const signupSchema = z.object({
   subdomain: z
     .string()
     .min(3, "Subdomain must be at least 3 characters long")
-    .regex(/^[a-z0-9\-]+$/, "Subdomain can only contain lowercase letters, numbers, and hyphens.")
+    .regex(/^[a-z0-9-]+$/, "Subdomain can only contain lowercase letters, numbers, and hyphens.")
 });
 
 type SignupFormData = z.infer<typeof signupSchema>;
@@ -76,7 +76,7 @@ const SignupPage = () => {
     }
 
     // Client-side quick syntax validation before calling API
-    const isValidSyntax = /^[a-z0-9\-]+$/.test(watchedSubdomain);
+    const isValidSyntax = /^[a-z0-9-]+$/.test(watchedSubdomain);
     if (!isValidSyntax) {
       setSubdomainStatus({
         state: "invalid",
@@ -115,7 +115,7 @@ const SignupPage = () => {
             message: response.data.message || "This subdomain is already taken."
           });
         }
-      } catch (err) {
+      } catch {
         setSubdomainStatus({
           state: "invalid",
           message: "Unable to reach verification server."

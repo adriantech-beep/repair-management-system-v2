@@ -209,7 +209,7 @@ const CreateServiceOrder = () => {
             `Device registry check succeeded! Found ${imeiDetails.brand} ${imeiDetails.model}. Auto-populating details.`,
           );
           goToStep(2);
-        } catch (registryError) {
+        } catch {
           // If both local and registry check fail, let them enter it manually
           completeLookup(
             "not-found",

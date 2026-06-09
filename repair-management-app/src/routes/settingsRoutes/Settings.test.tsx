@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import Settings from "./Settings";
@@ -25,7 +26,6 @@ vi.mock("@/hooks/useTenants", () => ({
 describe("Settings Page Component Tests", () => {
   // Helper to mock user authentication details
   const mockAuthState = (user: { role: string } | null) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(useAuthStore).mockImplementation((selector: any) => {
       const state = { user };
       return selector ? selector(state) : state;
@@ -47,7 +47,6 @@ describe("Settings Page Component Tests", () => {
       setSuccessMessage: vi.fn(),
       reset: vi.fn(),
     };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(useSettingsStore).mockImplementation((selector: any) => {
       const state = { ...defaultState, ...stateOverrides };
       return selector ? selector(state) : state;
