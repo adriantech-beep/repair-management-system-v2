@@ -192,7 +192,7 @@ export const IntakeJobSheet = React.forwardRef<HTMLDivElement, IntakeJobSheetPro
             1. **Risk Acknowledgement:** The customer acknowledges that devices submitted for diagnostics or repair—especially those with pre-existing liquid exposure, physical trauma, or motherboard/power issues—carry a high inherent risk of further degradation or complete power failure during the diagnostics process.
           </p>
           <p>
-            2. **Data Policy:** {data.companyName || "Pines Multi-Telecom"} takes no responsibility for user files, operating software, or cloud account linkages. The customer is solely responsible for backing up their data prior to submission.
+            2. **Data Policy:** {data.companyName || "Atechlabs"} takes no responsibility for user files, operating software, or cloud account linkages. The customer is solely responsible for backing up their data prior to submission.
           </p>
           <p>
             3. **Unclaimed Devices:** All repair jobs completed or declared unrepairable must be picked up within ninety (90) calendar days of notification. Devices left beyond 90 days will be disposed of or sold to recover cost of diagnostics and storage.

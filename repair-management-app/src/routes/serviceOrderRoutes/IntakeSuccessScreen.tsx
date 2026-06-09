@@ -30,7 +30,7 @@ export const IntakeSuccessScreen: React.FC<IntakeSuccessScreenProps> = ({
 }) => {
   const [customConsentNotes, setCustomConsentNotes] = useState<string>("");
   const { data: tenant } = useGetPublicTenant();
-  const companyName = tenant?.companyName || "Pines Multi-Telecom";
+  const companyName = tenant?.companyName || "Atechlabs";
 
   const intakeRef = useRef<HTMLDivElement>(null);
   const handlePrintIntake = useReactToPrint({
