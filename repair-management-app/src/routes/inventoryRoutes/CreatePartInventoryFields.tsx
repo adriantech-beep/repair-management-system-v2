@@ -14,55 +14,62 @@ type FieldConfig = {
   placeholder: string;
   type: string;
   parseAsNumber?: boolean;
+  className: string;
 };
 
 const partInventoryFields: FieldConfig[] = [
   {
-    name: "partNumber",
-    placeholder: "Part Number",
-    type: "text",
-  },
-  {
     name: "name",
     placeholder: "Part Name",
     type: "text",
+    className: "sm:col-span-6",
+  },
+  {
+    name: "partNumber",
+    placeholder: "Part Number",
+    type: "text",
+    className: "sm:col-span-3",
   },
   {
     name: "category",
     placeholder: "Category",
     type: "text",
+    className: "sm:col-span-3",
   },
   {
     name: "stockQuantity",
     placeholder: "Stock Quantity",
     type: "number",
     parseAsNumber: true,
+    className: "sm:col-span-2",
   },
   {
     name: "supplierPrice",
     placeholder: "Supplier Price",
     type: "number",
     parseAsNumber: true,
+    className: "sm:col-span-2",
   },
   {
     name: "sellingPrice",
     placeholder: "Selling Price",
     type: "number",
     parseAsNumber: true,
+    className: "sm:col-span-2",
   },
 ];
 
 const CreatePartInventoryFields = () => {
   const { control } = useFormContext<CreatePartInventoryFormData>();
   return (
-    <div className="space-y-4">
-      {partInventoryFields.map(({ name, placeholder, type, parseAsNumber }) => (
+    <div className="grid grid-cols-1 sm:grid-cols-6 gap-4">
+      {partInventoryFields.map(({ name, placeholder, type, parseAsNumber, className }) => (
         <FormField
           key={name}
           control={control}
           name={name}
           render={({ field }) => (
-            <FormItem className="space-y-1.5">
+            <FormItem className={`space-y-1.5 ${className}`}>
               <FormLabel className="text-sm font-medium text-emerald-950/80">
                 {placeholder}
               </FormLabel>
