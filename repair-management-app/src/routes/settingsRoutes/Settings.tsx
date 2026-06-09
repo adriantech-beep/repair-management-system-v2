@@ -41,7 +41,7 @@ const Settings = () => {
 
   const [isDragging, setIsDragging] = useState(false);
 
-  // Zustand Store for local UI states & previews
+
   const {
     file,
     filePreview,
@@ -258,11 +258,10 @@ const Settings = () => {
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
-              className={`w-full aspect-square max-w-[200px] rounded-2xl border-2 border-dashed flex flex-col items-center justify-center p-4 transition-all duration-300 relative group overflow-hidden ${
-                isDragging
-                  ? "border-indigo-500 bg-indigo-50/20 dark:bg-indigo-950/20 scale-[1.02]"
-                  : "border-slate-200 dark:border-zinc-850 bg-slate-50/50 dark:bg-zinc-950/20 hover:border-indigo-500/40 hover:bg-slate-50 dark:hover:bg-zinc-950/40"
-              }`}
+              className={`w-full aspect-square max-w-[200px] rounded-2xl border-2 border-dashed flex flex-col items-center justify-center p-4 transition-all duration-300 relative group overflow-hidden ${isDragging
+                ? "border-indigo-500 bg-indigo-50/20 dark:bg-indigo-950/20 scale-[1.02]"
+                : "border-slate-200 dark:border-zinc-850 bg-slate-50/50 dark:bg-zinc-950/20 hover:border-indigo-500/40 hover:bg-slate-50 dark:hover:bg-zinc-950/40"
+                }`}
             >
               {filePreview ? (
                 <div className="w-full h-full flex items-center justify-center relative">

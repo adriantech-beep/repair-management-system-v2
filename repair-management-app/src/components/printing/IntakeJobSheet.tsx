@@ -73,9 +73,9 @@ export const IntakeJobSheet = React.forwardRef<HTMLDivElement, IntakeJobSheetPro
           </div>
         </header>
 
-        {/* Info Grid */}
+
         <section className="grid grid-cols-2 gap-8 my-5">
-          {/* Customer Panel */}
+
           <div className="border border-zinc-200 rounded-lg p-3.5 space-y-2 bg-zinc-50/50">
             <h3 className="text-xs font-black uppercase text-zinc-800 tracking-wider border-b border-zinc-200 pb-1">
               Customer Details
@@ -92,7 +92,7 @@ export const IntakeJobSheet = React.forwardRef<HTMLDivElement, IntakeJobSheetPro
             </div>
           </div>
 
-          {/* Device Panel */}
+
           <div className="border border-zinc-200 rounded-lg p-3.5 space-y-2 bg-zinc-50/50">
             <h3 className="text-xs font-black uppercase text-zinc-800 tracking-wider border-b border-zinc-200 pb-1">
               Device Intake Details
@@ -112,7 +112,7 @@ export const IntakeJobSheet = React.forwardRef<HTMLDivElement, IntakeJobSheetPro
           </div>
         </section>
 
-        {/* Checklist Section */}
+
         <section className="border border-zinc-200 rounded-lg p-3.5 my-5">
           <h3 className="text-xs font-black uppercase text-zinc-800 tracking-wider border-b border-zinc-200 pb-1.5 mb-3">
             📋 Initial Condition Check & Inspection Report

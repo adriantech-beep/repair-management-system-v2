@@ -48,8 +48,8 @@ export const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateP
             </h2>
             <div className="flex justify-end gap-1.5 mt-1">
               <span className={`px-2 py-0.5 text-[9px] font-bold uppercase rounded ${data.isPaid
-                  ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
-                  : "bg-amber-100 text-amber-800 border border-amber-300"
+                ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                : "bg-amber-100 text-amber-800 border border-amber-300"
                 }`}>
                 {data.isPaid ? "PAID" : "PENDING PAYMENT"}
               </span>
