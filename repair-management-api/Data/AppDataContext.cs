@@ -55,6 +55,9 @@ public class AppDbContext : DbContext
             entity.Property(t => t.CompanyName).IsRequired().HasMaxLength(150);
             entity.Property(t => t.Subdomain).IsRequired().HasMaxLength(100);
             entity.HasIndex(t => t.Subdomain).IsUnique();
+            entity.Property(t => t.ContactNumber).HasMaxLength(50);
+            entity.Property(t => t.Website).HasMaxLength(150);
+            entity.Property(t => t.BusinessNumber).HasMaxLength(100);
         });
 
         // Configure Tenant relationships & Cascade deletion

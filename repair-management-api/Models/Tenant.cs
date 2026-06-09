@@ -17,6 +17,10 @@ public class Tenant
 
     public string? LogoUrl { get; set; }
 
+    public string? ContactNumber { get; set; }
+    public string? Website { get; set; }
+    public string? BusinessNumber { get; set; }
+
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
 
     public DateTime UpdatedAtUtc { get; set; } = DateTime.UtcNow;

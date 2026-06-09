@@ -62,13 +62,19 @@ const Settings = () => {
   const form = useForm<SettingsFormData>({
     resolver: zodResolver(settingsSchema),
     defaultValues: {
-      companyName: ""
+      companyName: "",
+      contactNumber: "",
+      website: "",
+      businessNumber: ""
     }
   });
 
   useEffect(() => {
     if (tenant) {
       form.setValue("companyName", tenant.companyName);
+      form.setValue("contactNumber", tenant.contactNumber ?? "");
+      form.setValue("website", tenant.website ?? "");
+      form.setValue("businessNumber", tenant.businessNumber ?? "");
       setFilePreview(tenant.logoUrl);
     }
   }, [tenant, form, setFilePreview]);
@@ -81,9 +87,14 @@ const Settings = () => {
 
   const onSaveName = (data: SettingsFormData) => {
     if (!isAdmin) return;
-    updateInfoMutation.mutate(data.companyName, {
+    updateInfoMutation.mutate({
+      companyName: data.companyName,
+      contactNumber: data.contactNumber ? data.contactNumber.trim() : null,
+      website: data.website ? data.website.trim() : null,
+      businessNumber: data.businessNumber ? data.businessNumber.trim() : null,
+    }, {
       onSuccess: () => {
-        setSuccessMessage("Store name updated successfully!");
+        setSuccessMessage("Store settings updated successfully!");
         setGeneralError(null);
         setTimeout(() => setSuccessMessage(null), 4000);
       },
@@ -411,6 +422,81 @@ const Settings = () => {
                   </FormItem>
                 )}
               />
+
+              {/* Dynamic details for printing */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <FormField
+                  control={form.control}
+                  name="contactNumber"
+                  render={({ field }) => (
+                    <FormItem className="space-y-2">
+                      <FormLabel className="text-xs font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-widest pl-1">
+                        Contact Number
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          disabled={!isAdmin}
+                          placeholder="e.g. +63 917 123 4567"
+                          className="h-12 rounded-xl bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-800 text-slate-900 dark:text-zinc-50 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus-visible:border-indigo-500 focus-visible:ring-indigo-500/20 disabled:text-slate-400 disabled:bg-slate-50/50 dark:disabled:bg-zinc-950/50 disabled:cursor-not-allowed transition"
+                          {...field}
+                          value={field.value ?? ""}
+                          onChange={(e) => field.onChange(e.target.value)}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs text-destructive" />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="website"
+                  render={({ field }) => (
+                    <FormItem className="space-y-2">
+                      <FormLabel className="text-xs font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-widest pl-1">
+                        Website URL
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          disabled={!isAdmin}
+                          placeholder="e.g. https://atechlabs.com"
+                          className="h-12 rounded-xl bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-800 text-slate-900 dark:text-zinc-50 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus-visible:border-indigo-500 focus-visible:ring-indigo-500/20 disabled:text-slate-400 disabled:bg-slate-50/50 dark:disabled:bg-zinc-950/50 disabled:cursor-not-allowed transition"
+                          {...field}
+                          value={field.value ?? ""}
+                          onChange={(e) => field.onChange(e.target.value)}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs text-destructive" />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="businessNumber"
+                  render={({ field }) => (
+                    <FormItem className="space-y-2">
+                      <FormLabel className="text-xs font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-widest pl-1">
+                        Business Number / TIN
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          disabled={!isAdmin}
+                          placeholder="e.g. 123-456-789-000"
+                          className="h-12 rounded-xl bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-800 text-slate-900 dark:text-zinc-50 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus-visible:border-indigo-500 focus-visible:ring-indigo-500/20 disabled:text-slate-400 disabled:bg-slate-50/50 dark:disabled:bg-zinc-950/50 disabled:cursor-not-allowed transition"
+                          {...field}
+                          value={field.value ?? ""}
+                          onChange={(e) => field.onChange(e.target.value)}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs text-destructive" />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <RoleGuard allowedRoles={["Admin"]}>
                 <div className="pt-4 flex justify-end">

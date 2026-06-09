@@ -11,8 +11,13 @@ export async function getPublicTenantSettings(): Promise<PublicTenantSettings> {
   return response.data;
 }
 
-export async function updateTenantSettings(companyName: string): Promise<void> {
-  await apiClient.put("/api/tenant", { companyName });
+export async function updateTenantSettings(payload: {
+  companyName: string;
+  contactNumber: string | null;
+  website: string | null;
+  businessNumber: string | null;
+}): Promise<void> {
+  await apiClient.put("/api/tenant", payload);
 }
 
 export async function uploadTenantLogo(file: File): Promise<string> {

@@ -20,9 +20,15 @@ export function useGetPublicTenant() {
 export function useUpdateTenant() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (companyName: string) => updateTenantSettings(companyName),
+    mutationFn: (payload: {
+      companyName: string;
+      contactNumber: string | null;
+      website: string | null;
+      businessNumber: string | null;
+    }) => updateTenantSettings(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tenantSettings"] });
+      queryClient.invalidateQueries({ queryKey: ["publicTenantSettings"] });
     },
   });
 }

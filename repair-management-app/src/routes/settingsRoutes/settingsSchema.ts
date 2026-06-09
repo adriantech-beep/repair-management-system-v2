@@ -20,6 +20,26 @@ export const settingsSchema = z.object({
         .min(2, "Company name must be at least 2 characters")
         .max(100, "Company name must be less than 100 characters"),
     logoFile: logoSchema.optional(),
+    contactNumber: z
+        .string()
+        .trim()
+        .max(50, "Contact number must be less than 50 characters")
+        .nullable()
+        .optional(),
+    website: z
+        .string()
+        .trim()
+        .max(150, "Website must be less than 150 characters")
+        .url("Must be a valid URL")
+        .or(z.literal(""))
+        .nullable()
+        .optional(),
+    businessNumber: z
+        .string()
+        .trim()
+        .max(100, "Business number must be less than 100 characters")
+        .nullable()
+        .optional(),
 });
 
 export type SettingsFormData = z.infer<typeof settingsSchema>;

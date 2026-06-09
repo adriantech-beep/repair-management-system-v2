@@ -1,41 +1,8 @@
+import type { InvoiceTemplateProps } from "@/types/invoice";
 import React from "react";
-import type { DeviceType } from "@/types/device";
 
-export type InvoicePartItem = {
-  partName: string;
-  unitPrice: number;
-  quantity: number;
-  subtotal: number;
-};
 
-export type InvoiceData = {
-  ticketId: string;
-  receivedAt: string;
-  completedAt?: string | null;
-  customerName: string;
-  customerPhone: string;
-  customerEmail?: string | null;
-  customerAddress?: string | null;
-  deviceBrand: string;
-  deviceModel: string;
-  imeiOrSerialNumber: string | null;
-  deviceType: DeviceType;
-  problemDescription: string;
-  resolutionNotes?: string | null;
-  laborCost: number;
-  parts: InvoicePartItem[];
-  finalCost: number;
-  status: string;
-  isPaid: boolean;
-  branchName: string;
-  branchPhone?: string;
-  branchAddress?: string;
-  companyName?: string; // ➕ Add this
-};
 
-interface InvoiceTemplateProps {
-  data: InvoiceData;
-}
 
 export const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateProps>(
   ({ data }, ref) => {
@@ -52,11 +19,25 @@ export const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateP
         <header className="flex justify-between items-start border-b-2 border-zinc-950 pb-4">
           <div className="space-y-1">
             <h1 className="text-xl font-black tracking-tight text-emerald-950 uppercase">
-              {data.companyName || "PINES MULTI-TELECOM"}
+              {data.companyName || "Atechlabs"}
             </h1>
             <p className="text-zinc-600 font-medium">{data.branchName}</p>
             {data.branchAddress && <p className="text-[10px] text-zinc-500 leading-snug">{data.branchAddress}</p>}
-            {data.branchPhone && <p className="text-[10px] text-zinc-500">Tel: {data.branchPhone}</p>}
+            {(data.branchPhone || data.contactNumber) && (
+              <p className="text-[10px] text-zinc-500">
+                Tel: {data.branchPhone || data.contactNumber}
+              </p>
+            )}
+            {data.website && (
+              <p className="text-[10px] text-zinc-500">
+                Web: {data.website}
+              </p>
+            )}
+            {data.businessNumber && (
+              <p className="text-[10px] text-zinc-500 font-semibold">
+                Business Reg / TIN: {data.businessNumber}
+              </p>
+            )}
           </div>
           <div className="text-right space-y-1">
             <div className="inline-block bg-emerald-600 text-white px-3 py-1 text-xs font-bold tracking-wider rounded uppercase">
@@ -66,11 +47,10 @@ export const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateP
               INVOICE: {data.ticketId}
             </h2>
             <div className="flex justify-end gap-1.5 mt-1">
-              <span className={`px-2 py-0.5 text-[9px] font-bold uppercase rounded ${
-                data.isPaid 
+              <span className={`px-2 py-0.5 text-[9px] font-bold uppercase rounded ${data.isPaid
                   ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
                   : "bg-amber-100 text-amber-800 border border-amber-300"
-              }`}>
+                }`}>
                 {data.isPaid ? "PAID" : "PENDING PAYMENT"}
               </span>
             </div>
@@ -190,7 +170,7 @@ export const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateP
             🛡️ Replacement Parts & Labor Warranty:
           </p>
           <p>
-            1. **Parts Warranty:** {data.companyName || "Pines Multi-Telecom"} offers a thirty (30) day warranty on the specific hardware parts replaced in this invoice (e.g. replaced screen, battery, IC chip). This warranty covers manufacturer defects only.
+            1. **Parts Warranty:** {data.companyName || "Atechlabs"} offers a thirty (30) day warranty on the specific hardware parts replaced in this invoice (e.g. replaced screen, battery, IC chip). This warranty covers manufacturer defects only.
           </p>
           <p>
             2. **Exclusions:** This warranty is immediately declared **VOID** if the device has signs of subsequent physical impact, drop damage, bent chassis, custom software tampering, or liquid exposure after checkout.
@@ -211,15 +191,15 @@ export const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateP
           <div className="flex flex-col items-center">
             <div className="w-full border-b border-zinc-400 h-6"></div>
             <span className="mt-1.5 text-[8px] font-black tracking-widest text-zinc-700 uppercase">
-              Authorized {data.companyName || "Pines"} Representative
+              Authorized {data.companyName || "Atechlabs"} Representative
             </span>
           </div>
         </section>
 
         {/* Footer */}
         <footer className="mt-8 border-t border-zinc-100 pt-3 text-center text-[8.5px] text-zinc-400 font-medium">
-          <p>Thank you for choosing {data.companyName || "Pines Multi-Telecom"}! We appreciate your business.</p>
-          <p className="mt-0.5 text-zinc-300">Powered by Beep Repair Management SaaS</p>
+          <p>Thank you for choosing {data.companyName || "Atechlabs"}! We appreciate your business.</p>
+          <p className="mt-0.5 text-zinc-300">Powered by Atechlabs Repair Management SaaS</p>
         </footer>
       </div>
     );
