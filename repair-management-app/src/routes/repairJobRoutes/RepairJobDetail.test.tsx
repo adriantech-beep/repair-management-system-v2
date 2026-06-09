@@ -634,7 +634,9 @@ describe("RepairJobDetail", () => {
     // 2. Assert allocated parts table shows linked parts
     expect(screen.getByText("Replacement Screen")).toBeInTheDocument();
     expect(screen.getByText("SCR-123")).toBeInTheDocument();
-    expect(screen.getAllByText(formatCurrency(100.00))).toHaveLength(3);
+    const allMatches = screen.getAllByText(formatCurrency(100.00));
+    const visibleMatches = allMatches.filter(el => !el.closest('[style*="display: none"]'));
+    expect(visibleMatches).toHaveLength(3);
 
     // 3. Select inventory part and allocate it
     const select = screen.getByRole("combobox", { name: "Select Inventory Part" });

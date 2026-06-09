@@ -177,7 +177,7 @@ export const IntakeJobSheet = React.forwardRef<HTMLDivElement, IntakeJobSheetPro
           <div className="text-right">
             <span className="text-xs text-zinc-500 font-medium mr-2">Initial Estimated Cost:</span>
             <span className="text-sm font-black text-zinc-950">
-              {data.estimatedCost !== null ? `$${data.estimatedCost.toFixed(2)}` : "TBD (Subject to Diagnostic)"}
+              {data.estimatedCost !== null ? `₱${data.estimatedCost.toFixed(2)}` : "TBD (Subject to Diagnostic)"}
             </span>
           </div>
         </section>

@@ -44,7 +44,7 @@ const InventoryPartDetailView = ({
             Selling Price
           </p>
           <p className="text-sm text-emerald-950">
-            ${part.sellingPrice.toFixed(2)}
+            ₱{part.sellingPrice.toFixed(2)}
           </p>
         </div>
 
@@ -53,7 +53,7 @@ const InventoryPartDetailView = ({
             Supplier Price
           </p>
           <p className="text-sm text-emerald-950">
-            ${part.supplierPrice.toFixed(2)}
+            ₱{part.supplierPrice.toFixed(2)}
           </p>
         </div>
 

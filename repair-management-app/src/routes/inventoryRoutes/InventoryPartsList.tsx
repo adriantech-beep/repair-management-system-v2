@@ -19,9 +19,9 @@ const InventoryPartsList = ({ inventory }: InventoryPartsListProps) => {
     <TypedTable.Row>
       <div className="font-medium text-gray-900">{inventory.name}</div>
       <div className="text-gray-600">{inventory.partNumber}</div>
-      <div className="text-gray-700">${inventory.sellingPrice.toFixed(2)}</div>
+      <div className="text-gray-700">₱{inventory.sellingPrice.toFixed(2)}</div>
       <div className="text-gray-700">{inventory.stockQuantity}</div>
-      <div className="text-gray-700">${inventory.supplierPrice.toFixed(2)}</div>
+      <div className="text-gray-700">₱{inventory.supplierPrice.toFixed(2)}</div>
 
       <ModalWindow>
         <div className="flex items-center justify-end gap-2">
