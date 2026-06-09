@@ -30,6 +30,7 @@ export type InvoiceData = {
   branchName: string;
   branchPhone?: string;
   branchAddress?: string;
+  companyName?: string; // ➕ Add this
 };
 
 interface InvoiceTemplateProps {
@@ -50,8 +51,8 @@ export const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateP
         {/* Header Section */}
         <header className="flex justify-between items-start border-b-2 border-zinc-950 pb-4">
           <div className="space-y-1">
-            <h1 className="text-xl font-black tracking-tight text-emerald-950">
-              PINES MULTI-TELECOM
+            <h1 className="text-xl font-black tracking-tight text-emerald-950 uppercase">
+              {data.companyName || "PINES MULTI-TELECOM"}
             </h1>
             <p className="text-zinc-600 font-medium">{data.branchName}</p>
             {data.branchAddress && <p className="text-[10px] text-zinc-500 leading-snug">{data.branchAddress}</p>}
@@ -141,9 +142,9 @@ export const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateP
                     Hardware teardown, diagnostic board inspection, alignment, and final assembly testing.
                   </span>
                 </td>
-                <td className="py-2.5 text-right font-mono">${data.laborCost.toFixed(2)}</td>
+                <td className="py-2.5 text-right font-mono">₱{data.laborCost.toFixed(2)}</td>
                 <td className="py-2.5 text-center">1</td>
-                <td className="py-2.5 text-right font-mono font-bold text-zinc-900">${data.laborCost.toFixed(2)}</td>
+                <td className="py-2.5 text-right font-mono font-bold text-zinc-900 font-sans">₱{data.laborCost.toFixed(2)}</td>
               </tr>
               {/* Allocated Parts */}
               {data.parts.map((item, idx) => (
@@ -154,9 +155,9 @@ export const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateP
                       Integrated replacement hardware part from stock inventory.
                     </span>
                   </td>
-                  <td className="py-2.5 text-right font-mono">${item.unitPrice.toFixed(2)}</td>
+                  <td className="py-2.5 text-right font-mono">₱{item.unitPrice.toFixed(2)}</td>
                   <td className="py-2.5 text-center">{item.quantity}</td>
-                  <td className="py-2.5 text-right font-mono font-bold text-zinc-900">${item.subtotal.toFixed(2)}</td>
+                  <td className="py-2.5 text-right font-mono font-bold text-zinc-900">₱{item.subtotal.toFixed(2)}</td>
                 </tr>
               ))}
             </tbody>
@@ -168,17 +169,17 @@ export const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateP
           <div className="w-[300px] border border-zinc-200 rounded-lg p-3.5 space-y-2 bg-zinc-50/50 text-[11px]">
             <div className="flex justify-between text-zinc-600">
               <span>Labor Total:</span>
-              <span className="font-mono">${data.laborCost.toFixed(2)}</span>
+              <span className="font-mono">₱{data.laborCost.toFixed(2)}</span>
             </div>
             {data.parts.length > 0 && (
               <div className="flex justify-between text-zinc-600">
                 <span>Parts Total:</span>
-                <span className="font-mono">${partsTotal.toFixed(2)}</span>
+                <span className="font-mono">₱{partsTotal.toFixed(2)}</span>
               </div>
             )}
             <div className="flex justify-between text-zinc-950 font-black text-sm border-t border-zinc-300 pt-2">
               <span>Total Paid / Owed:</span>
-              <span className="font-mono">${calculatedTotal.toFixed(2)}</span>
+              <span className="font-mono">₱{calculatedTotal.toFixed(2)}</span>
             </div>
           </div>
         </section>
@@ -189,7 +190,7 @@ export const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateP
             🛡️ Replacement Parts & Labor Warranty:
           </p>
           <p>
-            1. **Parts Warranty:** Pines Multi-Telecom offers a thirty (30) day warranty on the specific hardware parts replaced in this invoice (e.g. replaced screen, battery, IC chip). This warranty covers manufacturer defects only.
+            1. **Parts Warranty:** {data.companyName || "Pines Multi-Telecom"} offers a thirty (30) day warranty on the specific hardware parts replaced in this invoice (e.g. replaced screen, battery, IC chip). This warranty covers manufacturer defects only.
           </p>
           <p>
             2. **Exclusions:** This warranty is immediately declared **VOID** if the device has signs of subsequent physical impact, drop damage, bent chassis, custom software tampering, or liquid exposure after checkout.
@@ -210,14 +211,14 @@ export const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateP
           <div className="flex flex-col items-center">
             <div className="w-full border-b border-zinc-400 h-6"></div>
             <span className="mt-1.5 text-[8px] font-black tracking-widest text-zinc-700 uppercase">
-              Authorized Pines Representative
+              Authorized {data.companyName || "Pines"} Representative
             </span>
           </div>
         </section>
 
         {/* Footer */}
         <footer className="mt-8 border-t border-zinc-100 pt-3 text-center text-[8.5px] text-zinc-400 font-medium">
-          <p>Thank you for choosing Pines Multi-Telecom! We appreciate your business.</p>
+          <p>Thank you for choosing {data.companyName || "Pines Multi-Telecom"}! We appreciate your business.</p>
           <p className="mt-0.5 text-zinc-300">Powered by Beep Repair Management SaaS</p>
         </footer>
       </div>

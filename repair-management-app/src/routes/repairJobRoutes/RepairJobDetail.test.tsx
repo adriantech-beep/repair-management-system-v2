@@ -16,6 +16,11 @@ const mockUseAuthStore = vi.fn();
 const mockUseGetRepairJobParts = vi.fn();
 const mockUseAllocateRepairJobPart = vi.fn();
 const mockUseRemoveRepairJobPart = vi.fn();
+const mockUseGetPublicTenant = vi.fn(); // ➕ Add this
+
+vi.mock("@/hooks/useTenants", () => ({
+  useGetPublicTenant: () => mockUseGetPublicTenant(),
+})); // ➕ Add this
 
 vi.mock("@/hooks/useRepairJobs", () => ({
   useGetRepairJobById: (repairJobId: string) =>
@@ -53,6 +58,14 @@ vi.mock("@/store/authStore", () => ({
 function mockDefaultDependencies() {
   mockUseAuthStore.mockReturnValue({
     user: { role: "Admin" },
+  });
+
+  mockUseGetPublicTenant.mockReturnValue({
+    data: {
+      companyName: "Pines Multi-Telecom",
+      logoUrl: null,
+    },
+    isLoading: false,
   });
 
   mockUseUpdateRepairJob.mockReturnValue({
@@ -634,7 +647,9 @@ describe("RepairJobDetail", () => {
     // 2. Assert allocated parts table shows linked parts
     expect(screen.getByText("Replacement Screen")).toBeInTheDocument();
     expect(screen.getByText("SCR-123")).toBeInTheDocument();
-    expect(screen.getAllByText(formatCurrency(100.00))).toHaveLength(3);
+    const allMatches = screen.getAllByText(formatCurrency(100.00));
+    const visibleMatches = allMatches.filter(el => !el.closest('[style*="display: none"]'));
+    expect(visibleMatches).toHaveLength(3);
 
     // 3. Select inventory part and allocate it
     const select = screen.getByRole("combobox", { name: "Select Inventory Part" });
