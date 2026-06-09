@@ -12,13 +12,13 @@ import RepairJobStatusControls from "./RepairJobStatusControls";
 import PartsAvailabilitySection from "./PartsAvailabilitySection";
 import RepairJobPartsPanel from "./RepairJobPartsPanel";
 import useAuthStore from "@/store/authStore";
-import { useRef } from "react"; // ➕ Add this
-import { useReactToPrint } from "react-to-print"; // ➕ Add this
-import { Button } from "@/components/ui/button"; // ➕ Add this
-import { IntakeJobSheet } from "@/components/printing/IntakeJobSheet"; // ➕ Add this
-import { InvoiceTemplate } from "@/components/printing/InvoiceTemplate"; // ➕ Add this
-import { useGetRepairJobParts } from "@/hooks/useRepairJobParts"; // ➕ Add this
-import { useGetPublicTenant } from "@/hooks/useTenants"; // ➕ Add this
+import { useRef } from "react";
+import { useReactToPrint } from "react-to-print";
+import { Button } from "@/components/ui/button";
+import { IntakeJobSheet } from "@/components/printing/IntakeJobSheet";
+import { InvoiceTemplate } from "@/components/printing/InvoiceTemplate";
+import { useGetRepairJobParts } from "@/hooks/useRepairJobParts";
+import { useGetPublicTenant } from "@/hooks/useTenants";
 
 
 const RepairJobDetail = () => {
@@ -53,7 +53,7 @@ const RepairJobDetail = () => {
     contentRef: invoiceRef,
   });
 
-  // Data Map for A4 Intake Sheet
+
   const intakeSheetData = {
     ticketId: repairJob?.jobNumber ?? "",
     createdAt: repairJob?.createdAtUtc ?? "",
@@ -63,10 +63,10 @@ const RepairJobDetail = () => {
     customerAddress: customer?.address ?? null,
     deviceBrand: device?.brand ?? "Unknown Brand",
     deviceModel: device?.model ?? "Unknown Model",
-    imeiOrSerialNumber: device?.imeiOrSerialNumber ?? null, // 🔄 Fallback to null
-    deviceType: device?.deviceType ?? "Other", // 🔄 Fallback to "Other" (valid DeviceType)
+    imeiOrSerialNumber: device?.imeiOrSerialNumber ?? null,
+    deviceType: device?.deviceType ?? "Other",
     problemDescription: repairJob?.problemDescription ?? "",
-    estimatedCost: repairJob?.estimatedCost ?? null, // 🔄 Fallback to null (number | null)
+    estimatedCost: repairJob?.estimatedCost ?? null,
     branchName: `${companyName} - Main`,
     branchPhone: "+63 74 442 1234",
     branchAddress: "45 Session Road, Baguio City, Philippines",
@@ -77,19 +77,19 @@ const RepairJobDetail = () => {
     contactNumber: tenant?.contactNumber ?? null,
   };
 
-  // Data Map for A4 Sales Invoice
+
   const invoiceData = {
     ticketId: repairJob?.jobNumber ?? "",
     receivedAt: repairJob?.receivedAtUtc ?? "",
-    completedAt: repairJob?.completedAtUtc ?? null, // 🔄 Fallback to null
+    completedAt: repairJob?.completedAtUtc ?? null,
     customerName: customer?.fullName ?? "Unknown Customer",
     customerPhone: customer?.phone ?? "N/A",
     customerEmail: customer?.email ?? null,
     customerAddress: customer?.address ?? null,
     deviceBrand: device?.brand ?? "Unknown Brand",
     deviceModel: device?.model ?? "Unknown Model",
-    imeiOrSerialNumber: device?.imeiOrSerialNumber ?? null, // 🔄 Fallback to null
-    deviceType: device?.deviceType ?? "Other", // 🔄 Fallback to "Other"
+    imeiOrSerialNumber: device?.imeiOrSerialNumber ?? null,
+    deviceType: device?.deviceType ?? "Other",
     problemDescription: repairJob?.problemDescription ?? "",
     resolutionNotes: repairJob?.resolutionNotes ?? null,
     laborCost: repairJob?.estimatedCost ?? 0.0,
@@ -101,7 +101,7 @@ const RepairJobDetail = () => {
     })),
     finalCost: repairJob?.finalCost ?? 0.0,
     status: repairJob?.status ?? "Received",
-    isPaid: repairJob?.status === "Completed", 
+    isPaid: repairJob?.status === "Completed",
     branchName: `${companyName} - Main`,
     branchPhone: "+63 74 442 1234",
     branchAddress: "45 Session Road, Baguio City, Philippines",
@@ -194,7 +194,7 @@ const RepairJobDetail = () => {
               )}
             </section>
 
-            {/* Print Panel Upgrade */}
+
             <section className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-sm space-y-3">
               <h2 className="text-lg font-semibold text-emerald-950">
                 Print & Job Documents
@@ -219,7 +219,7 @@ const RepairJobDetail = () => {
               </div>
             </section>
 
-            {/* Hidden templates for printing iframe */}
+
             <div style={{ display: "none" }}>
               <IntakeJobSheet ref={intakeRef} data={intakeSheetData} />
               <InvoiceTemplate ref={invoiceRef} data={invoiceData} />
