@@ -16,6 +16,20 @@ export function useDocumentBranding() {
     const link = document.querySelector("link[rel*='icon']") as HTMLLinkElement;
     if (link) {
       link.href = logoUrl;
+
+      // Set matching MIME type dynamically based on file format
+      if (logoUrl.endsWith(".svg")) {
+        link.setAttribute("type", "image/svg+xml");
+      } else if (logoUrl.endsWith(".png")) {
+        link.setAttribute("type", "image/png");
+      } else if (logoUrl.endsWith(".webp")) {
+        link.setAttribute("type", "image/webp");
+      } else if (logoUrl.endsWith(".ico")) {
+        link.setAttribute("type", "image/x-icon");
+      } else {
+        // Remove type attribute for JPG or other formats, letting the browser auto-detect
+        link.removeAttribute("type");
+      }
     }
   }, [tenant]);
 }
