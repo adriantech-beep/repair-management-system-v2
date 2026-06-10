@@ -19,6 +19,13 @@ public class TenantResolverMiddleware
 
     public async Task InvokeAsync(HttpContext context, AppDbContext db, TenantContext tenantContext)
     {
+        // 1. Bypass tenant resolution for preflight OPTIONS requests
+        if (HttpMethods.IsOptions(context.Request.Method))
+        {
+            await _next(context);
+            return;
+        }
+
         // Bypass tenant resolution for global endpoints (onboarding, webhooks, and swagger)
         var path = context.Request.Path;
         if (path.StartsWithSegments("/api/onboarding") || 
