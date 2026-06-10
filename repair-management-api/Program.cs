@@ -184,6 +184,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("AllowFrontend");
+
 // SaaS HTTP Security Headers (OWASP Clickjacking, CSP, XSS, HSTS defenses)
 app.Use((context, next) =>
 {
@@ -204,8 +206,6 @@ app.Use((context, next) =>
 });
 
 app.UseRateLimiter();
-
-app.UseCors("AllowFrontend");
 
 app.UseMiddleware<TenantResolverMiddleware>();
 
