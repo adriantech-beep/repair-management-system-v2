@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -28,6 +28,10 @@ namespace repair_management_api.Migrations
                 type: "uuid",
                 nullable: false,
                 defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
+
+            // Re-associate any existing records with the first available tenant before applying foreign key constraints
+            migrationBuilder.Sql("UPDATE \"Parts\" SET \"TenantId\" = (SELECT \"Id\" FROM \"Tenants\" LIMIT 1) WHERE \"TenantId\" = '00000000-0000-0000-0000-000000000000';");
+            migrationBuilder.Sql("UPDATE \"Devices\" SET \"TenantId\" = (SELECT \"Id\" FROM \"Tenants\" LIMIT 1) WHERE \"TenantId\" = '00000000-0000-0000-0000-000000000000';");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Parts_TenantId",
