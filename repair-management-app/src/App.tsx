@@ -14,6 +14,8 @@ import InventoryPage from "./pages/InventoryPage";
 import SignupPage from "./pages/SignupPage";
 import OnboardingSuccessPage from "./pages/OnboardingSuccessPage";
 import SettingsPage from "./pages/SettingsPage";
+import UsersPage from "./pages/UsersPage";
+import RoleGuard from "./components/RoleGuard";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +50,14 @@ const AppContent = () => {
 
         <Route path="customers" element={<CustomerPage />} />
         <Route path="inventory" element={<InventoryPage />} />
+        <Route
+          path="users"
+          element={
+            <RoleGuard allowedRoles={["Admin"]}>
+              <UsersPage />
+            </RoleGuard>
+          }
+        />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
 
