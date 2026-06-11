@@ -24,6 +24,7 @@ const navItems = [
   { label: "Repair Jobs", to: "/repair-jobs", icon: Wrench },
   { label: "Customers", to: "/customers", icon: Users },
   { label: "Inventory", to: "/inventory", icon: Wrench },
+  { label: "Users", to: "/users", icon: Users, adminOnly: true },
   { label: "Settings", to: "/settings", icon: Settings },
 ];
 
@@ -31,9 +32,13 @@ const AppSidebar = () => {
   const { state } = useSidebar();
 
   const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
   const accessToken = useAuthStore((state) => state.accessToken);
   const refreshToken = useAuthStore((state) => state.refreshToken);
   const clearAuth = useAuthStore((state) => state.clearAuth);
+
+  const isAdmin = user?.role === "Admin";
+  const visibleNavItems = navItems.filter((item) => !item.adminOnly || isAdmin);
 
   const { data: tenant } = useQuery({
     queryKey: ["tenantSettings"],
@@ -97,7 +102,7 @@ const AppSidebar = () => {
         <SidebarGroup>
           <SidebarGroupLabel>Menu</SidebarGroupLabel>
           <SidebarMenu>
-            {navItems.map((item) => (
+            {visibleNavItems.map((item) => (
               <SidebarMenuItem key={item.to}>
                 <NavLink to={item.to}>
                   {({ isActive }) => (

@@ -41,3 +41,17 @@ export async function getUsers(role?: string): Promise<AuthUser[]> {
   return response.data;
 }
 
+export interface CreateUserRequest {
+  fullName: string;
+  email: string;
+  password: string;
+  role: string;
+  branchId: string;
+}
+
+export async function createUser(data: CreateUserRequest): Promise<AuthUser> {
+  const response = await apiClient.post<AuthUser>("/api/auth/users", data);
+  return response.data;
+}
+
+
