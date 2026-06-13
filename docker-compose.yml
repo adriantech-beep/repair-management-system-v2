@@ -1,0 +1,56 @@
+services:
+  # 1. PostgreSQL Database Service
+  db:
+    image: postgres:15-alpine
+    container_name: repair-management-db
+    environment:
+      - POSTGRES_DB=repair_management
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres_pass
+    ports:
+      - "5432:5432" # Allows connecting to Postgres locally from tools like pgAdmin
+    volumes:
+      - pgdata:/var/lib/postgresql/data # Persists the database files locally
+    networks:
+      - repair-net
+
+  # 2. C# Backend API Service
+  api:
+    build:
+      context: ./repair-management-api
+      dockerfile: Dockerfile
+    container_name: repair-management-api
+    depends_on:
+      - db
+    environment:
+      # Overrides the connection string in appsettings.json.
+      # Note the host is 'db' (Docker Compose resolves this automatically)
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=repair_management;Username=postgres;Password=postgres_pass
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+    ports:
+      - "3000:8080" # Maps local port 3000 to container port 8080 (matching Vite's VITE_API_BASE_URL)
+    networks:
+      - repair-net
+
+  # 3. React Frontend Service
+  app:
+    build:
+      context: ./repair-management-app
+      dockerfile: Dockerfile
+    container_name: repair-management-app
+    depends_on:
+      - api
+    ports:
+      - "5173:80" # Maps local port 5173 to container Nginx port 80
+    networks:
+      - repair-net
+
+# Persistent Volumes
+volumes:
+  pgdata:
+
+# Private Virtual Network for Services
+networks:
+  repair-net:
+    driver: bridge
