@@ -16,6 +16,7 @@ import OnboardingSuccessPage from "./pages/OnboardingSuccessPage";
 import SettingsPage from "./pages/SettingsPage";
 import UsersPage from "./pages/UsersPage";
 import RoleGuard from "./components/RoleGuard";
+import TenantGuard from "./components/TenantGuard";
 
 const queryClient = new QueryClient();
 
@@ -70,7 +71,9 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <AppContent />
+        <TenantGuard>
+          <AppContent />
+        </TenantGuard>
       </BrowserRouter>
     </QueryClientProvider>
   );
