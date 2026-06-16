@@ -8,12 +8,13 @@ export function useGetTenant() {
   });
 }
 
-export function useGetPublicTenant() {
+export function useGetPublicTenant(enabled = true) {
   return useQuery({
     queryKey: ["publicTenantSettings"],
     queryFn: getPublicTenantSettings,
     retry: false, // Don't retry if subdomain is not registered / default
     staleTime: 1000 * 60 * 10, // Cache public settings for 10 minutes
+    enabled,
   });
 }
 

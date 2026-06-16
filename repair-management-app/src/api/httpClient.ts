@@ -20,7 +20,10 @@ apiClient.interceptors.request.use((config) => {
     
     // Extract subdomain if running on a custom tenant subdomain (e.g. shopa.atechlabs.it.com -> shopa)
     if (hostParts.length > 2 && hostParts[0] !== "www" && hostParts[0] !== "api") {
-      config.headers["X-Tenant-Subdomain"] = hostParts[0].toLowerCase();
+      // Ensure we don't treat root domain 'atechlabs.it.com' as a subdomain
+      if (!(host.toLowerCase().endsWith("atechlabs.it.com") && hostParts.length <= 3)) {
+        config.headers["X-Tenant-Subdomain"] = hostParts[0].toLowerCase();
+      }
     } else if (hostParts.length === 2 && hostParts[1].toLowerCase() === "localhost") {
       config.headers["X-Tenant-Subdomain"] = hostParts[0].toLowerCase();
     }
