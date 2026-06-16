@@ -14,8 +14,35 @@ interface TenantGuardProps {
   children: React.ReactNode;
 }
 
+const getSubdomain = () => {
+  if (typeof window === "undefined") return null;
+  const host = window.location.hostname;
+  const hostParts = host.split(".");
+  
+  if (hostParts.length > 2 && hostParts[0] !== "www" && hostParts[0] !== "api") {
+    // If it is our root domain (e.g. atechlabs.it.com), it has 3 parts.
+    // If it is a subdomain (e.g. tenant.atechlabs.it.com), it has 4 parts.
+    if (host.toLowerCase().endsWith("atechlabs.it.com") && hostParts.length <= 3) {
+      return null;
+    }
+    return hostParts[0].toLowerCase();
+  }
+  
+  if (hostParts.length === 2 && hostParts[1].toLowerCase() === "localhost") {
+    return hostParts[0].toLowerCase();
+  }
+  
+  return null;
+};
+
 const TenantGuard: React.FC<TenantGuardProps> = ({ children }) => {
-  const { isLoading, isError, error } = useGetPublicTenant();
+  const subdomain = getSubdomain();
+  const { isLoading, isError, error } = useGetPublicTenant(!!subdomain);
+
+  // Bypass verification if no subdomain is present (landing page, signup page, etc.)
+  if (!subdomain) {
+    return <>{children}</>;
+  }
 
   if (isLoading) {
     return (
