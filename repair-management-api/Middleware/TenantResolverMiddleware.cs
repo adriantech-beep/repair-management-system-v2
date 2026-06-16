@@ -63,6 +63,10 @@ public class TenantResolverMiddleware
                         subdomain = originParts[0].ToLowerInvariant();
                     }
                 }
+                else if (originParts.Length == 2 && originParts[1].Equals("localhost", StringComparison.OrdinalIgnoreCase))
+                {
+                    subdomain = originParts[0].ToLowerInvariant();
+                }
             }
         }
 
@@ -116,12 +120,21 @@ public class TenantResolverMiddleware
             return;
         }
 
-        // 3. Subscription Status Check (Automated SaaS suspension)
-        if (tenant.SubscriptionStatus.Equals("Suspended", StringComparison.OrdinalIgnoreCase))
+        // 3. Subscription & Account Status Check
+        if (!tenant.SubscriptionStatus.Equals("Active", StringComparison.OrdinalIgnoreCase) && 
+            !tenant.SubscriptionStatus.Equals("Trialing", StringComparison.OrdinalIgnoreCase))
         {
-            context.Response.StatusCode = StatusCodes.Status402PaymentRequired;
             context.Response.ContentType = "application/json";
-            await context.Response.WriteAsJsonAsync(new { code = "SUBSCRIPTION_SUSPENDED", message = "Subscription suspended. Please update billing." });
+            if (tenant.SubscriptionStatus.Equals("Suspended", StringComparison.OrdinalIgnoreCase))
+            {
+                context.Response.StatusCode = StatusCodes.Status402PaymentRequired;
+                await context.Response.WriteAsJsonAsync(new { code = "SUBSCRIPTION_SUSPENDED", message = "Subscription suspended. Please update billing." });
+            }
+            else
+            {
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                await context.Response.WriteAsJsonAsync(new { code = "SHOP_CLOSED", message = $"This shop workspace is closed or disabled (status: {tenant.SubscriptionStatus})." });
+            }
             return;
         }
 
