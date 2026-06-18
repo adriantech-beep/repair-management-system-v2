@@ -18,7 +18,7 @@ export const QuickActions = ({ topDeviceBrands }: QuickActionsProps) => {
         </p>
 
         <div className="space-y-4">
-          {/* Create Service Order Wizard */}
+
           <Link
             to="/service-orders/new"
             className="flex items-center justify-between p-4 bg-indigo-50/50 dark:bg-indigo-950/20 hover:bg-indigo-50 dark:hover:bg-indigo-950/45 border border-indigo-100 dark:border-indigo-900/30 rounded-2xl group transition-all"
@@ -39,7 +39,7 @@ export const QuickActions = ({ topDeviceBrands }: QuickActionsProps) => {
             <ChevronRight className="h-5 w-5 text-indigo-400 transition-transform duration-200 group-hover:translate-x-1" />
           </Link>
 
-          {/* Register Customer */}
+
           <Link
             to="/customers"
             className="flex items-center justify-between p-4 bg-emerald-50/50 dark:bg-emerald-950/20 hover:bg-emerald-50 dark:hover:bg-emerald-950/45 border border-emerald-100 dark:border-emerald-900/30 rounded-2xl group transition-all"
@@ -60,7 +60,7 @@ export const QuickActions = ({ topDeviceBrands }: QuickActionsProps) => {
             <ChevronRight className="h-5 w-5 text-emerald-400 transition-transform duration-200 group-hover:translate-x-1" />
           </Link>
 
-          {/* Manage Inventory */}
+
           <Link
             to="/inventory"
             className="flex items-center justify-between p-4 bg-slate-100/40 dark:bg-zinc-800/10 hover:bg-slate-100/80 dark:hover:bg-zinc-800/20 border border-slate-200/50 dark:border-zinc-800/50 rounded-2xl group transition-all"
@@ -83,7 +83,7 @@ export const QuickActions = ({ topDeviceBrands }: QuickActionsProps) => {
         </div>
       </div>
 
-      {/* Top repaired brand statistics */}
+
       <div className="mt-8 border-t border-slate-100 dark:border-zinc-850 pt-4 w-full text-left">
         <h4 className="text-[11px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-widest pl-0.5 mb-3">
           Top Device Brands
@@ -99,7 +99,7 @@ export const QuickActions = ({ topDeviceBrands }: QuickActionsProps) => {
                     <span>{b.brand}</span>
                     <span className="text-[11px] text-slate-400">{b.count} jobs</span>
                   </div>
-                  {/* Custom visual progress bar bar */}
+
                   <div className="h-1.5 w-full bg-slate-100 dark:bg-zinc-850 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-indigo-500 dark:bg-indigo-400 rounded-full transition-all duration-500"

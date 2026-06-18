@@ -17,8 +17,8 @@ export type IntakeJobSheetData = {
   branchName: string;
   branchPhone?: string;
   branchAddress?: string;
-  customConsentNotes?: string; // Custom risk warnings (e.g. reballing risk, liquid damage)
-  companyName?: string; // ➕ Add this
+  customConsentNotes?: string;
+  companyName?: string;
   website?: string | null;
   businessNumber?: string | null;
   contactNumber?: string | null;
@@ -36,7 +36,6 @@ export const IntakeJobSheet = React.forwardRef<HTMLDivElement, IntakeJobSheetPro
         className="mx-auto w-full max-w-[800px] bg-white p-8 font-sans text-xs text-zinc-900 border border-zinc-200 shadow-sm printable-job-sheet"
         style={{ boxSizing: "border-box" }}
       >
-        {/* Header Grid */}
         <header className="flex justify-between items-start border-b-2 border-zinc-950 pb-4">
           <div className="space-y-1">
             <h1 className="text-xl font-black tracking-tight text-emerald-950 uppercase">
@@ -169,7 +168,7 @@ export const IntakeJobSheet = React.forwardRef<HTMLDivElement, IntakeJobSheetPro
           </div>
         </section>
 
-        {/* Problem Description Panel */}
+
         <section className="border border-zinc-200 rounded-lg p-3.5 my-5 space-y-1.5">
           <h3 className="text-xs font-black uppercase text-zinc-800 tracking-wider border-b border-zinc-200 pb-1">
             Problem Description (Client Declared)
@@ -179,7 +178,7 @@ export const IntakeJobSheet = React.forwardRef<HTMLDivElement, IntakeJobSheetPro
           </p>
         </section>
 
-        {/* Crucial Consent & Technician Notes Section */}
+
         <section className="border-2 border-red-500/80 rounded-lg p-3.5 my-5 space-y-1.5 bg-red-50/10">
           <h3 className="text-xs font-black uppercase text-red-700 tracking-wider border-b border-red-200 pb-1">
             ⚠️ CRITICAL DIAGNOSTIC NOTES & CUSTOM LIABILITY CONSENT
@@ -189,7 +188,7 @@ export const IntakeJobSheet = React.forwardRef<HTMLDivElement, IntakeJobSheetPro
           </p>
         </section>
 
-        {/* Estimate Details */}
+
         <section className="flex justify-between items-center border border-zinc-200 rounded-lg p-3.5 my-5 bg-zinc-50/50">
           <span className="text-zinc-700 font-black uppercase tracking-wider text-xs">Estimate summary</span>
           <div className="text-right">
@@ -200,7 +199,7 @@ export const IntakeJobSheet = React.forwardRef<HTMLDivElement, IntakeJobSheetPro
           </div>
         </section>
 
-        {/* Terms and Conditions / Liability Consent */}
+
         <section className="my-6 space-y-2 border-t border-zinc-200 pt-4 text-[9px] leading-relaxed text-zinc-500 text-justify">
           <p className="font-semibold text-zinc-700 uppercase tracking-wider text-[8px] mb-1">
             📜 Repair Terms & Conditions & Liability Release Statement:
@@ -216,7 +215,7 @@ export const IntakeJobSheet = React.forwardRef<HTMLDivElement, IntakeJobSheetPro
           </p>
         </section>
 
-        {/* Signatures */}
+
         <section className="grid grid-cols-2 gap-12 mt-12 pt-4">
           <div className="flex flex-col items-center">
             <div className="w-full border-b border-zinc-400 h-6"></div>
@@ -234,7 +233,7 @@ export const IntakeJobSheet = React.forwardRef<HTMLDivElement, IntakeJobSheetPro
           </div>
         </section>
 
-        {/* Footer */}
+
         <footer className="mt-8 border-t border-zinc-100 pt-3 text-center text-[8.5px] text-zinc-400 font-medium">
           <p>Thank you for trusting {data.companyName || "Pines Multi-Telecom"} with your device!</p>
           <p className="mt-0.5 text-zinc-300">Powered by Beep Repair Management SaaS</p>
