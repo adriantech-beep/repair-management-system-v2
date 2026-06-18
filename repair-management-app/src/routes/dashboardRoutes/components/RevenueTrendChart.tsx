@@ -55,7 +55,7 @@ export const RevenueTrendChart = ({ trend }: RevenueTrendChartProps) => {
         </div>
       </div>
 
-      {/* Render Area Chart Path in responsive SVG */}
+
       <div className="w-full overflow-hidden">
         <svg viewBox={`0 0 ${chartWidth} ${chartHeight}`} className="w-full h-auto text-indigo-500">
           <defs>
@@ -65,7 +65,7 @@ export const RevenueTrendChart = ({ trend }: RevenueTrendChartProps) => {
             </linearGradient>
           </defs>
 
-          {/* Horizontal gridlines */}
+
           {[0, 0.25, 0.5, 0.75, 1].map((val, idx) => {
             const y = chartHeight - paddingBottom - val * graphHeight;
             const labelVal = Math.round(val * maxRevenue);
@@ -92,7 +92,7 @@ export const RevenueTrendChart = ({ trend }: RevenueTrendChartProps) => {
             );
           })}
 
-          {/* X Axis Line */}
+
           <line
             x1={paddingLeft}
             y1={chartHeight - paddingBottom}
@@ -101,12 +101,12 @@ export const RevenueTrendChart = ({ trend }: RevenueTrendChartProps) => {
             stroke="rgba(148, 163, 184, 0.2)"
           />
 
-          {/* Revenue Area Fill */}
+
           {revenueAreaPath && (
             <path d={revenueAreaPath} fill="url(#revenue-gradient)" />
           )}
 
-          {/* Revenue Line */}
+
           {revenueLinePath && (
             <path
               d={revenueLinePath}
@@ -117,7 +117,7 @@ export const RevenueTrendChart = ({ trend }: RevenueTrendChartProps) => {
             />
           )}
 
-          {/* Jobs Intake Line (Dashed Orange) */}
+
           {jobsLinePath && (
             <path
               d={jobsLinePath}
@@ -129,7 +129,7 @@ export const RevenueTrendChart = ({ trend }: RevenueTrendChartProps) => {
             />
           )}
 
-          {/* Data Point Dot Markers */}
+
           {revenuePoints.map((p, idx) => (
             <g key={idx} className="group/dot cursor-pointer">
               <circle
@@ -141,12 +141,12 @@ export const RevenueTrendChart = ({ trend }: RevenueTrendChartProps) => {
                 strokeWidth="1.5"
                 className="transition-transform duration-200 group-hover/dot:scale-125 shadow-sm"
               />
-              {/* Tooltip detail overlay inside SVG on point hover */}
+
               <title>{`Date: ${p.date}\nRevenue: $${p.revenue.toFixed(2)}\nIntakes: ${p.jobs} jobs`}</title>
             </g>
           ))}
 
-          {/* Date labels on X-axis */}
+
           {revenuePoints.map((p, idx) => {
             const dateObj = new Date(p.date);
             const formattedDate = dateObj.toLocaleDateString("en-US", { month: "short", day: "numeric" });
@@ -166,7 +166,7 @@ export const RevenueTrendChart = ({ trend }: RevenueTrendChartProps) => {
         </svg>
       </div>
 
-      {/* Legend Indicator */}
+
       <div className="flex gap-4 justify-end mt-4 text-[11px] font-semibold text-slate-500 dark:text-zinc-400 pr-2">
         <span className="flex items-center gap-1.5">
           <span className="h-2.5 w-2.5 rounded-full bg-indigo-500" /> Revenue

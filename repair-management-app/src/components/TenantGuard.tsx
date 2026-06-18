@@ -18,7 +18,7 @@ const getSubdomain = () => {
   if (typeof window === "undefined") return null;
   const host = window.location.hostname;
   const hostParts = host.split(".");
-  
+
   if (hostParts.length > 2 && hostParts[0] !== "www" && hostParts[0] !== "api") {
     // If it is our root domain (e.g. atechlabs.it.com), it has 3 parts.
     // If it is a subdomain (e.g. tenant.atechlabs.it.com), it has 4 parts.
@@ -27,15 +27,16 @@ const getSubdomain = () => {
     }
     return hostParts[0].toLowerCase();
   }
-  
+
   if (hostParts.length === 2 && hostParts[1].toLowerCase() === "localhost") {
     return hostParts[0].toLowerCase();
   }
-  
+
   return null;
 };
 
 const TenantGuard: React.FC<TenantGuardProps> = ({ children }) => {
+  //can either be string or null
   const subdomain = getSubdomain();
   const { isLoading, isError, error } = useGetPublicTenant(!!subdomain);
 

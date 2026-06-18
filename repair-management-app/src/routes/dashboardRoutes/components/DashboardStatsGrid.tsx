@@ -8,7 +8,7 @@ interface DashboardStatsGridProps {
 export const DashboardStatsGrid = ({ stats }: DashboardStatsGridProps) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      {/* Active Repairs */}
+
       <div className="bg-gradient-to-br from-blue-500/5 to-indigo-500/5 dark:from-blue-500/10 dark:to-indigo-500/10 bg-white/40 dark:bg-zinc-900/30 backdrop-blur-md border border-slate-200/50 dark:border-zinc-800/80 shadow-sm rounded-3xl p-6 flex items-center justify-between group hover:border-blue-500/30 dark:hover:border-blue-500/30 transition-all duration-300">
         <div className="space-y-1">
           <p className="text-xs font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-widest pl-0.5">
@@ -28,7 +28,7 @@ export const DashboardStatsGrid = ({ stats }: DashboardStatsGridProps) => {
         </div>
       </div>
 
-      {/* Ready for Pickup */}
+
       <div className="bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-emerald-500/10 dark:to-teal-500/10 bg-white/40 dark:bg-zinc-900/30 backdrop-blur-md border border-slate-200/50 dark:border-zinc-800/80 shadow-sm rounded-3xl p-6 flex items-center justify-between group hover:border-emerald-500/30 dark:hover:border-emerald-500/30 transition-all duration-300">
         <div className="space-y-1">
           <p className="text-xs font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-widest pl-0.5">
@@ -43,7 +43,7 @@ export const DashboardStatsGrid = ({ stats }: DashboardStatsGridProps) => {
         </div>
       </div>
 
-      {/* Monthly Revenue */}
+
       <div className="bg-gradient-to-br from-indigo-500/5 to-purple-500/5 dark:from-indigo-500/10 dark:to-purple-500/10 bg-white/40 dark:bg-zinc-900/30 backdrop-blur-md border border-slate-200/50 dark:border-zinc-800/80 shadow-sm rounded-3xl p-6 flex items-center justify-between group hover:border-indigo-500/30 dark:hover:border-indigo-500/30 transition-all duration-300">
         <div className="space-y-1">
           <p className="text-xs font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-widest pl-0.5">
@@ -63,7 +63,7 @@ export const DashboardStatsGrid = ({ stats }: DashboardStatsGridProps) => {
         </div>
       </div>
 
-      {/* Low Stock Alerts */}
+
       <div className={`bg-white/40 dark:bg-zinc-900/30 backdrop-blur-md border shadow-sm rounded-3xl p-6 flex items-center justify-between group transition-all duration-300 ${stats.lowStockAlertsCount > 0
         ? "bg-gradient-to-br from-rose-500/5 to-red-500/5 dark:from-rose-500/10 dark:to-red-500/10 border-rose-500/30 dark:border-rose-500/30"
         : "border-slate-200/50 dark:border-zinc-800/80 hover:border-zinc-500/20"

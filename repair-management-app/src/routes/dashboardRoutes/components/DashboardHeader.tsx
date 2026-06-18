@@ -38,7 +38,6 @@ export const DashboardHeader = ({
       </div>
 
       <div className="flex items-center gap-3 w-full md:w-auto">
-        {/* Branch Selector for Tenant Admin */}
         {isTenantAdmin && branches && branches.length > 0 && (
           <div className="relative flex items-center shrink-0 min-w-[180px]">
             <Building2 className="absolute left-3.5 h-4.5 w-4.5 text-slate-400 dark:text-zinc-500 pointer-events-none" />
@@ -58,7 +57,7 @@ export const DashboardHeader = ({
           </div>
         )}
 
-        {/* Sync Button */}
+
         <button
           onClick={onRefresh}
           disabled={isLoading || isRefetching}
