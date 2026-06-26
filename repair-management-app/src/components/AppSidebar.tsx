@@ -10,7 +10,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, PlusCircle, Users, Wrench, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, PlusCircle, Users, Wrench, Settings, CircleUser, CirclePile, LogOut } from "lucide-react";
 
 import { NavLink, useNavigate } from "react-router-dom";
 import { logout } from "@/api/authApi";
@@ -23,8 +23,8 @@ const navItems = [
   { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
   { label: "Repair Jobs", to: "/repair-jobs", icon: Wrench },
   { label: "Customers", to: "/customers", icon: Users },
-  { label: "Inventory", to: "/inventory", icon: Wrench },
-  { label: "Users", to: "/users", icon: Users, adminOnly: true },
+  { label: "Inventory", to: "/inventory", icon: CirclePile },
+  { label: "Users", to: "/users", icon: CircleUser, adminOnly: true },
   { label: "Settings", to: "/settings", icon: Settings },
 ];
 
@@ -62,9 +62,9 @@ const AppSidebar = () => {
         {state === "expanded" ? (
           <div className="flex items-center gap-3">
             {tenant?.logoUrl ? (
-              <img 
-                src={tenant.logoUrl} 
-                alt="Logo" 
+              <img
+                src={tenant.logoUrl}
+                alt="Logo"
                 className="h-8 w-8 rounded-lg object-contain bg-white dark:bg-zinc-950 p-1 border border-sidebar-border shadow-xs"
               />
             ) : (
@@ -84,9 +84,9 @@ const AppSidebar = () => {
         ) : (
           <div className="flex justify-center">
             {tenant?.logoUrl ? (
-              <img 
-                src={tenant.logoUrl} 
-                alt="Logo" 
+              <img
+                src={tenant.logoUrl}
+                alt="Logo"
                 className="h-7 w-7 rounded-lg object-contain bg-white dark:bg-zinc-950 p-1 border border-sidebar-border shadow-xs"
               />
             ) : (
@@ -106,7 +106,7 @@ const AppSidebar = () => {
               <SidebarMenuItem key={item.to}>
                 <NavLink to={item.to}>
                   {({ isActive }) => (
-                    <SidebarMenuButton 
+                    <SidebarMenuButton
                       isActive={isActive}
                       className={isActive ? "bg-indigo-50/80 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 font-semibold" : ""}
                     >
@@ -124,7 +124,7 @@ const AppSidebar = () => {
       <SidebarFooter className="border-t border-sidebar-border p-2">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton 
+            <SidebarMenuButton
               onClick={handleLogout}
               className="text-slate-500 hover:text-red-650 hover:bg-red-50 dark:text-zinc-400 dark:hover:text-red-400 dark:hover:bg-red-950/20 transition-all font-medium cursor-pointer"
             >
